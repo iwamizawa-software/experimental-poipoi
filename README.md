@@ -11,3 +11,63 @@
 1. ChromeでTampermonkey ([Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ja), [Firefox](https://addons.mozilla.org/ja/firefox/addon/tampermonkey/))をインストール
 2. [experimental-poipoi-config](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi-config.user.js)をインストール
 3. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をインストール
+
+## 設定方法
+
+experimental-poipoi-configを編集する
+
+## 追加される機能
+
+### 入室時に配信を受信状態する
+
+- 初期値はONでOFFにできる
+
+### 名無しにナンバリングする
+
+- 名無しさん123のように数字をつける
+- 数字は別人であることを保証するものではなく、別人でも重複することがある
+- 初期値はONでOFFにできる
+
+### Enter1回で吹き出しを消す
+
+- 吹き出しを消すには2回Enterを押す必要があったが1回で消すようになる
+- 逆に吹き出しを残したいときは入力欄の横にある発言ボタンを使う
+- 初期値はONでOFFにできる
+
+### 呼出通知
+
+- ぽいぽいの設定で名前が呼ばれると呼出音がなる設定にしているときに、右下に通知も表示する
+- 初期値はONでOFFにできる
+- 通知をクリックすると自動で返信する　初期値は「ｎ」
+
+### 入退室通知
+
+- 入退室を通知する
+- 設定は常に通知、アクティブ時のみ通知、非アクティブ時のみ通知、通知しないの4通りあり、初期値はアクティブ時のみ通知
+
+### 入退室ログ
+
+- ログに入退室を記録する
+- 初期値はOFF
+
+### 自動あぼーん
+
+- 設定した名前の人が入ってきたら自動であぼーんする
+- 設定はexperimental-poipoi-configを編集する
+
+### Ctrl+Delキーでマップ上の吹き出しをすべて消す
+
+### 動画配信を新しいタブで開く
+
+- 動画をダブルクリックすると新しいタブで開く
+- 新しいタブのほうでダブルクリックすると全画面になる
+- 新しいタブをサブモニターに移動させてダブルクリックすることで、サブモニターで全画面に出来る
+
+### 新しいメッセージボタンの表示
+
+- ログをさかのぼると新しい発言が来ても下にスクロールされないので、それがわかるようにボタンを表示する
+
+### ログの名前を右クリックしてメニューを出す
+
+- 指定した人のログを右寄せ、相互あぼーん、右寄せの全解除、ログのクリアができる
+
