@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  1
+// @version  2
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -105,7 +105,7 @@ var inject = function inject() {
       tab.document.close();
     }
   });
-  // 新しいメッセージの表示ボタン
+  // 新しいメッセージボタン
   var chatLog, isAtBottom = () => (chatLog.scrollHeight - chatLog.clientHeight) - chatLog.scrollTop < 5;
   var newMessageButtonContainer = document.createElement('div');
   newMessageButtonContainer.id = 'login-page';
@@ -217,9 +217,15 @@ background-color: unset !important;
     }
   });
   // 呼び出し通知
+  var getCharacterPath = user => {
+    var name = user.characterId || (user.character && user.character.characterName);
+    return 'characters/' + name + '/front-standing.' + (vueApp.allCharacters.find(c=>c.characterName===name) || {format:'svg'}).format;
+  }
   var pngCache = {};
   var SVG2PNG = async function (url) {
     var callback;
+    if (url.slice(-3) === 'png')
+      return {then:c=>c(url)};
     if (pngCache[url])
       return {then:c=>c(pngCache[url])};
     try {
@@ -247,16 +253,14 @@ background-color: unset !important;
       vueApp.mentionSoundFunction &&
       vueApp.mentionSoundFunction(msg)
     ) {
-      var character = user.character;
-      var icon = 'characters/' + character.characterName + '/front-standing.' + character.format;
       mention = new Notification(user.name, {
         // ChromeはNotification.iconにSVGを指定できない
-        icon: character.format === 'svg' ? await SVG2PNG(icon) : icon,
+        icon: await SVG2PNG(getCharacterPath(user)),
         tag: 'mention',
         body: msg,
         requireInteraction: true
       });
-      mention.onclick = function (event) {
+      mention.onclick = function () {
         if (experimentalConfig.replyMsg) {
           vueApp.socket.emit('user-msg', experimentalConfig.replyMsg);
           vueApp.socket.emit('user-msg', '');
@@ -270,25 +274,45 @@ background-color: unset !important;
     if (mention)
       mention.close();
   });
+  // 入退室通知
+  var accessNotification = async function (user, msg) {
+    var notifyAccess = experimentalConfig.notifyAccess;
+    if (
+      (((notifyAccess & 1) && document.hasFocus()) || ((notifyAccess & 2) && !document.hasFocus())) &&
+      !vueApp.ignoredUserIds.has(user.id)
+    ) {
+      (new Notification(user.name, {
+        // ChromeはNotification.iconにSVGを指定できない
+        icon: await SVG2PNG(getCharacterPath(user)),
+        tag: 'access',
+        body: msg
+      })).onclick = function (event) {
+        this.close();
+        event.preventDefault();
+      };
+    }
+  };
   // socket event
   var socketEvent = function (eventName) {
     switch (eventName) {
       // 入退室ログ
       case 'server-user-joined-room':
-        if (!experimentalConfig.accessLog)
-          break;
         setTimeout(() => {
           var user = arguments[1];
-          if (user && user.id !== vueApp.myUserID)
+          if (!user || user.id === vueApp.myUserID)
+            return;
+          if (experimentalConfig.accessLog)
             vueApp.writeMessageToLog('SYSTEM',  user.name + text('が入室', ' has joined the room'), null);
+          accessNotification(user, text('入室', 'join'));
         }, 0);
         break;
       case 'server-user-left-room':
-        if (!experimentalConfig.accessLog)
-          break;
         var user = vueApp.users[arguments[1]];
-        if (user && user.id !== vueApp.myUserID)
+        if (!user || user.id === vueApp.myUserID)
+          return;
+        if (experimentalConfig.accessLog)
           vueApp.writeMessageToLog('SYSTEM', user.name + text('が退室', ' has left the room'), null);
+        accessNotification(user, text('退室', 'leave'));
         break;
       case 'server-msg':
         // 呼び出し通知
@@ -302,6 +326,8 @@ background-color: unset !important;
     socket.prependAny(socketEvent);
     return socket;
   };
+  if (vueApp.socket)
+    vueApp.socket.prependAny(socketEvent);
 };
 
 var script = document.createElement('script');

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi-config
-// @version  1
+// @version  2
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -20,8 +20,10 @@ script.textContent = '(' + function () {
     notifyMention: 1,
     // 呼出通知をクリックしたときに返信する言葉 返信しない→''
     replyMsg: 'ｎ',
+    // 入退室を通知　常に通知→3 非アクティブ時に通知→2 アクティブ時に通知→1 通知しない→0
+    notifyAccess: 1,
     // 入退室をログに出す→1 出さない→0
-    accessLog: 1,
+    accessLog: 0,
     // 自動相互あぼーん　誰もあぼーんしない→''
     // 名前を'で囲んでカンマ区切り　例：令和と◆SENVEYuLkwが含まれる名前をあぼーん→'令和,◆SENVEYuLkw'
     // RegExpオブジェクトも指定可
