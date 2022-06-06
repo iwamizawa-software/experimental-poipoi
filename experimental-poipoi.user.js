@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  2
+// @version  3
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -206,7 +206,7 @@ background-color: unset !important;
 <option value="moveLog">${rightUsers[selectedUserId] ? text('左寄せ', 'Align left') : text('右寄せ', 'Align right')}
 <option value="block">${text('相互あぼーん', 'Block')}
 <option disabled>-
-<option value="resetSplit">${text('ログ分割全解除', 'Reset splitted log')}
+<option value="resetSplit">${text('右寄せ全解除', 'Align left all')}
 <option value="clearLog">${text('ログをクリア', 'Clear log')}
 `;
       logMenu.options[0].text = (vueApp.users[selectedUserId] || {name: event.target.textContent}).name;
