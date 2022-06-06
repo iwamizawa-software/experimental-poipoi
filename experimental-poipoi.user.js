@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  3
+// @version  4
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -267,6 +267,7 @@ background-color: unset !important;
         }
         // Chromeはクリック時既定の動作がない
         focus();
+        document.getElementById('input-textbox').focus();
       };
     }
   };
