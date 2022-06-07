@@ -22,11 +22,15 @@ experimental-poipoi-configを編集する
 
 - 初期値はONでOFFにできる
 
+![wantToTakeStream](https://user-images.githubusercontent.com/65465755/172407720-f05b7d17-7215-4d43-bb12-c53684cfbd38.png)
+
 ### 名無しにナンバリングする
 
 - 名無しさん123のように数字をつける
 - 数字は別人であることを保証するものではなく、別人でも重複することがある
 - 初期値はONでOFFにできる
+
+![numbering](https://user-images.githubusercontent.com/65465755/172407813-83352ee1-a91f-4e0c-a8b9-a7fbfcbc8214.png)
 
 ### Enter1回で吹き出しを消す
 
@@ -40,10 +44,14 @@ experimental-poipoi-configを編集する
 - 初期値はONでOFFにできる
 - 通知をクリックすると自動で返信する　初期値は「ｎ」
 
+![mention](https://user-images.githubusercontent.com/65465755/172417648-14007904-a41e-4dda-92cb-feca530b7dee.png)
+
 ### 入退室通知
 
 - 入退室を通知する
 - 設定は常に通知、アクティブ時のみ通知、非アクティブ時のみ通知、通知しないの4通りあり、初期値はアクティブ時のみ通知
+
+![joined](https://user-images.githubusercontent.com/65465755/172408282-780133f3-fd0f-496a-965a-b50f76d66b47.png)
 
 ### 入退室ログ
 
@@ -54,6 +62,8 @@ experimental-poipoi-configを編集する
 
 - 設定した名前の人が入ってきたら自動であぼーんする
 - 設定はexperimental-poipoi-configを編集する
+
+![autoblock](https://user-images.githubusercontent.com/65465755/172408369-ded6854d-8e7b-4966-aeec-5f9ad2d14f41.png)
 
 ### Ctrl+Delキーでマップ上の吹き出しをすべて消す
 
@@ -67,7 +77,11 @@ experimental-poipoi-configを編集する
 
 - ログをさかのぼると新しい発言が来ても下にスクロールされないので、それがわかるようにボタンを表示する
 
+![new message](https://user-images.githubusercontent.com/65465755/172408811-8aea617b-5695-4d5e-8765-f1f651444a68.png)
+
 ### ログの名前を右クリックしてメニューを出す
 
 - 指定した人のログを右寄せ、相互あぼーん、右寄せの全解除、ログのクリアができる
+
+![contextmenu](https://user-images.githubusercontent.com/65465755/172408890-942fddbd-20db-4eef-b999-d1d8865d9751.png)
 
