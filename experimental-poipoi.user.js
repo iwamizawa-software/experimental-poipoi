@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  5
+// @version  6
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -60,6 +60,62 @@ var inject = function inject() {
       vueApp.resetBubbleImages();
     }
   });
+  // 動画配信を新しいタブで開く
+  if (!vueApp.moveVideoToNewTab) {
+    var getElementById = document.getElementById;
+    var getStreamTitle = video => ((document.getElementById(video.dataset.containerId) || 0).previousElementSibling || 0).innerText || 'Stream Tab';
+    var videoElements = {};
+    document.getElementById = id => {
+      var element = getElementById.call(document, id);
+      if (element)
+        return element;
+      var video = videoElements[id];
+      if (video) {
+        video.ownerDocument.title = getStreamTitle(video);
+        return video;
+      }
+      return null;
+    };
+    document.addEventListener('dblclick', event => {
+      if (/video/i.test(event.target.tagName)) {
+        if (!document.contains(event.target)) {
+          video.requestFullscreen();
+          return;
+        }
+        var video = event.target;
+        var before = video.previousElementSibling;
+        video.dataset.containerId = video.parentNode.id;
+        video.onpause = video.play.bind(video);
+        var tab = open('about:blank');
+        if (!tab) {
+          alert(text('ポップアップを許可してください', 'Allow to popup'));
+          return;
+        }
+        tab.document.open();
+        tab.document.write('<!doctype html>\n<title>Stream Tab</title><style>*{margin:0;padding:0;border:0;width:100%;height:100%}</style>');
+        tab.onload = () => {
+          tab.document.title = getStreamTitle(video);
+          tab.document.body.appendChild(videoElements[video.id] = video);
+          tab.document.body.onclick = () => {
+            p.remove();
+            video.play();
+          };
+          tab.document.body.ondblclick = video.requestFullscreen.bind(video);
+          var p = document.createElement('p');
+          if (video.paused) {
+            video.onplay = p.remove.bind(p);
+            p.setAttribute('style', 'position:absolute;top:0;text-align:center;font-size:48px');
+            p.textContent = text('クリックで再生します', 'Click to play');
+            tab.document.body.appendChild(p);
+          }
+        }
+        tab.onbeforeunload = () => {
+          before.after(video);
+        };
+        tab.document.close();
+      }
+    });
+  }
   // 新しいメッセージボタン
   var chatLog, isAtBottom = () => (chatLog.scrollHeight - chatLog.clientHeight) - chatLog.scrollTop < 5;
   var newMessageButtonContainer = document.createElement('div');

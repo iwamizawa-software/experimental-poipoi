@@ -21,6 +21,7 @@ experimental-poipoi-configを編集する
 ### 入室時に配信を受信状態する
 
 - 初期値はONでOFFにできる
+- 公式採用される予定
 
 ![wantToTakeStream](https://user-images.githubusercontent.com/65465755/172407720-f05b7d17-7215-4d43-bb12-c53684cfbd38.png)
 
@@ -72,11 +73,12 @@ experimental-poipoi-configを編集する
 - 動画をダブルクリックすると新しいタブで開く
 - 新しいタブのほうでダブルクリックすると全画面になる
 - 新しいタブをサブモニターに移動させてダブルクリックすることで、サブモニターで全画面に出来る
-- 公式採用されたので削除
+- 公式採用される予定
 
 ### 新しいメッセージボタンの表示
 
 - ログをさかのぼると新しい発言が来ても下にスクロールされないので、それがわかるようにボタンを表示する
+- 公式採用される予定
 
 ![new message](https://user-images.githubusercontent.com/65465755/172408811-8aea617b-5695-4d5e-8765-f1f651444a68.png)
 
