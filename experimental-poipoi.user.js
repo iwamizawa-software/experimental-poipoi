@@ -70,7 +70,6 @@ var inject = function inject() {
     chatLog.scrollTop = chatLog.scrollHeight - chatLog.clientHeight;
   };
   newMessageButton.style.pointerEvents = 'auto';
-  newMessageButton.textContent = text('↓ 新しいメッセージ', '↓ New Messages');
   var writeMessageToLog = vueApp.writeMessageToLog;
   vueApp.writeMessageToLog = function (userName, msg, userId) {
     if (!chatLog) {
@@ -81,6 +80,7 @@ var inject = function inject() {
       });
     }
     if (!chatLog.parentNode.contains(newMessageButtonContainer)) {
+      newMessageButton.textContent = text('↓ 新しいメッセージ', '↓ New Messages');
       newMessageButtonContainer.style.display = 'none';
       chatLog.parentNode.appendChild(newMessageButtonContainer);
     }
