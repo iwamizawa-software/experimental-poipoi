@@ -91,13 +91,14 @@ experimental-poipoi-configを編集する
 ### 音声入力
 
 - 音声にチェックを入れている間音声入力が出来る
-- 配信と同時に使えるので配信を聞いてない人にもメッセージを送れる
+- 配信と同時に使えるので配信を聞いてない人にもメッセージを送れる（かもしれない、音声認識が実用レベルか不明）
 
 ![voice input](https://user-images.githubusercontent.com/65465755/173175478-65838885-05d2-4463-bab4-1581b9d67b0c.png)
 
 ### ログ窓
 
 - ログを新しいウィンドウで開く
+- [最前面でポーズ](https://www.vector.co.jp/soft/winnt/util/se468861.html)等の指定ウィンドウを最前面にするツールと組み合わせて使うと作業しながらチャットしやすいと思う
 
 ![log window](https://user-images.githubusercontent.com/65465755/173202134-20a23428-daf5-498f-9d1a-ccf106c504e6.png)
 
