@@ -14,7 +14,9 @@
 
 ## 設定方法
 
-experimental-poipoi-configを編集する
+![experimental-poipoi-configを編集する](https://user-images.githubusercontent.com/65465755/173208412-bea3d38d-2186-4e03-b319-3645ddb5c038.png) 
+
+![通知の許可](https://user-images.githubusercontent.com/65465755/173208424-25fd394f-1a64-42d9-9d90-ccbe50d03acb.png)
 
 ## 追加される機能
 
