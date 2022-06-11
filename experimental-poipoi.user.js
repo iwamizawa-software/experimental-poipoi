@@ -204,13 +204,13 @@ background-color: unset !important;
     }
     // ログ窓
     var logWindow;
-    var writeLogToWindow = function (text) {
+    var writeLogToWindow = function (text, forceScroll) {
       if (!logWindow || logWindow.closed)
         return;
       var log = logWindow.document.body.firstElementChild;
       var bottom = (log.scrollHeight - log.clientHeight) - log.scrollTop < 5;
       log.value += ('' + text).replace(/(^|\n)\[[\d\-\s:]+\]\s/g, '$1') + '\n';
-      if (bottom)
+      if (forceScroll || bottom)
         log.scrollTop = log.scrollHeight - log.clientHeight;
     };
     HTMLDivElement.prototype.appendChild = function (aChild) {
@@ -248,7 +248,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
 <textarea readonly></textarea><input type="text">
 `);
       logWindow.onload = function () {
-        writeLogToWindow(document.getElementById('chatLog').innerText);
+        writeLogToWindow(document.getElementById('chatLog').innerText, true);
         logWindow.document.body.lastElementChild.onkeypress = function (event) {
           if (this.value && event.key === 'Enter') {
             sendMessage(this.value);
