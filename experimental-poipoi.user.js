@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  7
+// @version  8
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -171,6 +171,33 @@ background-color: unset !important;
       event.preventDefault();
     }
   });
+  // 音声入力
+  var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
+  var textbox = document.getElementById('input-textbox');
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    textbox.parentNode.insertBefore(document.createElement('span'), textbox).innerHTML = '<br><label><input type="checkbox" id="enableSpeech">' + text('音声', 'Voice') + '</label>';
+    textbox.previousSibling.firstChild.before(textbox.parentNode.firstChild);
+    var enableSpeech = document.getElementById('enableSpeech');
+    enableSpeech.onclick = function () {
+      recognition.locale = vueApp._i18n.locale;
+      recognition[enableSpeech.checked ? 'start' : 'stop']();
+    };
+    var recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.onresult = function (event) {
+      var result = [];
+      for (var i = event.resultIndex; i < event.results.length; i++)
+        if (event.results[i].isFinal)
+          result.push(event.results[i][0].transcript);
+      vueApp.socket.emit('user-msg', text('音声入力:', 'Voice input:') + result.join(' '));
+      vueApp.socket.emit('user-msg', '');
+    };
+    recognition.onend = function () {
+      if (enableSpeech.checked)
+        recognition.start();
+    };
+  }
   // 呼び出し通知
   var getCharacterPath = user => {
     var name = user.characterId || (user.character && user.character.characterName);

@@ -88,3 +88,8 @@ experimental-poipoi-configを編集する
 
 ![contextmenu](https://user-images.githubusercontent.com/65465755/172408890-942fddbd-20db-4eef-b999-d1d8865d9751.png)
 
+### 音声入力
+
+- 音声にチェックを入れている間音声入力が出来る
+- 配信と同時に使えるので配信を聞いてない人にもメッセージを送れる
+
