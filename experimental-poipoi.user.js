@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  8
+// @version  9
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -172,31 +172,40 @@ background-color: unset !important;
     }
   });
   // 音声入力
-  var textbox = document.getElementById('input-textbox');
-  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (SpeechRecognition) {
-    textbox.parentNode.insertBefore(document.createElement('span'), textbox).innerHTML = '<br><label><input type="checkbox" id="enableSpeech">' + text('音声', 'Voice') + '</label>';
-    textbox.previousSibling.firstChild.before(textbox.parentNode.firstChild);
-    var enableSpeech = document.getElementById('enableSpeech');
-    enableSpeech.onclick = function () {
-      recognition.locale = vueApp._i18n.locale;
-      recognition[enableSpeech.checked ? 'start' : 'stop']();
-    };
-    var recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.onresult = function (event) {
-      var result = [];
-      for (var i = event.resultIndex; i < event.results.length; i++)
-        if (event.results[i].isFinal)
-          result.push(event.results[i][0].transcript);
-      vueApp.socket.emit('user-msg', text('音声入力:', 'Voice input:') + result.join(' '));
-      vueApp.socket.emit('user-msg', '');
-    };
-    recognition.onend = function () {
-      if (enableSpeech.checked)
-        recognition.start();
-    };
-  }
+  var connectToServer = vueApp.connectToServer;
+  vueApp.connectToServer = async function () {
+    var r = await connectToServer.apply(this, arguments);
+    try {
+      var textbox = document.getElementById('input-textbox');
+      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        textbox.parentNode.insertBefore(document.createElement('span'), textbox).innerHTML = '<br><label><input type="checkbox" id="enableSpeech">' + text('音声', 'Voice') + '</label>';
+        textbox.previousSibling.firstChild.before(textbox.parentNode.firstChild);
+        var enableSpeech = document.getElementById('enableSpeech');
+        enableSpeech.onclick = function () {
+          recognition.locale = vueApp._i18n.locale;
+          recognition[enableSpeech.checked ? 'start' : 'stop']();
+        };
+        var recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.onresult = function (event) {
+          var result = [];
+          for (var i = event.resultIndex; i < event.results.length; i++)
+            if (event.results[i].isFinal)
+              result.push(event.results[i][0].transcript);
+          vueApp.socket.emit('user-msg', text('音声入力:', 'Voice input:') + result.join(' '));
+          vueApp.socket.emit('user-msg', '');
+        };
+        recognition.onend = function () {
+          if (enableSpeech.checked)
+            recognition.start();
+        };
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    return r;
+  };
   // 呼び出し通知
   var getCharacterPath = user => {
     var name = user.characterId || (user.character && user.character.characterName);
