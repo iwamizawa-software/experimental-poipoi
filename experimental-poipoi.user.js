@@ -172,7 +172,6 @@ background-color: unset !important;
     }
   });
   // 音声入力
-  var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
   var textbox = document.getElementById('input-textbox');
   var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (SpeechRecognition) {
