@@ -99,4 +99,5 @@ experimental-poipoi-configを編集する
 
 - ログを新しいウィンドウで開く
 
+![log window](https://user-images.githubusercontent.com/65465755/173202134-20a23428-daf5-498f-9d1a-ccf106c504e6.png)
 
