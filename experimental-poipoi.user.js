@@ -111,7 +111,7 @@ width: 50%;
 background-color: unset !important;
 }
 `;
-    else 
+    else
       splittedLogStyle.textContent = '';
     setTimeout(() => document.getElementById('chatLog').scrollTop = y, 0);
   };
@@ -215,9 +215,9 @@ background-color: unset !important;
   var SVG2PNG = async function (url) {
     var callback;
     if (url.slice(-3) === 'png')
-      return {then:c=>c(url)};
+      return url;
     if (pngCache[url])
-      return {then:c=>c(pngCache[url])};
+      return pngCache[url];
     try {
       var canvas = document.createElement('canvas');
       var ctx = canvas.getContext('2d');
@@ -230,7 +230,7 @@ background-color: unset !important;
       };
       img.src = 'data:image/svg+xml,' + encodeURIComponent(await (await fetch(url)).text());
     } catch (err) {
-      return {then:c=>c(url)};
+      return url;
     }
     return {then:c=>callback=c};
   };
