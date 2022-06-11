@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  9
+// @version  10
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -20,6 +20,10 @@ var inject = function inject() {
   });
   var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
   var systemMessage = msg => vueApp.writeMessageToLog('SYSTEM', msg, null);
+  var sendMessage = function (msg) {
+    vueApp.socket.emit('user-msg', msg);
+    vueApp.socket.emit('user-msg', '');
+  };
   // デフォルトで受信状態にする
   var updateRoomState = vueApp.updateRoomState;
   vueApp.updateRoomState = async function (dto) {
@@ -171,41 +175,104 @@ background-color: unset !important;
       event.preventDefault();
     }
   });
-  // 音声入力
-  var connectToServer = vueApp.connectToServer;
-  vueApp.connectToServer = async function () {
-    var r = await connectToServer.apply(this, arguments);
-    try {
-      var textbox = document.getElementById('input-textbox');
-      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        textbox.parentNode.insertBefore(document.createElement('span'), textbox).innerHTML = '<br><label><input type="checkbox" id="enableSpeech">' + text('音声', 'Voice') + '</label>';
-        textbox.previousSibling.firstChild.before(textbox.parentNode.firstChild);
-        var enableSpeech = document.getElementById('enableSpeech');
-        enableSpeech.onclick = function () {
-          recognition.locale = vueApp._i18n.locale;
-          recognition[enableSpeech.checked ? 'start' : 'stop']();
-        };
-        var recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.onresult = function (event) {
-          var result = [];
-          for (var i = event.resultIndex; i < event.results.length; i++)
-            if (event.results[i].isFinal)
-              result.push(event.results[i][0].transcript);
-          vueApp.socket.emit('user-msg', text('音声入力:', 'Voice input:') + result.join(' '));
-          vueApp.socket.emit('user-msg', '');
-        };
-        recognition.onend = function () {
-          if (enableSpeech.checked)
-            recognition.start();
-        };
-      }
-    } catch (err) {
-      console.log(err);
+  // ログイン時
+  var onlogin = function () {
+    // 音声入力
+    var textbox = document.getElementById('input-textbox');
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      textbox.parentNode.insertBefore(document.createElement('span'), textbox).innerHTML = '<br><label><input type="checkbox" id="enableSpeech">' + text('音声', 'Voice') + '</label>';
+      textbox.previousSibling.firstChild.before(textbox.parentNode.firstChild);
+      var enableSpeech = document.getElementById('enableSpeech');
+      enableSpeech.onclick = function () {
+        recognition.locale = vueApp._i18n.locale;
+        recognition[enableSpeech.checked ? 'start' : 'stop']();
+      };
+      var recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.onresult = function (event) {
+        var result = [];
+        for (var i = event.resultIndex; i < event.results.length; i++)
+          if (event.results[i].isFinal)
+            result.push(event.results[i][0].transcript);
+        sendMessage(text('音声入力:', 'Voice input:') + result.join(' '));
+      };
+      recognition.onend = function () {
+        if (enableSpeech.checked)
+          recognition.start();
+      };
     }
-    return r;
+    // ログ窓
+    var logWindow;
+    var writeLogToWindow = function (text) {
+      if (!logWindow || logWindow.closed)
+        return;
+      var log = logWindow.document.body.firstElementChild;
+      var bottom = (log.scrollHeight - log.clientHeight) - log.scrollTop < 5;
+      log.value += ('' + text).replace(/(^|\n)\[[\d\-\s:]+\]\s/g, '$1') + '\n';
+      if (bottom)
+        log.scrollTop = log.scrollHeight - log.clientHeight;
+    };
+    HTMLDivElement.prototype.appendChild = function (aChild) {
+      if (this.id === 'chatLog') {
+        try {
+          if (!aChild.classList.contains('ignored-message'))
+            writeLogToWindow(aChild.innerText);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      return Node.prototype.appendChild.call(this, aChild);
+    };
+    var logWindowButton = document.createElement('input');
+    logWindowButton.type = 'button';
+    logWindowButton.value = text('ログ窓', 'Log Window');
+    logWindowButton.onclick = function () {
+      if (logWindow && !logWindow.closed) {
+        logWindow.focus();
+        return;
+      }
+      logWindow = open('about:blank', 'log', 'width=300,height=500,menubar=no,toolbar=no,location=no');
+      if (!logWindow) {
+        vueApp.showWarningToast(text('ポップアップを許可してください', 'Allow to popup'));
+        return;
+      }
+      logWindow.document.write(`
+<!doctype html>
+<title>${text('ギコっぽいぽいログ', 'Gikopoipoi Log')}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;width:100%;height:100%;resize:none}
+textarea{height:calc(100% - 3em);padding:2px;font-size:12px}
+input{display:block;position:fixed;bottom:0;height:2em}
+</style>
+<textarea readonly></textarea><input type="text">
+`);
+      logWindow.onload = function () {
+        writeLogToWindow(document.getElementById('chatLog').innerText);
+        logWindow.document.body.lastElementChild.onkeypress = function (event) {
+          if (this.value && event.key === 'Enter') {
+            sendMessage(this.value);
+            this.value = '';
+          }
+        };
+      };
+      logWindow.onfocus = function () {
+        logWindow.document.body.lastElementChild.focus();
+      };
+      logWindow.document.close();
+    };
+    document.getElementById('chatLog').before(logWindowButton);
   };
+  if (document.getElementById('input-textbox')) {
+    onlogin();
+  } else {
+    var connectToServer = vueApp.connectToServer;
+    vueApp.connectToServer = async function () {
+      var r = await connectToServer.apply(this, arguments);
+      onlogin();
+      return r;
+    };
+  }
   // 呼び出し通知
   var getCharacterPath = user => {
     var name = user.characterId || (user.character && user.character.characterName);
@@ -251,10 +318,8 @@ background-color: unset !important;
         requireInteraction: true
       });
       mention.onclick = function () {
-        if (experimentalConfig.replyMsg) {
-          vueApp.socket.emit('user-msg', experimentalConfig.replyMsg);
-          vueApp.socket.emit('user-msg', '');
-        }
+        if (experimentalConfig.replyMsg)
+          sendMessage(experimentalConfig.replyMsg);
         // Chromeはクリック時既定の動作がない
         focus();
         document.getElementById('input-textbox').focus();
