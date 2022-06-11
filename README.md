@@ -93,3 +93,5 @@ experimental-poipoi-configを編集する
 - 音声にチェックを入れている間音声入力が出来る
 - 配信と同時に使えるので配信を聞いてない人にもメッセージを送れる
 
+![image](https://user-images.githubusercontent.com/65465755/173175478-65838885-05d2-4463-bab4-1581b9d67b0c.png)
+
