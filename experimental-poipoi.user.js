@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  11
+// @version  12
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -179,10 +179,11 @@ background-color: unset !important;
   var getUserListForListPopup = vueApp.getUserListForListPopup;
   vueApp.getUserListForListPopup = function () {
     var output = getUserListForListPopup.apply(this, arguments);
-    output.forEach(u => {
-      if (u.isInRoom)
-        u.name = u.name.replace(/(◆.+)?$/, '◇' + btoa(u.id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6) + '$1')
-    });
+    if (experimentalConfig.numbering === 2)
+      output.forEach(u => {
+        if (u.isInRoom)
+          u.name = u.name.replace(/(◆.+)?$/, '◇' + btoa(u.id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6) + '$1')
+      });
     return output;
   };
   // ログ追加時
