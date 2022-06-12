@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  10
+// @version  11
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -39,7 +39,7 @@ var inject = function inject() {
     // 名無しナンバリング
     if (experimentalConfig.numbering && typeof userDTO.id === 'string') {
       userDTO.name = vueApp.toDisplayName(userDTO.name);
-      if (userDTO.name === vueApp.toDisplayName(''))
+      if (experimentalConfig.numbering === 1 && userDTO.name === vueApp.toDisplayName(''))
         userDTO.name += parseInt(userDTO.id.slice(-3), 16);
     }
     // 自動あぼーん
@@ -175,6 +175,33 @@ background-color: unset !important;
       event.preventDefault();
     }
   });
+  // ユーザーリスト表示時
+  var getUserListForListPopup = vueApp.getUserListForListPopup;
+  vueApp.getUserListForListPopup = function () {
+    var output = getUserListForListPopup.apply(this, arguments);
+    output.forEach(u => {
+      if (u.isInRoom)
+        u.name = u.name.replace(/(◆.+)?$/, '◇' + btoa(u.id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6) + '$1')
+    });
+    return output;
+  };
+  // ログ追加時
+  var writeLogToWindow;
+  HTMLDivElement.prototype.appendChild = function (aChild) {
+    if (this.id === 'chatLog') {
+      try {
+        // 白トリップ表示
+        if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
+          aChild.querySelector('.message-author').innerHTML += '◇' + btoa(aChild.dataset.userId.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
+        // ログ窓に書き出し
+        if (writeLogToWindow && !aChild.classList.contains('ignored-message'))
+          writeLogToWindow(aChild.innerText);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    return Node.prototype.appendChild.call(this, aChild);
+  };
   // ログイン時
   var onlogin = function () {
     // 音声入力
@@ -204,7 +231,7 @@ background-color: unset !important;
     }
     // ログ窓
     var logWindow;
-    var writeLogToWindow = function (text, forceScroll) {
+    writeLogToWindow = function (text, forceScroll) {
       if (!logWindow || logWindow.closed)
         return;
       var log = logWindow.document.body.firstElementChild;
@@ -212,17 +239,6 @@ background-color: unset !important;
       log.value += ('' + text).replace(/(^|\n)\[[\d\-\s:]+\]\s/g, '$1') + '\n';
       if (forceScroll || bottom)
         log.scrollTop = log.scrollHeight - log.clientHeight;
-    };
-    HTMLDivElement.prototype.appendChild = function (aChild) {
-      if (this.id === 'chatLog') {
-        try {
-          if (!aChild.classList.contains('ignored-message'))
-            writeLogToWindow(aChild.innerText);
-        } catch (err) {
-          console.log(err);
-        }
-      }
-      return Node.prototype.appendChild.call(this, aChild);
     };
     var logWindowButton = document.createElement('input');
     logWindowButton.type = 'button';

@@ -12,7 +12,7 @@ script.textContent = '(' + function () {
   window.experimentalConfig = {
     // 入室してすぐ配信を受信する→1 しない→0
     takeStreamImmediately : 1,
-    // 名無しに番号を振る→1 振らない→0
+    // 名無しに番号を振る→1 振らない→0 全員に白トリップを付ける→2
     numbering : 1,
     // Enter1回で吹き出しも消す→1 消さない→0
     clearBubble: 1,

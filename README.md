@@ -35,6 +35,12 @@
 
 ![numbering](https://user-images.githubusercontent.com/65465755/172407813-83352ee1-a91f-4e0c-a8b9-a7fbfcbc8214.png)
 
+### 疑似的な白トリップを付ける
+
+- 名無しさん◇qaqEJAのように識別用トリップをつける
+- ログインするたびに変わるランダムな値のため、個人の特定には使用できない
+- 初期値はOFFでONにできる（numbering : 2にする）
+
 ### Enter1回で吹き出しを消す
 
 - 吹き出しを消すには2回Enterを押す必要があったが1回で消すようになる
