@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  12
+// @version  13
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/
@@ -259,7 +259,7 @@ background-color: unset !important;
 <title>${text('ギコっぽいぽいログ', 'Gikopoipoi Log')}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;width:100%;height:100%;resize:none}
-textarea{height:calc(100% - 3em);padding:2px;font-size:12px}
+textarea{height:calc(100% - 3em);padding:2px;font-size:12px;line-height:1.5}
 input{display:block;position:fixed;bottom:0;height:2em}
 </style>
 <textarea readonly></textarea><input type="text">
