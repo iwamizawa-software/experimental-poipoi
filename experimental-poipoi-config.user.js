@@ -3,7 +3,7 @@
 // @version  2
 // @grant    none
 // @run-at   document-end
-// @match    https://gikopoipoi.net/
+// @match    https://gikopoipoi.net/*
 // ==/UserScript==
 
 var script = document.createElement('script');
