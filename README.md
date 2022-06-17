@@ -114,4 +114,5 @@
 
 - 部屋のURLから入ると初期部屋がそこになる
 
+![enkai url](https://user-images.githubusercontent.com/65465755/174309502-16605aaa-8831-4b6c-ba54-470564bea937.png)
 
