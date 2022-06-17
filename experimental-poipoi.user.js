@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  13
+// @version  14
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -24,13 +24,16 @@ var inject = function inject() {
     vueApp.socket.emit('user-msg', msg);
     vueApp.socket.emit('user-msg', '');
   };
-  // デフォルトで受信状態にする
+  // 入室時
   var updateRoomState = vueApp.updateRoomState;
   vueApp.updateRoomState = async function (dto) {
     var r = await updateRoomState.call(this, dto);
+    // デフォルトで受信状態にする
     if (experimentalConfig.takeStreamImmediately)
       for (var i = 0; i < dto.streams.length; i++)
         vueApp.wantToTakeStream(i);
+    // アドレスバーを現在の部屋のURLに書き換え
+    history.replaceState(null, '', '/?areaid=' + vueApp.areaId + '&roomid=' + dto.currentRoom.id);
     return r;
   };
   // ユーザー追加時

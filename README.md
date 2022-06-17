@@ -110,3 +110,8 @@
 
 ![log window](https://user-images.githubusercontent.com/65465755/173202134-20a23428-daf5-498f-9d1a-ccf106c504e6.png)
 
+### アドレスバーを現在の部屋のURLに書き換え
+
+- 部屋のURLから入ると初期部屋がそこになる
+
+
