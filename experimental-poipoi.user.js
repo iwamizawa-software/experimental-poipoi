@@ -235,14 +235,16 @@ background-color: unset !important;
     }
     // ログ窓
     var logWindow;
-    writeLogToWindow = function (text, forceScroll) {
+    writeLogToWindow = function (line, forceScroll) {
       if (!logWindow || logWindow.closed)
         return;
       var log = logWindow.document.body.firstElementChild;
       var bottom = (log.scrollHeight - log.clientHeight) - log.scrollTop < 5;
-      log.value += ('' + text).replace(/(^|\n)\[[\d\-\s:]+\]\s/g, '$1') + '\n';
+      log.value += ('' + line).replace(/(^|\n)\[[\d\-\s:]+\]\s/g, '$1') + '\n';
       if (forceScroll || bottom)
         log.scrollTop = log.scrollHeight - log.clientHeight;
+      else
+        logWindow.document.title = text('↓ 新しいメッセージ', '↓ New Messages');
     };
     var logWindowButton = document.createElement('input');
     logWindowButton.type = 'button';
@@ -268,13 +270,18 @@ input{display:block;position:fixed;bottom:0;height:2em}
 <textarea readonly></textarea><input type="text">
 `);
       logWindow.onload = function () {
-        writeLogToWindow(document.getElementById('chatLog').innerText, true);
+        var log = logWindow.document.body.firstElementChild;
+        logWindow.onresize = log.onscroll = function () {
+          if ((log.scrollHeight - log.clientHeight) - log.scrollTop < 5)
+            logWindow.document.title = text('ギコっぽいぽいログ', 'Gikopoipoi Log');
+        };
         logWindow.document.body.lastElementChild.onkeypress = function (event) {
           if (this.value && event.key === 'Enter') {
             sendMessage(this.value);
             this.value = '';
           }
         };
+        writeLogToWindow(document.getElementById('chatLog').innerText, true);
       };
       logWindow.onfocus = function () {
         logWindow.document.body.lastElementChild.focus();
