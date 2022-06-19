@@ -116,3 +116,5 @@
 
 ![enkai url](https://user-images.githubusercontent.com/65465755/174309502-16605aaa-8831-4b6c-ba54-470564bea937.png)
 
+### ログがたまってる状態で名前選択して赤くしても重くならない
+
