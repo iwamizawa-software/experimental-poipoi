@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     experimental-poipoi
-// @version  14
+// @version  15
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -23,6 +23,12 @@ var inject = function inject() {
   var sendMessage = function (msg) {
     vueApp.socket.emit('user-msg', msg);
     vueApp.socket.emit('user-msg', '');
+  };
+  var createButtonContainer = function () {
+    var fakePopup = document.createElement('div');
+    fakePopup.className = 'popup';
+    fakePopup.style.all = 'unset';
+    return fakePopup;
   };
   // 入室時
   var updateRoomState = vueApp.updateRoomState;
@@ -70,9 +76,8 @@ var inject = function inject() {
   // 新しいメッセージボタン
   var chatLog, isAtBottom = () => (chatLog.scrollHeight - chatLog.clientHeight) - chatLog.scrollTop < 5;
   var newMessageButtonContainer = document.createElement('div');
-  newMessageButtonContainer.id = 'login-page';
-  newMessageButtonContainer.setAttribute('style', 'position:relative;top:-46px;text-align:center;width:100%;user-select:none;pointer-events:none');
-  var newMessageButton = newMessageButtonContainer.appendChild(document.createElement('button'));
+  newMessageButtonContainer.setAttribute('style', 'position:relative;top:-40px;text-align:center;width:100%;user-select:none;pointer-events:none');
+  var newMessageButton = newMessageButtonContainer.appendChild(createButtonContainer()).appendChild(document.createElement('button'));
   newMessageButton.onclick = () => {
     chatLog.scrollTop = chatLog.scrollHeight - chatLog.clientHeight;
   };
@@ -212,8 +217,11 @@ background-color: unset !important;
     var textbox = document.getElementById('input-textbox');
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
-      textbox.parentNode.insertBefore(document.createElement('span'), textbox).innerHTML = '<br><label><input type="checkbox" id="enableSpeech">' + text('音声', 'Voice') + '</label>';
-      textbox.previousSibling.firstChild.before(textbox.parentNode.firstChild);
+      var buttonContainer = createButtonContainer();
+      buttonContainer.appendChild(textbox.previousSibling);
+      buttonContainer.innerHTML += '<br><input type="checkbox" id="enableSpeech" style="display:none"><button onclick="this.previousSibling.click()">' + text('音声', 'Voice') + '</button>'
+      textbox.before(buttonContainer);
+      document.querySelector('head').appendChild(document.createElement('style')).textContent = '#enableSpeech:checked+button{background-color:#9f6161}';
       var enableSpeech = document.getElementById('enableSpeech');
       enableSpeech.onclick = function () {
         recognition.locale = vueApp._i18n.locale;
@@ -246,9 +254,8 @@ background-color: unset !important;
       else
         logWindow.document.title = text('↓ 新しいメッセージ', '↓ New Messages');
     };
-    var logWindowButton = document.createElement('input');
-    logWindowButton.type = 'button';
-    logWindowButton.value = text('ログ窓', 'Log Window');
+    var logWindowButton = document.createElement('button');
+    logWindowButton.textContent = text('ログ窓', 'Log Window');
     logWindowButton.onclick = function () {
       if (logWindow && !logWindow.closed) {
         logWindow.focus();
@@ -288,7 +295,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
       };
       logWindow.document.close();
     };
-    document.getElementById('chatLog').before(logWindowButton);
+    document.getElementById('chatLog').before(createButtonContainer().appendChild(logWindowButton).parentNode);
   };
   if (document.getElementById('input-textbox')) {
     onlogin();
