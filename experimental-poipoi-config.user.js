@@ -27,10 +27,17 @@ script.textContent = '(' + function () {
     // 自動相互あぼーん　誰もあぼーんしない→''
     // 名前を'で囲んでカンマ区切り　例：令和と◆SENVEYuLkwが含まれる名前をあぼーん→'令和,◆SENVEYuLkw'
     // RegExpオブジェクトも指定可
-    autoBlock: ''
+    autoBlock: '',
+    // ログ窓のCSS ``の間に書く
+    logWindowCSS: `
+.message {
+  padding: 2px 0;
+  border-bottom: 1px solid #000;
+}
+    `
   };
-  
-  
+
+
   if (document.currentScript)
     document.currentScript.parentNode.removeChild(document.currentScript);
 

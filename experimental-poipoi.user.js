@@ -203,8 +203,8 @@ background-color: unset !important;
         if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
           aChild.querySelector('.message-author').innerHTML += '◇' + btoa(aChild.dataset.userId.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
         // ログ窓に書き出し
-        if (writeLogToWindow && !aChild.classList.contains('ignored-message'))
-          writeLogToWindow(aChild.innerText);
+        if (writeLogToWindow)
+          writeLogToWindow(aChild);
       } catch (err) {
         console.log(err);
       }
@@ -243,17 +243,18 @@ background-color: unset !important;
     }
     // ログ窓
     var logWindow;
-    writeLogToWindow = function (line, forceScroll) {
+    writeLogToWindow = function (div) {
       if (!logWindow || logWindow.closed)
         return;
       var log = logWindow.document.body.firstElementChild;
       var bottom = (log.scrollHeight - log.clientHeight) - log.scrollTop < 5;
-      log.value += ('' + line).replace(/(^|\n)\[[\d\-\s:]+\]\s/g, '$1') + '\n';
-      if (forceScroll || bottom)
+      log.append(logWindow.document.importNode(div, true));
+      if (bottom)
         log.scrollTop = log.scrollHeight - log.clientHeight;
       else
         logWindow.document.title = text('↓ 新しいメッセージ', '↓ New Messages');
     };
+    
     var logWindowButton = document.createElement('button');
     logWindowButton.textContent = text('ログ窓', 'Log Window');
     logWindowButton.onclick = function () {
@@ -268,16 +269,22 @@ background-color: unset !important;
       }
       logWindow.document.write(`
 <!doctype html>
+<head>
 <title>${text('ギコっぽいぽいログ', 'Gikopoipoi Log')}</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;width:100%;height:100%;resize:none}
-textarea{height:calc(100% - 3em);padding:2px;font-size:12px;line-height:1.5}
+html,body,#chatLog,input{margin:0;padding:0;box-sizing:border-box;width:100%;height:100%;resize:none;overflow:auto}
+#chatLog{height:calc(100% - 3em);padding:2px;font-size:12px}
+.message-timestamp,.ignored-message{display:none}
 input{display:block;position:fixed;bottom:0;height:2em}
 </style>
-<textarea readonly></textarea><input type="text">
+<style id="user-style">${experimentalConfig.logWindowCSS}</style>
+</head>
+<body><input type="text"></body>
 `);
       logWindow.onload = function () {
-        var log = logWindow.document.body.firstElementChild;
+        var log = logWindow.document.importNode(document.getElementById('chatLog'), true);
+        logWindow.document.body.firstElementChild.before(log);
+        log.scrollTop = log.scrollHeight - log.clientHeight;
         logWindow.onresize = log.onscroll = function () {
           if ((log.scrollHeight - log.clientHeight) - log.scrollTop < 5)
             logWindow.document.title = text('ギコっぽいぽいログ', 'Gikopoipoi Log');
@@ -288,7 +295,6 @@ input{display:block;position:fixed;bottom:0;height:2em}
             this.value = '';
           }
         };
-        writeLogToWindow(document.getElementById('chatLog').innerText, true);
       };
       logWindow.onfocus = function () {
         logWindow.document.body.lastElementChild.focus();
@@ -392,7 +398,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
           if (!user || user.id === vueApp.myUserID)
             return;
           if (experimentalConfig.accessLog)
-            vueApp.writeMessageToLog('SYSTEM',  user.name + text('が入室', ' has joined the room'), null);
+            vueApp.writeMessageToLog('SYSTEM', user.name + text('が入室', ' has joined the room'), null);
           accessNotification(user, text('入室', 'join'));
         }, 0);
         break;
