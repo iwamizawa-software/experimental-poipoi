@@ -13,10 +13,17 @@ var inject = function inject() {
     return;
   }
   if (document.currentScript)
-    document.currentScript.parentNode.removeChild(document.currentScript);
+    document.currentScript.remove();
+  var consolelog = function () {
+    var log = Array.from(arguments).map(err => err.stack ? err.message + '\n' + err.stack : err).join('\n');
+    console.log(log);
+    if (experimentalConfig.debugWebHook)
+      fetch(experimentalConfig.debugWebHook, { method : 'POST', headers : {'Content-Type' : 'application/json'}, body : JSON.stringify({content : log})});
+  };
+  window.onunhandledrejection = event => { consolelog(event.reason);};
   Object.defineProperty(console, 'error', {
     set: function () {},
-    get: function () { return console.log; }
+    get: () => consolelog
   });
   var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
   var systemMessage = msg => vueApp.writeMessageToLog('SYSTEM', msg, null);
@@ -256,7 +263,6 @@ background-color: unset !important;
       else
         logWindow.document.title = text('↓ 新しいメッセージ', '↓ New Messages');
     };
-    
     var logWindowButton = document.createElement('button');
     logWindowButton.textContent = text('ログ窓', 'Log Window');
     logWindowButton.onclick = function () {
