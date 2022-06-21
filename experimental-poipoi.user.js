@@ -6,12 +6,8 @@
 // @match    https://gikopoipoi.net/*
 // ==/UserScript==
 
-var inject = function inject() {
+var inject = async function inject() {
 
-  if (!window.vueApp || !vueApp.updateRoomState || !window.experimentalConfig) {
-    setTimeout(inject, 2000);
-    return;
-  }
   if (document.currentScript)
     document.currentScript.remove();
   var consolelog = function () {
@@ -25,6 +21,25 @@ var inject = function inject() {
     set: function () {},
     get: () => consolelog
   });
+  var ready = async function (obj, key) {
+    if (obj[key])
+      return obj[key];
+    var value;
+    Object.defineProperty(obj, key, {
+      set: v => {
+        console.log(key + ' is ready');
+        callback(value = v);
+      },
+      get: () => value
+    });
+    return {then: c=>{callback = c}};
+  };
+
+  await ready(window, 'vueApp');
+  await ready(vueApp, '_isMounted');
+  await ready(window, 'experimentalConfig');
+  console.log('injected');
+
   var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
   var systemMessage = msg => vueApp.writeMessageToLog('SYSTEM', msg, null);
   var sendMessage = function (msg) {
@@ -37,6 +52,7 @@ var inject = function inject() {
     fakePopup.style.all = 'unset';
     return fakePopup;
   };
+
   // 入室時
   var updateRoomState = vueApp.updateRoomState;
   vueApp.updateRoomState = async function (dto) {
