@@ -24,11 +24,13 @@ var inject = async function inject() {
   var ready = async function (obj, key) {
     if (obj[key])
       return obj[key];
-    var value;
+    var value, callback;
     Object.defineProperty(obj, key, {
       set: v => {
-        console.log(key + ' is ready');
-        callback(value = v);
+        if (value = v) {
+          console.log(key + ' is ready');
+          callback(value);
+        }
       },
       get: () => value
     });
