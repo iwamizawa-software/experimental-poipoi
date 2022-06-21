@@ -8,7 +8,7 @@
 
 ## 導入方法
 
-1. ChromeでTampermonkey ([Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ja), [Firefox](https://addons.mozilla.org/ja/firefox/addon/tampermonkey/))をインストール
+1. ChromeでTampermonkey ([Edge](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd), [Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ja), [Firefox](https://addons.mozilla.org/ja/firefox/addon/tampermonkey/))をインストール
 2. [experimental-poipoi-config](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi-config.user.js)をインストール
 3. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をインストール
 
