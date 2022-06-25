@@ -6,6 +6,7 @@
   replyMsg: 'ｎ',
   notifyAccess: 1,
   accessLog: 0,
+  notifyStream: 1,
   autoBlock: '',
   logWindowCSS: `
 .message {
