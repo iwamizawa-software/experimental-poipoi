@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  16
+// @version  17
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -39,7 +39,6 @@ document.querySelector('head').appendChild(document.createElement('script').appe
 
   await ready(window, 'vueApp');
   await ready(vueApp, '_isMounted');
-  await ready(window, 'experimentalConfig');
   console.log('injected');
 
   var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
@@ -54,7 +53,57 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     fakePopup.style.all = 'unset';
     return fakePopup;
   };
-
+  
+  // config
+  var configButtonContainer = createButtonContainer();
+  configButtonContainer.style.all = '';
+  configButtonContainer.setAttribute('style', 'all:unset;position:fixed;right:30px;top:0');
+  var saveButton = configButtonContainer.appendChild(document.createElement('button'));
+  saveButton.textContent = 'save';
+  saveButton.style.display = 'none';
+  saveButton.onclick = function () {
+    try {
+      experimentalConfig = Function('return ' + configEditor.value)();
+      localStorage.setItem('experimentalConfig', configText = configEditor.value);
+      setUserCSS();
+      configButton.click();
+    } catch (err) {
+      alert(text('設定の書式が間違っていて保存できない', 'Faild to save by wrong format'));
+    }
+  };
+  var configButton = configButtonContainer.appendChild(document.createElement('button'));
+  configButton.textContent = 'config';
+  var configEditor = document.body.appendChild(document.createElement('textarea'));
+  configEditor.setAttribute('style', 'position:fixed;right:30px;top:34px;display:none;width:50vw;height:50vh;resize:vertical');
+  var editing;
+  configButton.onclick = function () {
+    if (editing) {
+      if (configEditor.value === configText) {
+        configButton.textContent = 'config';
+        saveButton.style.display = configEditor.style.display = 'none';
+        editing = false;
+      } else if (confirm(text('変更を破棄しますか？', 'Discard changes?'))) {
+        configEditor.value = configText;
+        configButton.click();
+      }
+    } else {
+      editing = true;
+      configButton.textContent = 'cancel';
+      saveButton.style.display = configEditor.style.display = 'inline';
+    }
+  };
+  document.body.append(configButtonContainer);
+  document.body.append(configEditor);
+  var configText = localStorage.getItem('experimentalConfig') || await (await fetch('https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/config.js?t=' + (new Date).getTime())).text();
+  configEditor.value = configText;
+  var experimentalConfig = Function('return ' + configText)();
+  // userCSS
+  var userCSS = document.querySelector('head').appendChild(document.createElement('style'));
+  var setUserCSS = function () {
+    if (experimentalConfig.userCSS)
+      userCSS.textContent = experimentalConfig.userCSS;
+  };
+  setUserCSS();
   // 入室時
   var updateRoomState = vueApp.updateRoomState;
   vueApp.updateRoomState = async function (dto) {
@@ -303,7 +352,7 @@ html,body,#chatLog,input{margin:0;padding:0;box-sizing:border-box;width:100%;hei
 .message-timestamp,.ignored-message{display:none}
 input{display:block;position:fixed;bottom:0;height:2em}
 </style>
-<style id="user-style">${experimentalConfig.logWindowCSS}</style>
+<style id="log-style">${experimentalConfig.logWindowCSS}</style>
 </head>
 <body><input type="text"></body>
 `);
@@ -324,6 +373,9 @@ input{display:block;position:fixed;bottom:0;height:2em}
       };
       logWindow.onfocus = function () {
         logWindow.document.body.lastElementChild.focus();
+      };
+      logWindow.onstorage = function () {
+        logWindow.document.getElementById('log-style').textContent = experimentalConfig.logWindowCSS;
       };
       logWindow.document.close();
     };

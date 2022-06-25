@@ -1,5 +1,5 @@
 {
-  takeStreamImmediately : 1,
+  takeStreamImmediately : 0,
   numbering : 1,
   clearBubble: 1,
   notifyMention: 1,
@@ -9,8 +9,12 @@
   autoBlock: '',
   logWindowCSS: `
 .message {
-padding: 2px 0;
-border-bottom: 1px solid #000;
+  padding: 2px 0;
+  border-bottom: 1px solid #000;
+}
+  `,
+  userCSS: `
+.message {
 }
   `,
 }
