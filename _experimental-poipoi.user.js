@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  18
+// @version  19
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -276,8 +276,6 @@ background-color: unset !important;
         // 白トリップ表示
         if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
           aChild.querySelector('.message-author').innerHTML += '◇' + btoa(aChild.dataset.userId.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
-        // ログ選択軽くするテスト
-        aChild.classList.remove('highlighted-message');
         // ログ窓に書き出し
         if (writeLogToWindow)
           writeLogToWindow(aChild);
@@ -391,20 +389,6 @@ input{display:block;position:fixed;bottom:0;height:2em}
       return r;
     };
   }
-  // ログ選択軽くするテスト
-  var highlightedUserStyle = document.querySelector('style').appendChild(document.createElement('style'));
-  vueApp.highlightUser = function(userId, userName) {
-    if (this.highlightedUserId === userId) {
-      this.highlightedUserId = this.highlightedUserName = null;
-      highlightedUserStyle.textContent = '';
-    } else {
-      this.highlightedUserId = userId;
-      this.highlightedUserName = userName;
-      highlightedUserStyle.textContent = '.message[data-user-id="' + userId +'"]{color:red}';
-    }
-    this.isUsernameRedrawRequired = this.isRedrawRequired = true;
-    this.updateCanvasObjects();
-  };
   // 呼び出し通知
   var getCharacterPath = user => {
     var name = user.characterId || (user.character && user.character.characterName);
