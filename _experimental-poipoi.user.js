@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  19
+// @version  20
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -114,6 +114,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         vueApp.wantToTakeStream(i);
     // アドレスバーを現在の部屋のURLに書き換え
     history.replaceState(null, '', '/?areaid=' + vueApp.areaId + '&roomid=' + dto.currentRoom.id);
+    // ログ窓タイトル変更
+    if (logWindow && !logWindow.closed)
+      logWindow.onresize();
     return r;
   };
   // ユーザー追加時
@@ -286,6 +289,7 @@ background-color: unset !important;
     return Node.prototype.appendChild.call(this, aChild);
   };
   // ログイン時
+  var logWindow;
   var onlogin = function () {
     // 音声入力
     var textbox = document.getElementById('input-textbox');
@@ -316,7 +320,6 @@ background-color: unset !important;
       };
     }
     // ログ窓
-    var logWindow;
     writeLogToWindow = function (div) {
       if (!logWindow || logWindow.closed)
         return;
@@ -335,7 +338,7 @@ background-color: unset !important;
         logWindow.focus();
         return;
       }
-      logWindow = open('about:blank', 'log', 'width=300,height=500,menubar=no,toolbar=no,location=no');
+      logWindow = open('about:blank', 'log' + (new Date()).getTime(), 'width=300,height=500,menubar=no,toolbar=no,location=no');
       if (!logWindow) {
         vueApp.showWarningToast(text('ポップアップを許可してください', 'Allow to popup'));
         return;
@@ -343,7 +346,7 @@ background-color: unset !important;
       logWindow.document.write(`
 <!doctype html>
 <head>
-<title>${text('ギコっぽいぽいログ', 'Gikopoipoi Log')}</title>
+<title>${vueApp._i18n.t('room.' + vueApp.currentRoom.id)}</title>
 <style>
 html,body,#chatLog,input{margin:0;padding:0;box-sizing:border-box;width:100%;height:100%;resize:none;overflow:auto}
 #chatLog{height:calc(100% - 3em);padding:2px;font-size:12px}
@@ -360,7 +363,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
         log.scrollTop = log.scrollHeight - log.clientHeight;
         logWindow.onresize = log.onscroll = function () {
           if ((log.scrollHeight - log.clientHeight) - log.scrollTop < 5)
-            logWindow.document.title = text('ギコっぽいぽいログ', 'Gikopoipoi Log');
+            logWindow.document.title = vueApp._i18n.t('room.' + vueApp.currentRoom.id);
         };
         logWindow.document.body.lastElementChild.onkeypress = function (event) {
           if (this.value && event.key === 'Enter') {
@@ -378,6 +381,10 @@ input{display:block;position:fixed;bottom:0;height:2em}
       logWindow.document.close();
     };
     document.getElementById('chatLog').before(createButtonContainer().appendChild(logWindowButton).parentNode);
+    addEventListener('beforeunload', () => {
+      if (logWindow && !logWindow.closed)
+        logWindow.document.title = text('切断されたログ', 'Disconnected log');
+    });
   };
   if (document.getElementById('input-textbox')) {
     onlogin();
