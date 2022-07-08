@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  20
+// @version  21
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -107,6 +107,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // 入室時
   var updateRoomState = vueApp.updateRoomState;
   vueApp.updateRoomState = async function (dto) {
+    // 部屋背景色変更
+    if (experimentalConfig.roomColor)
+      dto.currentRoom.backgroundColor = experimentalConfig.roomColor;
     var r = await updateRoomState.call(this, dto);
     // デフォルトで受信状態にする
     if (experimentalConfig.takeStreamImmediately)
