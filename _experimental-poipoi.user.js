@@ -67,6 +67,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       localStorage.setItem('experimentalConfig', configText = configEditor.value);
       setUserCSS();
       configButton.click();
+      if (experimentalConfig.hasOwnProperty('roomColor') && vueApp.currentRoom) {
+        vueApp.currentRoom.backgroundColor = experimentalConfig.roomColor;
+        vueApp.isRedrawRequired = true;
+      }
     } catch (err) {
       alert(text('設定の書式が間違っていて保存できない', 'Faild to save by wrong format'));
     }
