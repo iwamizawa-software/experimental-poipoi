@@ -1,3 +1,5 @@
+// 設定項目の説明 https://iwamizawa-software.github.io/experimental-poipoi/config.html
+// 設定はブラウザのキャッシュクリアで消えるのでメモ帳かなにかに控えてください
 {
   takeStreamImmediately : 0,
   numbering : 1,
@@ -8,6 +10,7 @@
   accessLog: 0,
   notifyStream: 1,
   autoBlock: '',
+  roomColor: '',
   logWindowCSS: `
 .message {
   padding: 2px 0;
