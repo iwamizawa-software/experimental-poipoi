@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  21
+// @version  22
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -345,7 +345,7 @@ background-color: unset !important;
         logWindow.focus();
         return;
       }
-      logWindow = open('about:blank', 'log' + (new Date()).getTime(), 'width=300,height=500,menubar=no,toolbar=no,location=no');
+      window.logWindow = logWindow = open('about:blank', 'log' + (new Date()).getTime(), 'width=300,height=500,menubar=no,toolbar=no,location=no');
       if (!logWindow) {
         vueApp.showWarningToast(text('ポップアップを許可してください', 'Allow to popup'));
         return;
@@ -361,6 +361,15 @@ html,body,#chatLog,input{margin:0;padding:0;box-sizing:border-box;width:100%;hei
 input{display:block;position:fixed;bottom:0;height:2em}
 </style>
 <style id="log-style">${experimentalConfig.logWindowCSS}</style>
+<script>window.interval = setInterval(function () {
+  try {
+    if (opener.logWindow !== window)
+      throw 1;
+  } catch (err) {
+    document.title = "${text('切断されたログ', 'Disconnected log')}";
+    clearInterval(interval);
+  }
+}, 10000);</script>
 </head>
 <body><input type="text"></body>
 `);
@@ -388,9 +397,11 @@ input{display:block;position:fixed;bottom:0;height:2em}
       logWindow.document.close();
     };
     document.getElementById('chatLog').before(createButtonContainer().appendChild(logWindowButton).parentNode);
-    addEventListener('beforeunload', () => {
-      if (logWindow && !logWindow.closed)
+    addEventListener('unload', () => {
+      if (logWindow && !logWindow.closed) {
         logWindow.document.title = text('切断されたログ', 'Disconnected log');
+        logWindow.clearInterval(logWindow.interval);
+      }
     });
   };
   if (document.getElementById('input-textbox')) {
