@@ -16,6 +16,12 @@
 1. ChromeでTampermonkey ([Edge用リンク](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd), [Chrome用リンク](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ja), [Firefox用リンク](https://addons.mozilla.org/ja/firefox/addon/tampermonkey/))をインストール
 2. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をインストール
 
+### experimental-poipoiをクリックしてインストールの画面にならない場合
+
+![chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/options.html#nav=utils を開く](https://user-images.githubusercontent.com/65465755/178100897-b04a9400-b040-4e74-884b-28eb955377b8.png)
+
+URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js と入れてインストール
+
 ## 設定方法
 
 - [https://iwamizawa-software.github.io/experimental-poipoi/config.htmlを参照](https://iwamizawa-software.github.io/experimental-poipoi/config.html)
