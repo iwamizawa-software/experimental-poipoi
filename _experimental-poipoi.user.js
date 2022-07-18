@@ -100,7 +100,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   document.body.append(configEditor);
   var configText = localStorage.getItem('experimentalConfig') || await (await fetch('https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/config.js?t=' + (new Date).getTime())).text();
   configEditor.value = configText;
-  var experimentalConfig = Function('return ' + configText)();
+  var experimentalConfig = Function('return (' + configEditor.value + ')')();
   // userCSS
   var userCSS = document.querySelector('head').appendChild(document.createElement('style'));
   var setUserCSS = function () {
