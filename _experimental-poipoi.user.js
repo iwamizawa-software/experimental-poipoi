@@ -63,7 +63,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   saveButton.style.display = 'none';
   saveButton.onclick = function () {
     try {
-      experimentalConfig = Function('return ' + configEditor.value.replace(/(?:^|\n)\/\/.*/g, '').replace(/^\s*/, ''))();
+      experimentalConfig = Function('return (' + configEditor.value + ')')();
       localStorage.setItem('experimentalConfig', configText = configEditor.value);
       setUserCSS();
       configButton.click();
