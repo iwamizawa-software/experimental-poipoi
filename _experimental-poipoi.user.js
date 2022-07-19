@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  22
+// @version  23
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -53,6 +53,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     fakePopup.style.all = 'unset';
     return fakePopup;
   };
+  var toIHash = id => '◇' + btoa(id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
+  var addIHash = (name, id) => experimentalConfig.numbering === 2 ? name.replace(/(◆.+)?$/, toIHash(id) + '$1') : name;
   
   // config
   var configButtonContainer = createButtonContainer();
@@ -274,7 +276,7 @@ background-color: unset !important;
     if (experimentalConfig.numbering === 2)
       output.forEach(u => {
         if (u.isInRoom)
-          u.name = u.name.replace(/(◆.+)?$/, '◇' + btoa(u.id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6) + '$1')
+          u.name = addIHash(u.name, u.id);
       });
     return output;
   };
@@ -285,7 +287,7 @@ background-color: unset !important;
       try {
         // 白トリップ表示
         if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
-          aChild.querySelector('.message-author').innerHTML += '◇' + btoa(aChild.dataset.userId.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
+          aChild.querySelector('.message-author').innerHTML += toIHash(aChild.dataset.userId);
         // ログ窓に書き出し
         if (writeLogToWindow)
           writeLogToWindow(aChild);
@@ -515,7 +517,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
           if (!user || user.id === vueApp.myUserID)
             return;
           if (experimentalConfig.accessLog)
-            vueApp.writeMessageToLog('SYSTEM', user.name + text('が入室', ' has joined the room'), null);
+            vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が入室', ' has joined the room'), null);
           accessNotification(user, text('入室', 'join'));
         }, 0);
         break;
@@ -524,7 +526,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
         if (!user || user.id === vueApp.myUserID)
           return;
         if (experimentalConfig.accessLog)
-          vueApp.writeMessageToLog('SYSTEM', user.name + text('が退室', ' has left the room'), null);
+          vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が退室', ' has left the room'), null);
         accessNotification(user, text('退室', 'leave'));
         break;
       case 'server-msg':
