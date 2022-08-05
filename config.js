@@ -9,6 +9,7 @@
   notifyAccess: 1,
   accessLog: 0,
   notifyStream: 1,
+  hairControl: 0,
   autoBlock: '',
   roomColor: '',
   logWindowCSS: `

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  23
+// @version  24
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -411,6 +411,11 @@ input{display:block;position:fixed;bottom:0;height:2em}
   } else {
     var connectToServer = vueApp.connectToServer;
     vueApp.connectToServer = async function () {
+      // 内藤髪制御
+      if (localStorage.getItem('characterId') === 'naito' && experimentalConfig.hairControl) {
+        vueApp.characterId = experimentalConfig.hairControl === 1 ? 'naito' : 'funkynaito';
+        vueApp.selectedCharacter = vueApp.allCharacters.find(c => c.characterName === vueApp.characterId);
+      }
       var r = await connectToServer.apply(this, arguments);
       onlogin();
       return r;
