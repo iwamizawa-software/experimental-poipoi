@@ -133,6 +133,11 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 
 - CSSがわかる人は自分で書いたCSSを設定してデザインを変えられる
 
+### ﾙｰﾗ出来ないところも出来る
+
+- 人数は手抜きで-1にしてある
+- 屋根裏配信者の名前は?になる
+
 ### その他
 
 - Ctrl+Delキーでマップ上の吹き出しをすべて消す

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  24
+// @version  25
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -548,6 +548,15 @@ input{display:block;position:fixed;bottom:0;height:2em}
         streamStates = currentStates;
         if (index !== -1)
           streamNotification(vueApp.users[arguments[1][index].userId], index);
+        break;
+      // 全部屋ﾙｰﾗ
+      case 'server-room-list':
+        var streams = 0;
+        arguments[1].forEach(room => streams += room.streams.length);
+        arguments[1].push(
+          {id: 'admin_old', group: 'gikopoi', userCount: -1, streamers: [], streams: +vueApp.serverStats.streamCount === streams ? [] : [{userName: '?'}]},
+          {id: 'badend', group: 'gikopoipoi', userCount: -1, streamers: [], streams: []}
+        );
         break;
     }
   };
