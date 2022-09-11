@@ -554,8 +554,8 @@ input{display:block;position:fixed;bottom:0;height:2em}
         var streams = 0;
         arguments[1].forEach(room => streams += room.streams.length);
         arguments[1].push(
-          {id: 'admin_old', group: 'gikopoi', userCount: -1, streamers: [], streams: +vueApp.serverStats.streamCount === streams ? [] : [{userName: '?'}]},
-          {id: 'badend', group: 'gikopoipoi', userCount: -1, streamers: [], streams: []}
+          {id: 'admin_old', group: 'gikopoi', userCount: '?', streamers: [], streams: +vueApp.serverStats.streamCount === streams ? [] : [{userName: '?'}]},
+          {id: 'badend', group: 'gikopoipoi', userCount: '?', streamers: [], streams: []}
         );
         break;
     }

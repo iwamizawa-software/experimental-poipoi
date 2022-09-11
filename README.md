@@ -135,8 +135,7 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 
 ### ﾙｰﾗ出来ないところも出来る
 
-- 人数は手抜きで-1にしてある
-- 屋根裏配信者の名前は?になる
+- 人数と配信者の名前は手抜きで?になる
 
 ### その他
 
