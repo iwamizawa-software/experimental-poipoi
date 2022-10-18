@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  25
+// @version  26
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -249,6 +249,8 @@ background-color: unset !important;
   document.addEventListener('click', function (event) {
     if (event.target.parentNode !== logMenu)
       logMenu.style.display = 'none';
+    if (experimentalConfig.youtube && event.target.href && /^https:\/\/(?:(?:www\.|m\.)?youtube\.com|youtu\.be)\/./.test(event.target.href))
+      event.target.href = 'https://iwamizawa-software.github.io/experimental-poipoi/youtube.html#' + encodeURIComponent(event.target.href);
   });
   document.addEventListener('contextmenu', function (event) {
     logMenu.style.display = 'none';

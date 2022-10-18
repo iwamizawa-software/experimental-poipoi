@@ -11,6 +11,7 @@
   notifyStream: 1,
   hairControl: 0,
   autoBlock: '',
+  youtube: 0,
   roomColor: '',
   logWindowCSS: `
 .message {
