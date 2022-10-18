@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+<head><title>ぽいぽいスクリプト</title></head>
+<body>
+<h1>Androidでexperimental-poipoiを実行する方法</h1>
+<h2>Firefox NightlyとTampermonkeyを入れる</h2>
+<p>一番わかりやすい方法だけどFirefoxの動作が不安定らしい
+<p>やり方は頑張って調べてください
+<h2>ちょっと面倒だけど全部のブラウザで使える方法</h2>
+<h3>インストール</h3>
+<ol>
+<li>これをタップしてコピー→<input type="text" id="bookmarklet">
+<li>ここをブックマーク
+<li>ブックマークを編集
+<li>URLのところを全消ししてコピーしたやつを貼り付け
+</ol>
+<h3>実行</h3>
+<p>ぽいぽいを開くたびに以下の手順で実行する必要がある
+<ol>
+<li>ぽいぽいを開く
+<li>アドレス欄にぽいぽいスクリプトと入力する
+<li>でてきたやつを押す
+</ol>
+<script>
+var input = document.getElementById('bookmarklet');
+input.value = 'javascript:' + encodeURIComponent('(' + async function () {
+  try {
+    var script = document.createElement('script');
+    script.textContent = await (await fetch('https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/_experimental-poipoi.user.js?t=' + (new Date).getTime())).text();
+    document.querySelector('head').append(script);
+    Array.from(document.querySelectorAll('#character-selection label')).forEach(e=>{e.style.display='';e.removeChild(e.firstChild)});
+  } catch (err) {
+    console.log(err);
+  }
+} + ')()');
+input.onclick = function () {
+  this.select();
+  document.execCommand('copy');
+  alert('コピーした');
+};
+</script>
+</body>
+</html>
