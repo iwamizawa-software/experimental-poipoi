@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head><title>ぽいぽいスクリプト</title></head>
+<body>
+<h1>iPhoneでexperimental-poipoiを実行する方法</h1>
+<h2>Userscriptsを入れる</h2>
+<p>やり方が難しい
+<p>頑張れる人は調べてやってください
+<h2>ちょっと面倒だけど全部のブラウザで使える方法</h2>
+<h3>インストール</h3>
+<ol>
+<li>これをタップしてコピー→<input type="text" id="bookmarklet" style="font-size:1em">
+<li>ここをブックマーク
+<li>ブックマークを編集
+<li>URLのところを全消ししてコピーしたやつを貼り付け
+</ol>
+<h3>実行</h3>
+<p>ぽいぽいを開くたびに以下の手順で実行する必要がある
+<ol>
+<li>ぽいぽいを開く
+<li>さっき入れたブックマークを開く
+</ol>
+<p>これを実行すると一番下に無音のオーディオトラックが出てきますがこれを再生している間はスリープやページがバックグラウンドに行っても接続が持続します
+<script>
+var input = document.getElementById('bookmarklet');
+input.value = 'javascript:' + encodeURIComponent('(' + async function () {
+  try {
+    if (window.experimentalBookmarklet)
+      return;
+    window.experimentalBookmarklet = true;
+    var script = document.createElement('script');
+    script.textContent = await (await fetch('https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/_experimental-poipoi.user.js?t=' + (new Date).getTime())).text();
+    document.querySelector('head').append(script);
+    Array.from(document.querySelectorAll('#character-selection label')).forEach(e=>{e.style.display='';e.removeChild(e.firstChild)});
+    var audio = new Audio();
+    audio.src = 'data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxDsAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxHYAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxLEAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV/+MYxMQAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+    audio.loop = audio.controls = true;
+    audio.setAttribute('style', 'position:fixed;bottom:0;right:0');
+    document.body.append(audio);
+  } catch (err) {
+    console.log(err);
+  }
+} + ')()');
+input.onclick = function () {
+  this.select();
+  document.execCommand('copy');
+  alert('コピーした');
+};
+</script>
+</body>
+</html>
