@@ -13,6 +13,13 @@
 
 ## 導入方法
 
+### スマホの場合
+
+- [Android](https://iwamizawa-software.github.io/experimental-poipoi/android.html)
+- [iPhone](https://iwamizawa-software.github.io/experimental-poipoi/iphone.html)
+
+### PCの場合
+
 1. ChromeでTampermonkey ([Edge用リンク](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd), [Chrome用リンク](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ja), [Firefox用リンク](https://addons.mozilla.org/ja/firefox/addon/tampermonkey/))をインストール
 2. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をインストール
 
@@ -25,12 +32,6 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 ## 設定方法
 
 - [https://iwamizawa-software.github.io/experimental-poipoi/config.htmlを参照](https://iwamizawa-software.github.io/experimental-poipoi/config.html)
-
-### 古い設定方法について
-
-[experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)が最新であればexperimental-poipoi-configは要らなくなったので消していいです
-![delete experimental-poipoi-config](https://user-images.githubusercontent.com/65465755/175765086-b2c797fe-8768-41ab-b533-a3f0afe2226e.png)
-
 
 ## 追加される機能
 
