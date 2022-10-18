@@ -9,7 +9,7 @@
 <h2>ちょっと面倒だけど全部のブラウザで使える方法</h2>
 <h3>インストール</h3>
 <ol>
-<li>これをタップしてコピー→<input type="text" id="bookmarklet">
+<li>これをタップしてコピー→<input type="text" id="bookmarklet" style="font-size:1em">
 <li>ここをブックマーク
 <li>ブックマークを編集
 <li>URLのところを全消ししてコピーしたやつを貼り付け
@@ -25,6 +25,9 @@
 var input = document.getElementById('bookmarklet');
 input.value = 'javascript:' + encodeURIComponent('(' + async function () {
   try {
+    if (window.experimentalBookmarklet)
+      return;
+    window.experimentalBookmarklet = true;
     var script = document.createElement('script');
     script.textContent = await (await fetch('https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/_experimental-poipoi.user.js?t=' + (new Date).getTime())).text();
     document.querySelector('head').append(script);
