@@ -47,12 +47,13 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     audio.loop = audio.controls = true;
     audio.setAttribute('style', 'position:fixed;bottom:0;right:0');
     document.body.append(audio);
+    document.querySelector('head').appendChild(document.createElement('style')).textContent = '#main-section{padding-bottom:20px}';
     var clicked;
     document.addEventListener('click', function () {
       if (clicked)
         return;
       clicked = true;
-      speechSynthesis.speak(new SpeechSynthesisUtterance('読み上げ有効'));
+      speechSynthesis.speak(new SpeechSynthesisUtterance(''));
     });
   }
 
