@@ -2,6 +2,8 @@
 
 [ぽいぽい](https://gikopoipoi.net/)に実験的機能を追加するuserscript
 
+[**たまに有効にならないバグについて**](https://iwamizawa-software.github.io/experimental-poipoi/fix.html)
+
 ## ライセンス
 
 [![CC0](https://licensebuttons.net/p/zero/1.0/88x31.png) ](https://creativecommons.org/publicdomain/zero/1.0/deed.ja)
