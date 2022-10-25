@@ -49,13 +49,6 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     audio.setAttribute('style', 'position:fixed;bottom:0;right:0');
     document.body.append(audio);
     document.querySelector('head').appendChild(document.createElement('style')).textContent = '#main-section{padding-bottom:20px}';
-    var clicked;
-    document.addEventListener('click', function () {
-      if (clicked)
-        return;
-      clicked = true;
-      speechSynthesis.speak(new SpeechSynthesisUtterance(''));
-    });
   }
 
   var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
