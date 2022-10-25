@@ -4,6 +4,7 @@
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
+// @match    https://play.gikopoi.com/*
 // ==/UserScript==
 
 
