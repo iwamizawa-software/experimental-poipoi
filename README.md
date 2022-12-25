@@ -117,12 +117,6 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 
 ![log window](https://user-images.githubusercontent.com/65465755/175764744-717dc617-44c1-4015-b06a-d126c49ec9ad.png)
 
-### アドレスバーを現在の部屋のURLに書き換え
-
-- 部屋のURLから入ると初期部屋がそこになる
-
-![enkai url](https://user-images.githubusercontent.com/65465755/174309502-16605aaa-8831-4b6c-ba54-470564bea937.png)
-
 ### CSSでデザインをカスタマイズできる
 
 - CSSがわかる人は自分で書いたCSSを設定してデザインを変えられる

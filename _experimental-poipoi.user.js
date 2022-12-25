@@ -133,8 +133,6 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (experimentalConfig.takeStreamImmediately)
       for (var i = 0; i < dto.streams.length; i++)
         vueApp.wantToTakeStream(i);
-    // アドレスバーを現在の部屋のURLに書き換え
-    history.replaceState(null, '', '/?areaid=' + vueApp.areaId + '&roomid=' + dto.currentRoom.id);
     // ログ窓タイトル変更
     if (logWindow && !logWindow.closed)
       logWindow.onresize();
