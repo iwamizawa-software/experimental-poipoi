@@ -238,7 +238,6 @@ background-color: unset !important;
   var logMenu = document.body.appendChild(document.createElement('select'));
   var selectedUserId;
   logMenu.setAttribute('style', 'position:fixed;display:none');
-  logMenu.size = 6;
   logMenu.onchange = function () {
     switch (logMenu.value) {
       case 'moveLog':
@@ -249,9 +248,6 @@ background-color: unset !important;
         break;
       case 'resetSplit':
         resetLogStyle();
-        break;
-      case 'clearLog':
-        vueApp.clearLog();
         break;
     }
     logMenu.style.display = 'none';
@@ -272,8 +268,8 @@ background-color: unset !important;
 <option value="block">${text('相互あぼーん', 'Block')}
 <option disabled>-
 <option value="resetSplit">${text('右寄せ全解除', 'Align left all')}
-<option value="clearLog">${text('ログをクリア', 'Clear log')}
 `;
+      logMenu.size = logMenu.options.length;
       logMenu.options[0].text = (vueApp.users[selectedUserId] || {name: event.target.textContent}).name;
       logMenu.style.bottom = (document.documentElement.clientHeight - event.clientY) + 'px';
       logMenu.style.left = event.pageX + 'px';
@@ -341,6 +337,8 @@ background-color: unset !important;
       };
     }
     // ログ窓
+    var logButtons = createButtonContainer();
+    document.getElementById('chatLog').before(logButtons);
     writeLogToWindow = function (div) {
       if (!logWindow || logWindow.closed)
         return;
@@ -352,7 +350,7 @@ background-color: unset !important;
       else
         logWindow.document.title = text('↓ 新しいメッセージ', '↓ New Messages');
     };
-    var logWindowButton = document.createElement('button');
+    var logWindowButton = logButtons.appendChild(document.createElement('button'));
     logWindowButton.textContent = text('ログ窓', 'Log Window');
     logWindowButton.onclick = function () {
       if (logWindow && !logWindow.closed) {
@@ -410,13 +408,31 @@ input{display:block;position:fixed;bottom:0;height:2em}
       };
       logWindow.document.close();
     };
-    document.getElementById('chatLog').before(createButtonContainer().appendChild(logWindowButton).parentNode);
     addEventListener('unload', () => {
       if (logWindow && !logWindow.closed) {
         logWindow.document.title = text('切断されたログ', 'Disconnected log');
         logWindow.clearInterval(logWindow.interval);
       }
     });
+    // ログクリアボタン
+    var clearLog = logButtons.appendChild(document.createElement('button'));
+    clearLog.textContent = text('クリア', 'Clear');
+    clearLog.onclick = vueApp.clearLog;
+    // ログ保存ボタン
+    var download = logButtons.appendChild(document.createElement('button'));
+    download.textContent = text('保存', 'Save');
+    var downloadLink = document.createElement('a');
+    download.onclick = function () {
+      URL.revokeObjectURL(downloadLink.href);
+      var log = document.getElementById('chatLog').innerText;
+      if (!log)
+        return;
+      downloadLink.href = URL.createObjectURL(new Blob([log.replace(/([^\r])\n/g, '$1\r\n')], {type: 'application/octet-stream'}));
+      var opts = {year: 'numeric'};
+      opts.month = opts.day = opts.hour = opts.minute = opts.second = '2-digit';
+      downloadLink.download = (new Date()).toLocaleString([], opts).replace(/\D/g, '') + '.txt';
+      downloadLink.click();
+    };
   };
   if (document.getElementById('input-textbox')) {
     onlogin();
