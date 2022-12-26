@@ -243,6 +243,9 @@ background-color: unset !important;
       case 'moveLog':
         moveLog(selectedUserId);
         break;
+      case 'ignore':
+        vueApp.ignoreUser(selectedUserId);
+        break;
       case 'block':
         vueApp.blockUser(selectedUserId);
         break;
@@ -265,6 +268,7 @@ background-color: unset !important;
       logMenu.innerHTML = `
 <option disabled selected>-
 <option value="moveLog">${rightUsers[selectedUserId] ? text('左寄せ', 'Align left') : text('右寄せ', 'Align right')}
+<option value="ignore">${text('一方あぼーん', 'Ignore')}
 <option value="block">${text('相互あぼーん', 'Block')}
 <option disabled>-
 <option value="resetSplit">${text('右寄せ全解除', 'Align left all')}
