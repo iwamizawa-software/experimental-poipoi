@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  28
+// @version  29
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -209,6 +209,18 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   logMenu.setAttribute('style', 'position:fixed;display:none');
   logMenu.onchange = function () {
     switch (logMenu.value) {
+      case 'color':
+        var colorPicker = document.getElementById('colorPicker');
+        var style = (document.getElementById('color-' + selectedUserId) || document.querySelector('head').appendChild(document.createElement('style')));
+        style.id = 'color-' + selectedUserId;
+        colorPicker.oninput = function () {
+          style.textContent = `[data-user-id="${selectedUserId}"],[data-user-id="${selectedUserId}"] .message-author{color:${colorPicker.value}}`;
+        };
+        colorPicker.click();
+        break;
+      case 'uncolor':
+        document.getElementById('color-' + selectedUserId)?.remove();
+        break;
       case 'ignore':
         vueApp.ignoreUser(selectedUserId);
         break;
@@ -230,6 +242,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       selectedUserId = event.target.parentNode.dataset.userId;
       logMenu.innerHTML = `
 <option disabled selected>-
+<option value="color">${text('色', 'Color')}
+<option value="uncolor">${text('色解除', 'Uncolor')}
 <option value="ignore">${text('一方あぼーん', 'Ignore')}
 <option value="block">${text('相互あぼーん', 'Block')}
 `;
@@ -397,6 +411,11 @@ input{display:block;position:fixed;bottom:0;height:2em}
       downloadLink.download = (new Date()).toLocaleString([], opts).replace(/\D/g, '') + '.txt';
       downloadLink.click();
     };
+    // カラーピッカー
+    var colorPicker = logButtons.appendChild(document.createElement('input'));
+    colorPicker.id = 'colorPicker';
+    colorPicker.type = 'color';
+    colorPicker.style.visibility = 'hidden';
   };
   if (document.getElementById('input-textbox')) {
     onlogin();

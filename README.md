@@ -99,9 +99,7 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 
 ### ログの名前を右クリックしてメニューを出す
 
-- 指定した人のログを右寄せ、相互あぼーん、右寄せの全解除、ログのクリアができる
-
-![contextmenu](https://user-images.githubusercontent.com/65465755/172408890-942fddbd-20db-4eef-b999-d1d8865d9751.png)
+- 指定した人のログを色指定、一方あぼーん、相互あぼーんできる
 
 ### 音声入力
 
