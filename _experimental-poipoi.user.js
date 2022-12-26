@@ -213,7 +213,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         var colorPicker = document.getElementById('colorPicker');
         var style = (document.getElementById('color-' + selectedUserId) || document.querySelector('head').appendChild(document.createElement('style')));
         style.id = 'color-' + selectedUserId;
-        colorPicker.oninput = function () {
+        colorPicker.onchange = colorPicker.oninput = function () {
           style.textContent = `[data-user-id="${selectedUserId}"],[data-user-id="${selectedUserId}"] .message-author{color:${colorPicker.value}}`;
         };
         colorPicker.click();
