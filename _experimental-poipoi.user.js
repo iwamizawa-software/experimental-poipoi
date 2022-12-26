@@ -118,8 +118,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // userCSS
   var userCSS = document.querySelector('head').appendChild(document.createElement('style'));
   var setUserCSS = function () {
-    if (experimentalConfig.userCSS)
-      userCSS.textContent = experimentalConfig.userCSS;
+    userCSS.textContent = experimentalConfig.userCSS || '';
   };
   setUserCSS();
   // 入室時
@@ -204,53 +203,17 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       vueApp.socket.emit('user-msg', '');
     return v;
   };
-  // ログ分割
-  var rightUsers = {};
-  var splittedLogStyle = document.querySelector('head').appendChild(document.createElement('style'));
-  var updateLogStyle = function () {
-    var y = document.getElementById('chatLog').scrollTop;
-    var rightUsersList = Object.keys(rightUsers);
-    if (rightUsersList.length)
-      splittedLogStyle.textContent = rightUsersList.map(id => '[data-user-id="' + id + '"]').join(',') + `{position:relative;left:50%}
-.message{
-width: 50%;
-}
-.dark-mode .message,.dark-mode .message:nth-child(2n){
-background-color: unset !important;
-}
-`;
-    else
-      splittedLogStyle.textContent = '';
-    setTimeout(() => document.getElementById('chatLog').scrollTop = y, 0);
-  };
-  var resetLogStyle = function () {
-    rightUsers = {};
-    updateLogStyle();
-  };
-  var moveLog = function (userId) {
-    if (rightUsers[userId])
-      delete rightUsers[userId];
-    else
-      rightUsers[userId] = 1;
-    updateLogStyle();
-  };
   // ログメニュー
   var logMenu = document.body.appendChild(document.createElement('select'));
   var selectedUserId;
   logMenu.setAttribute('style', 'position:fixed;display:none');
   logMenu.onchange = function () {
     switch (logMenu.value) {
-      case 'moveLog':
-        moveLog(selectedUserId);
-        break;
       case 'ignore':
         vueApp.ignoreUser(selectedUserId);
         break;
       case 'block':
         vueApp.blockUser(selectedUserId);
-        break;
-      case 'resetSplit':
-        resetLogStyle();
         break;
     }
     logMenu.style.display = 'none';
@@ -267,11 +230,8 @@ background-color: unset !important;
       selectedUserId = event.target.parentNode.dataset.userId;
       logMenu.innerHTML = `
 <option disabled selected>-
-<option value="moveLog">${rightUsers[selectedUserId] ? text('左寄せ', 'Align left') : text('右寄せ', 'Align right')}
 <option value="ignore">${text('一方あぼーん', 'Ignore')}
 <option value="block">${text('相互あぼーん', 'Block')}
-<option disabled>-
-<option value="resetSplit">${text('右寄せ全解除', 'Align left all')}
 `;
       logMenu.size = logMenu.options.length;
       logMenu.options[0].text = (vueApp.users[selectedUserId] || {name: event.target.textContent}).name;
