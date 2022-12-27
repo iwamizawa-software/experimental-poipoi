@@ -85,6 +85,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         vueApp.currentRoom.backgroundColor = experimentalConfig.roomColor;
         vueApp.isRedrawRequired = true;
       }
+      mentionSound = experimentalConfig.mentionSound && new Audio(experimentalConfig.mentionSound);
     } catch (err) {
       alert(text('設定の書式が間違っていて保存できない', 'Faild to save by wrong format'));
     }
@@ -121,6 +122,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     userCSS.textContent = experimentalConfig.userCSS || '';
   };
   setUserCSS();
+  // mentionSound
+  var mentionSound = experimentalConfig.mentionSound && new Audio(experimentalConfig.mentionSound);
   // 入室時
   var updateRoomState = vueApp.updateRoomState;
   vueApp.updateRoomState = async function (dto) {
@@ -483,6 +486,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
         focus();
         document.getElementById('input-textbox').focus();
       };
+      mentionSound?.play?.();
     }
   };
   addEventListener('focus', function () {
