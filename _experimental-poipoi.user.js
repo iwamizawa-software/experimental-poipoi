@@ -511,6 +511,22 @@ input{display:block;position:fixed;bottom:0;height:2em}
       };
     }
   };
+  // 配信通知
+  var streamNotification = async function (user, index) {
+    if (experimentalConfig.notifyStream && !document.hasFocus()) {
+      (new Notification(user.name, {
+        // ChromeはNotification.iconにSVGを指定できない
+        icon: await SVG2PNG(getCharacterPath(user)),
+        tag: 'stream',
+        body: text('ﾁｬﾝﾈﾙ' + (index + 1) + 'で配信開始', 'Start stream in Channel ' + (index + 1))
+      })).onclick = function (event) {
+        vueApp.wantToTakeStream(index);
+        this.close();
+        event.preventDefault();
+      };
+    }
+  };
+  var streamStates = [];
   // socket event
   var socketEvent = function (eventName) {
     switch (eventName) {
@@ -536,6 +552,17 @@ input{display:block;position:fixed;bottom:0;height:2em}
       case 'server-msg':
         // 呼び出し通知
         mentionNotification(vueApp.users[arguments[1]], arguments[2]);
+        break;
+      // 配信通知
+      case 'server-update-current-room-state':
+        streamStates = arguments[1].streams.map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
+        break;
+      case 'server-update-current-room-streams':
+        var currentStates = arguments[1].map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
+        var index = currentStates.findIndex((s, i) => s && !streamStates[i] && !vueApp.takenStreams[i]);
+        streamStates = currentStates;
+        if (index !== -1)
+          streamNotification(vueApp.users[arguments[1][index].userId], index);
         break;
       // 全部屋ﾙｰﾗ
       case 'server-room-list':

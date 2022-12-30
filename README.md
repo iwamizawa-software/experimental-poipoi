@@ -80,6 +80,15 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 
 ![joined](https://user-images.githubusercontent.com/65465755/172408282-780133f3-fd0f-496a-965a-b50f76d66b47.png)
 
+### 配信開始通知
+
+- 同じ部屋で配信が開始されたら通知する
+- 通知をクリックすると配信を聴ける
+- 設定でONOFF変えられる
+- 他の部屋の配信通知を実装することは技術的に可能だが個人的な考えにより実装予定なし
+
+![stream](https://user-images.githubusercontent.com/65465755/175776785-6872263a-bc60-4024-bd3c-fc1f56d12410.png)
+
 ### 入退室ログ
 
 - ログに入退室を記録する
