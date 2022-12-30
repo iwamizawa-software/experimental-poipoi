@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  30
+// @version  31
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -70,6 +70,18 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var addIHash = (name, id) => experimentalConfig.numbering === 2 ? name.replace(/(◆.+)?$/, toIHash(id) + '$1') : name;
   
   // config
+  var save = function (value) {
+    if (experimentalConfig.useCookie) {
+      document.cookie = 'experimentalConfig=' + encodeURIComponent(value) + '; expires=Tue, 31-Dec-2037 00:00:00 GMT;';
+      return;
+    }
+    document.cookie = 'experimentalConfig=; expires=Fri, 31-Dec-1999 23:59:59 GMT;';
+    return localStorage.setItem('experimentalConfig', value);
+  };
+  var load = function () {
+    var m = document.cookie.match(/experimentalConfig=([^;]+)/);
+    return m?.[1] ? decodeURIComponent(m[1]) : localStorage.getItem('experimentalConfig');
+  };
   var configButtonContainer = createButtonContainer();
   configButtonContainer.style.all = '';
   configButtonContainer.setAttribute('style', 'all:unset;position:fixed;right:30px;top:0');
@@ -79,7 +91,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   saveButton.onclick = function () {
     try {
       experimentalConfig = Function('return (' + configEditor.value + ')')();
-      localStorage.setItem('experimentalConfig', configText = configEditor.value);
+      save(configText = configEditor.value);
       setUserCSS();
       configButton.click();
       if (experimentalConfig.hasOwnProperty('roomColor') && vueApp.currentRoom) {
@@ -114,7 +126,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
   document.body.append(configButtonContainer);
   document.body.append(configEditor);
-  var configText = localStorage.getItem('experimentalConfig') || await (await fetch('https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/config.js?t=' + (new Date).getTime())).text();
+  var configText = load() || await (await fetch('https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/config.js?t=' + (new Date).getTime())).text();
   configEditor.value = configText;
   var experimentalConfig = Function('return (' + configEditor.value + ')')();
   // userCSS

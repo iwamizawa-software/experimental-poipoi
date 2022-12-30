@@ -12,6 +12,7 @@
   hairControl: 0,
   autoBlock: '',
   youtube: 0,
+  useCookie: 0,
   roomColor: '',
   logWindowCSS: `
 .message {
