@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  29
+// @version  30
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -57,7 +57,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var systemMessage = msg => vueApp.writeMessageToLog('SYSTEM', msg, null);
   var sendMessage = function (msg) {
     vueApp.socket.emit('user-msg', msg);
-    vueApp.socket.emit('user-msg', '');
+    if (experimentalConfig.clearBubble)
+      vueApp.socket.emit('user-msg', '');
   };
   var createButtonContainer = function () {
     var fakePopup = document.createElement('div');
@@ -216,13 +217,22 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         var colorPicker = document.getElementById('colorPicker');
         var style = (document.getElementById('color-' + selectedUserId) || document.querySelector('head').appendChild(document.createElement('style')));
         style.id = 'color-' + selectedUserId;
+        if (logWindow && !logWindow.closed) {
+          var logDoc = logWindow.document;
+          var style2 = (logDoc.getElementById(style.id) || logDoc.querySelector('head').appendChild(logDoc.createElement('style')));
+          style2.id = style.id;
+        }
         (colorPicker.onchange = colorPicker.oninput = function () {
           style.textContent = `[data-user-id="${selectedUserId}"],[data-user-id="${selectedUserId}"] .message-author{color:${colorPicker.value}}`;
+          if (style2)
+            style2.textContent = style.textContent;
         })();
         colorPicker.click();
         break;
       case 'uncolor':
         document.getElementById('color-' + selectedUserId)?.remove();
+        if (logWindow && !logWindow.closed)
+          logWindow.document.getElementById('color-' + selectedUserId)?.remove();
         break;
       case 'ignore':
         vueApp.ignoreUser(selectedUserId);
@@ -513,7 +523,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
   };
   // 配信通知
   var streamNotification = async function (user, index) {
-    if (experimentalConfig.notifyStream && !document.hasFocus()) {
+    if (experimentalConfig.notifyStream && !vueApp.showNotifications && !document.hasFocus()) {
       (new Notification(user.name, {
         // ChromeはNotification.iconにSVGを指定できない
         icon: await SVG2PNG(getCharacterPath(user)),
