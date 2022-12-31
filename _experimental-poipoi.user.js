@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  31
+// @version  32
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -390,6 +390,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
 `);
       logWindow.onload = function () {
         var log = logWindow.document.importNode(document.getElementById('chatLog'), true);
+        log.style.height = log.style.width = '';
         logWindow.document.body.firstElementChild.before(log);
         log.scrollTop = log.scrollHeight - log.clientHeight;
         logWindow.onresize = log.onscroll = function () {
