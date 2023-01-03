@@ -13,6 +13,8 @@
   autoBlock: '',
   youtube: 0,
   useCookie: 0,
+  voiceLog: 0,
+  voiceLang: '',
   roomColor: '',
   logWindowCSS: `
 .message {

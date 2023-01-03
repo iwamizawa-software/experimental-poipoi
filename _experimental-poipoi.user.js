@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  33
+// @version  34
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -322,7 +322,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       document.querySelector('head').appendChild(document.createElement('style')).textContent = '#enableSpeech:checked+button{background-color:#9f6161}';
       var enableSpeech = document.getElementById('enableSpeech');
       enableSpeech.onclick = function () {
-        recognition.lang = vueApp._i18n.locale;
+        recognition.lang = experimentalConfig.voiceLang || vueApp._i18n.locale;
         recognition[enableSpeech.checked ? 'start' : 'stop']();
       };
       var recognition = new SpeechRecognition();
@@ -332,7 +332,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         for (var i = event.resultIndex; i < event.results.length; i++)
           if (event.results[i].isFinal)
             result.push(event.results[i][0].transcript);
-        sendMessage(text('音声入力:', 'Voice input:') + result.join(' '));
+        if (experimentalConfig.voiceLog)
+          vueApp.writeMessageToLog(text('音声入力', 'Voice input'), result.join(' '), 'voice input');
+        else
+          sendMessage(text('音声入力:', 'Voice input:') + result.join(' '));
       };
       recognition.onend = function () {
         if (enableSpeech.checked)
