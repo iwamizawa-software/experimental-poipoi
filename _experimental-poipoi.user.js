@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  32
+// @version  33
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -322,7 +322,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       document.querySelector('head').appendChild(document.createElement('style')).textContent = '#enableSpeech:checked+button{background-color:#9f6161}';
       var enableSpeech = document.getElementById('enableSpeech');
       enableSpeech.onclick = function () {
-        recognition.locale = vueApp._i18n.locale;
+        recognition.lang = vueApp._i18n.locale;
         recognition[enableSpeech.checked ? 'start' : 'stop']();
       };
       var recognition = new SpeechRecognition();
