@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  34
+// @version  35
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -43,6 +43,25 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   console.log('injected');
 
   Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
+  var loginButton = document.getElementById('login-button');
+  if (loginButton) {
+    var select = document.createElement('select');
+    Object.keys(vueApp._i18n.messages.en.room).map(key => ({
+      value: key,
+      text: vueApp._i18n.t('room.' + key, 'ja') + ' - ' + vueApp._i18n.messages.en.room[key],
+      reading: vueApp._i18n.t('room.' + key, 'ja', {reading: true})
+    })).sort((a, b) => a.reading > b.reading ? 1 : -1).forEach(({value, text}) => {
+      var option = select.appendChild(document.createElement('option'));
+      option.value = value;
+      option.text = text;
+    });
+    select.value = (new URL(location.href)).searchParams.get('roomid') || 'admin_st';
+    document.getElementById('area-selection').onchange = select.onchange = () => {
+      history.replaceState(null, '', '?areaid=' + vueApp.areaId + '&roomid=' + select.value);
+    };
+    select.style.display = 'block';
+    loginButton.before(select);
+  }
 
   if (window.iPhoneBookmarklet) {
     var audio = new Audio();
