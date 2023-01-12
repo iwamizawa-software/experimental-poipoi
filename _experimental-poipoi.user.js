@@ -44,7 +44,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
 
   Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
   var loginButton = document.getElementById('login-button');
-  if (loginButton) {
+  if (location.host === 'gikopoipoi.net' && loginButton) {
     var select = document.createElement('select');
     Object.keys(vueApp._i18n.messages.en.room).map(key => ({
       value: key,
