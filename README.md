@@ -136,3 +136,4 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 
 - Ctrl+Delキーでマップ上の吹き出しをすべて消す
 - 内藤の髪制御
+- Alt+1でチャンネル1の動画配信を上下逆さにする

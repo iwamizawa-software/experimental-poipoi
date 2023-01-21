@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  35
+// @version  36
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -195,12 +195,18 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     }
     return addUser.call(this, userDTO);
   };
-  // Ctrl+Delキーで吹き出し消す
   document.addEventListener('keydown', event => {
+    // Ctrl+Delキーで吹き出し消す
     if (event.ctrlKey && event.key === 'Delete') {
       for (var id in vueApp.users)
         vueApp.users[id].message = '';
       vueApp.resetBubbleImages();
+    }
+    // 動画上下逆さ
+    if (event.altKey && /^[123]$/.test(event.key)) {
+      var video = document.getElementById('received-video-' + (event.key - 1));
+      if (video)
+        video.style.transform = video.style.transform ? '' : 'rotate(180deg)';
     }
   });
   // 新しいメッセージボタン
