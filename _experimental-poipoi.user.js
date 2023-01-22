@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  36
+// @version  37
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -577,8 +577,24 @@ input{display:block;position:fixed;bottom:0;height:2em}
       };
     }
   };
-  var streamStates = [];
+  // チェス通知
+  var chess;
+  var chessNotification = function () {
+    chess = new Notification(text('チェス', 'Chess'), {
+      tag: 'chess',
+      body: text('あなたの番です', "It's your turn."),
+      requireInteraction: true
+    });
+    chess.onclick = focus.bind(window);
+    mentionSound?.play?.();
+  };
+  var closeChessNotification = function () {
+    chess?.close();
+  };
+  addEventListener('focus', closeChessNotification);
+  addEventListener('mousedown', closeChessNotification);
   // socket event
+  var streamStates = [];
   var socketEvent = function (eventName) {
     switch (eventName) {
       // 入退室ログ
@@ -623,6 +639,12 @@ input{display:block;position:fixed;bottom:0;height:2em}
           {id: 'admin_old', group: 'gikopoi', userCount: '?', streamers: [], streams: +vueApp.serverStats.streamCount === streams ? [] : [{userName: '?'}]},
           {id: 'badend', group: 'gikopoipoi', userCount: '?', streamers: [], streams: []}
         );
+        break;
+      // チェス通知
+      case 'server-update-chessboard':
+        var state = arguments[1] || {};
+        if (state[{w: 'whiteUserID', b: 'blackUserID'}[state.turn]] === vueApp.myUserID)
+          chessNotification();
         break;
     }
   };
