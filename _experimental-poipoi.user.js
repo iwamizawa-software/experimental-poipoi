@@ -325,7 +325,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     roomNameToKey[halfSize] = key;
     roomNameToKey[key] = key;
   });
-  var roomNameRegex = new RegExp(Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|'), 'g');
+  var roomNameRegex = new RegExp('(?:' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(?=[に 　]|$)', 'g');
   var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
   // ログ追加時
   var writeLogToWindow;
