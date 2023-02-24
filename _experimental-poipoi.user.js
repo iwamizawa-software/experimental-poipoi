@@ -453,6 +453,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
       logWindow.onstorage = function () {
         logWindow.document.getElementById('log-style').textContent = experimentalConfig.logWindowCSS;
       };
+      logWindow.vueApp = vueApp;
       logWindow.document.close();
     };
     addEventListener('unload', () => {
