@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  37
+// @version  38
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -316,6 +316,17 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       });
     return output;
   };
+  // ルーラリンク
+  var roomNameToKey = {};
+  Object.keys(vueApp._i18n.messages.en.room).forEach(key => {
+    var roomName = vueApp._i18n.t('room.' + key, 'ja').split(' ');
+    roomNameToKey[roomName = roomName[1] || roomName[0]] = key;
+    var halfSize = roomName.replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt() - (0xFF01 - 0x21)));
+    roomNameToKey[halfSize] = key;
+    roomNameToKey[key] = key;
+  });
+  var roomNameRegex = new RegExp(Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|'), 'g');
+  var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
   // ログ追加時
   var writeLogToWindow;
   HTMLDivElement.prototype.appendChild = function (aChild) {
@@ -324,6 +335,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         // 白トリップ表示
         if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
           aChild.querySelector('.message-author').innerHTML += toIHash(aChild.dataset.userId);
+        // ルーラリンク
+        var messageBody = aChild.querySelector('.message-body');
+        if (messageBody && !aChild.querySelector('.message-body *') && (messageBodyHTML = replaceRulaLink(messageBody.innerHTML)) !== messageBody.innerHTML)
+          messageBody.innerHTML = messageBodyHTML;
         // ログ窓に書き出し
         if (writeLogToWindow)
           writeLogToWindow(aChild);
