@@ -336,8 +336,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
           aChild.querySelector('.message-author').innerHTML += toIHash(aChild.dataset.userId);
         // ルーラリンク
-        var messageBody = aChild.querySelector('.message-body');
-        if (messageBody && !aChild.querySelector('.message-body *') && (messageBodyHTML = replaceRulaLink(messageBody.innerHTML)) !== messageBody.innerHTML)
+        var messageBody = aChild.querySelector('.message-body>span') || aChild.querySelector('.message-body');
+        if (messageBody && !aChild.querySelector('.message-body a') && (messageBodyHTML = replaceRulaLink(messageBody.innerHTML)) !== messageBody.innerHTML)
           messageBody.innerHTML = messageBodyHTML;
         // ログ窓に書き出し
         if (writeLogToWindow)
