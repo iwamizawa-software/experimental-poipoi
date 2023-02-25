@@ -536,8 +536,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
       experimentalConfig.notifyMention &&
       !document.hasFocus() &&
       !vueApp.ignoredUserIds.has(user.id) &&
-      vueApp.mentionSoundFunction &&
-      vueApp.mentionSoundFunction(msg)
+      vueApp.checkIfMentioned?.(msg)
     ) {
       mention = new Notification(user.name, {
         // ChromeはNotification.iconにSVGを指定できない
