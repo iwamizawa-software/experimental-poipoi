@@ -206,7 +206,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (event.altKey && /^[123]$/.test(event.key)) {
       var video = document.getElementById('received-video-' + (event.key - 1));
       if (video)
-        video.style.transform = 'rotate(' + (video.dataset.rotate = +(video.dataset.rotate || 0) + 90) + 'deg)';
+        video.style.transform = 'rotate(' + (video.dataset.rotate = (+(video.dataset.rotate || 0) + 90) % 360) + 'deg)';
     }
   });
   // 新しいメッセージボタン
