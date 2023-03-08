@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  38
+// @version  39
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -206,7 +206,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (event.altKey && /^[123]$/.test(event.key)) {
       var video = document.getElementById('received-video-' + (event.key - 1));
       if (video)
-        video.style.transform = video.style.transform ? '' : 'rotate(180deg)';
+        video.style.transform = 'rotate(' + (video.dataset.rotate = +(video.dataset.rotate || 0) + 90) + 'deg)';
     }
   });
   // 新しいメッセージボタン
