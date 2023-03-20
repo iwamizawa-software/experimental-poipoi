@@ -2,7 +2,8 @@
 
 [ぽいぽい](https://gikopoipoi.net/)に実験的機能を追加するuserscript
 
-[**たまに有効にならないバグについて**](https://iwamizawa-software.github.io/experimental-poipoi/fix.html)
+- [**たまに有効にならないバグについて**](https://iwamizawa-software.github.io/experimental-poipoi/fix.html)
+- **最近ログインが遅くなったと感じた人は[fast-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/fast-poipoi.user.js)をインストールしてみてください** (早くなる代わりに瞬きしなくなります)
 
 ## ライセンス
 
