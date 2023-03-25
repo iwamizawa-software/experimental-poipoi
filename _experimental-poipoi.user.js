@@ -214,7 +214,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // 新しいメッセージボタン
   var chatLog, isAtBottom = () => (chatLog.scrollHeight - chatLog.clientHeight) - chatLog.scrollTop < 5;
   var newMessageButtonContainer = document.createElement('div');
-  newMessageButtonContainer.setAttribute('style', 'position:relative;top:-40px;text-align:center;width:100%;user-select:none;pointer-events:none');
+  newMessageButtonContainer.setAttribute('style', 'position:relative;top:-80px;text-align:center;width:100%;user-select:none;pointer-events:none');
   var newMessageButton = newMessageButtonContainer.appendChild(createButtonContainer()).appendChild(document.createElement('button'));
   newMessageButton.onclick = () => {
     chatLog.scrollTop = chatLog.scrollHeight - chatLog.clientHeight;
