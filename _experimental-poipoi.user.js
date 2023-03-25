@@ -88,6 +88,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var toIHash = id => '◇' + btoa(id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
   var addIHash = (name, id) => experimentalConfig.numbering === 2 ? name.replace(/(◆.+)?$/, toIHash(id) + '$1') : name;
   
+  // userscript CSS
+  document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
   // config
   var save = function (value) {
     if (experimentalConfig.useCookie) {
@@ -103,7 +105,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
   var configButtonContainer = createButtonContainer();
   configButtonContainer.style.all = '';
-  configButtonContainer.setAttribute('style', 'all:unset;position:fixed;right:30px;top:0');
+  configButtonContainer.setAttribute('style', 'all:unset;position:fixed;right:30px;top:20px');
   var saveButton = configButtonContainer.appendChild(document.createElement('button'));
   saveButton.textContent = 'save';
   saveButton.style.display = 'none';
@@ -125,7 +127,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var configButton = configButtonContainer.appendChild(document.createElement('button'));
   configButton.textContent = 'config';
   var configEditor = document.body.appendChild(document.createElement('textarea'));
-  configEditor.setAttribute('style', 'position:fixed;right:30px;top:34px;display:none;width:50vw;height:50vh;resize:vertical');
+  configEditor.setAttribute('style', 'position:fixed;right:30px;top:54px;display:none;width:50vw;height:50vh;resize:vertical');
   var editing;
   configButton.onclick = function () {
     if (editing) {
@@ -359,7 +361,6 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       buttonContainer.appendChild(textbox.previousSibling);
       buttonContainer.innerHTML += '<br><input type="checkbox" id="enableSpeech" style="display:none"><button onclick="this.previousSibling.click()">' + text('音声', 'Voice') + '</button>'
       textbox.before(buttonContainer);
-      document.querySelector('head').appendChild(document.createElement('style')).textContent = '#enableSpeech:checked+button{background-color:#9f6161}';
       var enableSpeech = document.getElementById('enableSpeech');
       enableSpeech.onclick = function () {
         recognition.lang = experimentalConfig.voiceLang || vueApp._i18n.locale;
