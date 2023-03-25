@@ -89,7 +89,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var addIHash = (name, id) => experimentalConfig.numbering === 2 ? name.replace(/(◆.+)?$/, toIHash(id) + '$1') : name;
   
   // userscript CSS
-  document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
+  document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-label{display:none}#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
   // config
   var save = function (value) {
     if (experimentalConfig.useCookie) {
@@ -385,7 +385,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     }
     // ログ窓
     var logButtons = createButtonContainer();
-    document.getElementById('chatLog').before(logButtons);
+    document.getElementById('chatLog').after(logButtons);
     writeLogToWindow = function (div) {
       if (!logWindow || logWindow.closed)
         return;
