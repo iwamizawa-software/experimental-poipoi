@@ -339,7 +339,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (this.id === 'chatLog') {
       try {
         // NGワード
-        if (aChild.dataset.userId === 'filtered')
+        if (aChild.dataset.userId === 'filtered' && experimentalConfig.wordBlock !== 2)
           aChild.setAttribute('style', 'height:0;padding:0;border-bottom:1px solid red');
         // 白トリップ表示
         if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
