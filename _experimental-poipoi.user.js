@@ -72,6 +72,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     document.querySelector('head').appendChild(document.createElement('style')).textContent = '#main-section{padding-bottom:20px}';
   }
 
+  if (localStorage.getItem('isInfoboxVisible') === null)
+    vueApp.toggleInfobox();
+
   var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
   var systemMessage = msg => vueApp.writeMessageToLog('SYSTEM', msg, null);
   var sendMessage = function (msg) {
