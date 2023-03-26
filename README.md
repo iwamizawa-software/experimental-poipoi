@@ -101,6 +101,11 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 
 ![autoblock](https://user-images.githubusercontent.com/65465755/172408369-ded6854d-8e7b-4966-aeec-5f9ad2d14f41.png)
 
+### NGワード
+
+- NGワードを設定するとログに出なくなる
+- NGワード発言者をあぼーんするか選べる
+
 ### 新しいメッセージボタンの表示
 
 - ログをさかのぼると新しい発言が来ても下にスクロールされないので、それがわかるようにボタンを表示する

@@ -11,6 +11,8 @@
   notifyStream: 1,
   hairControl: 0,
   autoBlock: '',
+  wordFilter: '',
+  wordBlock: 0,
   youtube: 0,
   useCookie: 0,
   voiceLog: 0,

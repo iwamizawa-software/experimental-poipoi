@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  39
+// @version  40
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -87,6 +87,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
   var toIHash = id => '◇' + btoa(id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
   var addIHash = (name, id) => experimentalConfig.numbering === 2 ? name.replace(/(◆.+)?$/, toIHash(id) + '$1') : name;
+  var match = (str, cond) => typeof str === 'string' && cond && (cond?.test?.(str) || cond?.split?.(',').some(s => str.indexOf(s) !== -1));
   
   // userscript CSS
   document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-label{display:none}#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
@@ -184,17 +185,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         userDTO.name += parseInt(userDTO.id.slice(-3), 16);
     }
     // 自動あぼーん
-    var autoBlock = experimentalConfig.autoBlock;
-    if (
-      autoBlock &&
-      userDTO.id !== vueApp.myUserID &&
-      (typeof autoBlock === 'string' ? autoBlock.split(',').some(name => userDTO.name.indexOf(name) !== -1) : autoBlock.test(userDTO.name))
-    ) {
+    if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoBlock))
       setTimeout(function () {
         vueApp.socket.emit('user-block', userDTO.id);
         systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
       }, 0);
-    }
     return addUser.call(this, userDTO);
   };
   document.addEventListener('keydown', event => {
@@ -222,6 +217,15 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   newMessageButton.style.pointerEvents = 'auto';
   var writeMessageToLog = vueApp.writeMessageToLog;
   vueApp.writeMessageToLog = function (userName, msg, userId) {
+    // NGワード
+    if (userId && match(msg, experimentalConfig.wordFilter)) {
+      if (userId !== vueApp.myUserID && experimentalConfig.wordBlock) {
+        vueApp.socket.emit('user-block', userId);
+        systemMessage(userName + text('をNGワードあぼーんした', ' has been blocked by filtering'));
+      }
+      return;
+    }
+    // 新しいメッセージボタン
     if (!chatLog) {
       chatLog = document.getElementById('chatLog');
       chatLog.addEventListener('scroll', () => {
