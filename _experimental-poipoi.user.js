@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  40
+// @version  41
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -193,6 +193,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         vueApp.socket.emit('user-block', userDTO.id);
         systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
       }, 0);
+    // 自動一方あぼーん
+    if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoIgnore))
+      vueApp.ignoreUser(userDTO.id);
     return addUser.call(this, userDTO);
   };
   document.addEventListener('keydown', event => {
