@@ -223,7 +223,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         vueApp.socket.emit('user-block', userId);
         systemMessage(userName + text('をNGワードあぼーんした', ' has been blocked by filtering'));
       }
-      return;
+      arguments[2] = 'filtered';
     }
     // 新しいメッセージボタン
     if (!chatLog) {
@@ -338,6 +338,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   HTMLDivElement.prototype.appendChild = function (aChild) {
     if (this.id === 'chatLog') {
       try {
+        // NGワード
+        if (aChild.dataset.userId === 'filtered')
+          aChild.setAttribute('style', 'height:0;padding:0;border-bottom:1px solid red');
         // 白トリップ表示
         if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
           aChild.querySelector('.message-author').innerHTML += toIHash(aChild.dataset.userId);
