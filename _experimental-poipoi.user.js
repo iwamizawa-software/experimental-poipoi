@@ -40,7 +40,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
 
   await ready(window, 'vueApp');
   if (location.host === 'gikopoipoi.net') {
-    var vueApp = window.vueApp._container._vnode.component.proxy;
+    var vueApp = await ready(await ready(await ready(await ready(window.vueApp, '_container'), '_vnode'), 'component'), 'proxy');
     vueApp._i18n = vueApp.$i18n;
     vueApp.toDisplayName = name => name || vueApp._i18n.t('default_user_name');
     window.vueApp.changeRoom = vueApp.changeRoom;
