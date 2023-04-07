@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  42
+// @version  43
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -39,9 +39,14 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
 
   await ready(window, 'vueApp');
-  var vueApp = window.vueApp._container._vnode.component.proxy;
-  vueApp._i18n = vueApp.$i18n;
-  vueApp.toDisplayName = name => name || vueApp._i18n.t('default_user_name');
+  if (location.host === 'gikopoipoi.net') {
+    var vueApp = window.vueApp._container._vnode.component.proxy;
+    vueApp._i18n = vueApp.$i18n;
+    vueApp.toDisplayName = name => name || vueApp._i18n.t('default_user_name');
+    window.vueApp.changeRoom = vueApp.changeRoom;
+  } else {
+    await ready(vueApp = window.vueApp, '_isMounted');
+  }
   console.log('injected');
 
   Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
@@ -340,7 +345,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     roomNameToKey[key] = key;
   });
   var roomNameRegex = new RegExp('(?:' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(?=[に 　]|$)', 'g');
-  var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp._container._vnode.component.proxy.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
+  var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
   // ログ追加時
   var writeLogToWindow;
   HTMLDivElement.prototype.appendChild = function (aChild) {
