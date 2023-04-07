@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  41
+// @version  42
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -39,7 +39,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
 
   await ready(window, 'vueApp');
-  await ready(vueApp, '_isMounted');
+  var vueApp = window.vueApp._container._vnode.component.proxy;
+  vueApp._i18n = vueApp.$i18n;
+  vueApp.toDisplayName = name => name || vueApp._i18n.t('default_user_name');
   console.log('injected');
 
   Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
@@ -338,7 +340,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     roomNameToKey[key] = key;
   });
   var roomNameRegex = new RegExp('(?:' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(?=[に 　]|$)', 'g');
-  var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
+  var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp._container._vnode.component.proxy.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
   // ログ追加時
   var writeLogToWindow;
   HTMLDivElement.prototype.appendChild = function (aChild) {
@@ -467,7 +469,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
       logWindow.onstorage = function () {
         logWindow.document.getElementById('log-style').textContent = experimentalConfig.logWindowCSS;
       };
-      logWindow.vueApp = vueApp;
+      logWindow.vueApp = window.vueApp;
       logWindow.document.close();
     };
     addEventListener('unload', () => {
