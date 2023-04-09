@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  43
+// @version  44
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -36,6 +36,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       get: () => value
     });
     return {then: c=>{callback = c}};
+  };
+  var objectExists = async function (obj, key) {
+    while (!obj[key])
+      await {then: f => setTimeout(f, 1000)};
+    return obj[key];
   };
 
   await ready(window, 'vueApp');
@@ -196,8 +201,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     }
     // 自動あぼーん
     if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoBlock))
-      setTimeout(function () {
-        vueApp.socket.emit('user-block', userDTO.id);
+      setTimeout(async function () {
+        (await objectExists(vueApp, 'socket')).emit('user-block', userDTO.id);
         systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
       }, 0);
     // 自動一方あぼーん
@@ -229,11 +234,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
   newMessageButton.style.pointerEvents = 'auto';
   var writeMessageToLog = vueApp.writeMessageToLog;
-  vueApp.writeMessageToLog = function (userName, msg, userId) {
+  vueApp.writeMessageToLog = async function (userName, msg, userId) {
     // NGワード
     if (userId && match(msg, experimentalConfig.wordFilter)) {
       if (userId !== vueApp.myUserID && experimentalConfig.wordBlock) {
-        vueApp.socket.emit('user-block', userId);
+        (await objectExists(vueApp, 'socket')).emit('user-block', userId);
         systemMessage(userName + text('をNGワードあぼーんした', ' has been blocked by filtering'));
       }
       arguments[2] = 'filtered';
@@ -556,6 +561,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
     if (
       experimentalConfig.notifyMention &&
       !document.hasFocus() &&
+      user &&
       !vueApp.ignoredUserIds.has(user.id) &&
       vueApp.checkIfMentioned?.(msg)
     ) {
@@ -651,6 +657,9 @@ input{display:block;position:fixed;bottom:0;height:2em}
         if (experimentalConfig.accessLog)
           vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が退室', ' has left the room'), null);
         accessNotification(user, text('退室', 'leave'));
+        var stream = vueApp.streams.find(s => s.userId === user.id);
+        if (stream)
+          stream.isActive = false;
         break;
       case 'server-msg':
         // 呼び出し通知
