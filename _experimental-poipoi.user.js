@@ -401,7 +401,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       textbox.before(buttonContainer);
       var enableSpeech = document.getElementById('enableSpeech');
       enableSpeech.onclick = function () {
-        recognition.lang = experimentalConfig.voiceLang || vueApp._i18n.locale;
+        recognition.lang = experimentalConfig.voiceLang || vueApp.$i18n.locale;
         recognition[enableSpeech.checked ? 'start' : 'stop']();
       };
       var recognition = new SpeechRecognition();
