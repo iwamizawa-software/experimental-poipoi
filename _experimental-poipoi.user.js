@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  44
+// @version  45
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -14,7 +14,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var consolelog = function () {
     var log = Array.from(arguments).map(err => err.stack ? err.message + '\n' + err.stack : err).join('\n');
     console.log(log);
-    if (experimentalConfig.debugWebHook)
+    if (experimentalConfig?.debugWebHook)
       fetch(experimentalConfig.debugWebHook, { method : 'POST', headers : {'Content-Type' : 'application/json'}, body : JSON.stringify({content : log})});
   };
   window.onunhandledrejection = event => { consolelog(event.reason);};
@@ -46,7 +46,20 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   await ready(window, 'vueApp');
   if (location.host === 'gikopoipoi.net') {
     var vueApp = await ready(await ready(await ready(await ready(window.vueApp, '_container'), '_vnode'), 'component'), 'proxy');
-    vueApp._i18n = vueApp.$i18n;
+    vueApp._i18n = {
+      messages: {},
+      t: function (key, lang, options = {}) {
+        if (!this.messages[lang = lang || vueApp.$i18n.locale])
+          lang = 'en';
+        var data = eval(`vueApp._i18n.messages.${lang}.${key}`);
+        return typeof data === 'string' ? data : data[options.reading && data.length > 1 ? 1 : 0];
+      }
+    };
+    var loadLang = async l => vueApp._i18n.messages[l] = eval('(' + await (await fetch('https://raw.githubusercontent.com/iccanobif/gikopoi2/master/src/langs/' + l + '.json')).text() + ')');
+    await Promise.all(['en', 'ja'].map(loadLang));
+    vueApp.$i18n.availableLocales.filter(l => l !== 'en' && l !== 'ja').forEach(loadLang);
+    var room = vueApp._i18n.messages.ja.room;
+    Object.keys(room).forEach(key => room[key] = room[key].split(' | '));
     vueApp.toDisplayName = name => name || vueApp._i18n.t('default_user_name');
     window.vueApp.changeRoom = vueApp.changeRoom;
   } else {
