@@ -264,16 +264,21 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     chatLog.scrollTop = chatLog.scrollHeight - chatLog.clientHeight;
   };
   newMessageButton.style.pointerEvents = 'auto';
+  // NGワード
+  var displayUserMessage = vueApp.displayUserMessage;
+  vueApp.displayUserMessage = async function (user, msg) {
+    if (user?.id && match(msg, experimentalConfig.wordFilter)) {
+      if (user.id !== vueApp.myUserID && experimentalConfig.wordBlock) {
+        (await objectExists(vueApp, 'socket')).emit('user-block', user.id);
+        systemMessage(user.name + text('をNGワードあぼーんした', ' has been blocked by filtering'));
+      }
+      if (experimentalConfig.wordBlock !== 2)
+        return;
+    }
+    return displayUserMessage.apply(this, arguments);
+  };
   var writeMessageToLog = vueApp.writeMessageToLog;
   vueApp.writeMessageToLog = async function (userName, msg, userId) {
-    // NGワード
-    if (userId && match(msg, experimentalConfig.wordFilter)) {
-      if (userId !== vueApp.myUserID && experimentalConfig.wordBlock) {
-        (await objectExists(vueApp, 'socket')).emit('user-block', userId);
-        systemMessage(userName + text('をNGワードあぼーんした', ' has been blocked by filtering'));
-      }
-      arguments[2] = 'filtered';
-    }
     // 新しいメッセージボタン
     if (!chatLog) {
       chatLog = document.getElementById('chatLog');
@@ -376,9 +381,6 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   HTMLDivElement.prototype.appendChild = function (aChild) {
     if (this.id === 'chatLog') {
       try {
-        // NGワード
-        if (aChild.dataset.userId === 'filtered' && experimentalConfig.wordBlock !== 2)
-          aChild.setAttribute('style', 'height:0;padding:0;border-bottom:1px solid red');
         // 白トリップ表示
         if (experimentalConfig.numbering === 2 && aChild.dataset.userId && aChild.dataset.userId !== 'null')
           aChild.querySelector('.message-author').innerHTML += toIHash(aChild.dataset.userId);
