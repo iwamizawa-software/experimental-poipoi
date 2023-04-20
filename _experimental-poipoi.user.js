@@ -714,13 +714,17 @@ input{display:block;position:fixed;bottom:0;height:2em}
     }
   };
   var _io = window.io;
-  window.io = function () {
-    var socket = _io.apply(this, arguments);
-    socket.prependAny(socketEvent);
-    return socket;
-  };
-  if (vueApp.socket)
-    vueApp.socket.prependAny(socketEvent);
+  if (_io) {
+    window.io = function () {
+      var socket = _io.apply(this, arguments);
+      socket.prependAny(socketEvent);
+      return socket;
+    };
+    if (vueApp.socket)
+      vueApp.socket.prependAny(socketEvent);
+  } else {
+    (await objectExists(vueApp, 'socket')).prependAny(socketEvent);
+  }
 
 } + ')()')).parentNode);
 
