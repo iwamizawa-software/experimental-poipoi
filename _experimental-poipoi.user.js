@@ -42,6 +42,19 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       await {then: f => setTimeout(f, 1000)};
     return obj[key];
   };
+  // ルーラリンク
+  var roomNameToKey = {}, roomNameRegex = /0^/;
+  var createRoomNameRegex = function () {
+    Object.keys(vueApp._i18n.messages.en.room).forEach(key => {
+      var roomName = vueApp._i18n.t('room.' + key, 'ja').split(' ');
+      roomNameToKey[roomName = roomName[1] || roomName[0]] = key;
+      var halfSize = roomName.replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt() - (0xFF01 - 0x21)));
+      roomNameToKey[halfSize] = key;
+      roomNameToKey[key] = key;
+    });
+    roomNameRegex = new RegExp('(?:' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(?=[に 　]|$)', 'g');
+  };
+  var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
 
   await ready(window, 'vueApp');
   if (location.host === 'gikopoipoi.net') {
@@ -51,42 +64,46 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       t: function (key, lang, options = {}) {
         if (!this.messages[lang = lang || vueApp.$i18n.locale])
           lang = 'en';
-        var data = eval(`vueApp._i18n.messages.${lang}.${key}`);
+        var data = eval(`vueApp._i18n.messages.${lang}?.${key}`) || key;
         return typeof data === 'string' ? data : data[options.reading && data.length > 1 ? 1 : 0];
       }
     };
     var loadLang = async l => vueApp._i18n.messages[l] = eval('(' + await (await fetch('https://raw.githubusercontent.com/iccanobif/gikopoi2/master/src/langs/' + l + '.json')).text() + ')');
-    await Promise.all(['en', 'ja'].map(loadLang));
-    vueApp.$i18n.availableLocales.filter(l => l !== 'en' && l !== 'ja').forEach(loadLang);
-    var room = vueApp._i18n.messages.ja.room;
-    Object.keys(room).forEach(key => room[key] = room[key].split(' | '));
     vueApp.toDisplayName = name => name || vueApp._i18n.t('default_user_name');
+    (async () => {
+      await Promise.all(['en', 'ja'].map(loadLang));
+      vueApp.$i18n.availableLocales.filter(l => l !== 'en' && l !== 'ja').forEach(loadLang);
+      var room = vueApp._i18n.messages.ja.room;
+      Object.keys(room).forEach(key => room[key] = room[key].split(' | '));
+      createRoomNameRegex();
+      var loginButton = document.getElementById('login-button');
+      if (loginButton) {
+        var select = document.createElement('select');
+        Object.keys(vueApp._i18n.messages.en.room).map(key => ({
+          value: key,
+          text: vueApp._i18n.t('room.' + key, 'ja') + ' - ' + vueApp._i18n.messages.en.room[key],
+          reading: vueApp._i18n.t('room.' + key, 'ja', {reading: true})
+        })).sort((a, b) => a.reading > b.reading ? 1 : -1).forEach(({value, text}) => {
+          var option = select.appendChild(document.createElement('option'));
+          option.value = value;
+          option.text = text;
+        });
+        select.value = (new URL(location.href)).searchParams.get('roomid') || 'admin_st';
+        document.getElementById('area-selection').onchange = select.onchange = () => {
+          history.replaceState(null, '', '?areaid=' + vueApp.areaId + '&roomid=' + select.value);
+        };
+        select.style.display = 'block';
+        loginButton.before(select);
+      }
+    })();
     window.vueApp.changeRoom = vueApp.changeRoom;
   } else {
     await ready(vueApp = window.vueApp, '_isMounted');
+    createRoomNameRegex();
   }
   console.log('injected');
 
   Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
-  var loginButton = document.getElementById('login-button');
-  if (location.host === 'gikopoipoi.net' && loginButton) {
-    var select = document.createElement('select');
-    Object.keys(vueApp._i18n.messages.en.room).map(key => ({
-      value: key,
-      text: vueApp._i18n.t('room.' + key, 'ja') + ' - ' + vueApp._i18n.messages.en.room[key],
-      reading: vueApp._i18n.t('room.' + key, 'ja', {reading: true})
-    })).sort((a, b) => a.reading > b.reading ? 1 : -1).forEach(({value, text}) => {
-      var option = select.appendChild(document.createElement('option'));
-      option.value = value;
-      option.text = text;
-    });
-    select.value = (new URL(location.href)).searchParams.get('roomid') || 'admin_st';
-    document.getElementById('area-selection').onchange = select.onchange = () => {
-      history.replaceState(null, '', '?areaid=' + vueApp.areaId + '&roomid=' + select.value);
-    };
-    select.style.display = 'block';
-    loginButton.before(select);
-  }
 
   if (window.iPhoneBookmarklet) {
     var audio = new Audio();
@@ -353,17 +370,6 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       });
     return output;
   };
-  // ルーラリンク
-  var roomNameToKey = {};
-  Object.keys(vueApp._i18n.messages.en.room).forEach(key => {
-    var roomName = vueApp._i18n.t('room.' + key, 'ja').split(' ');
-    roomNameToKey[roomName = roomName[1] || roomName[0]] = key;
-    var halfSize = roomName.replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt() - (0xFF01 - 0x21)));
-    roomNameToKey[halfSize] = key;
-    roomNameToKey[key] = key;
-  });
-  var roomNameRegex = new RegExp('(?:' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(?=[に 　]|$)', 'g');
-  var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
   // ログ追加時
   var writeLogToWindow;
   HTMLDivElement.prototype.appendChild = function (aChild) {
