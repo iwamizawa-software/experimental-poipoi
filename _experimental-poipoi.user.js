@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  45
+// @version  46
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -52,9 +52,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       roomNameToKey[halfSize] = key;
       roomNameToKey[key] = key;
     });
-    roomNameRegex = new RegExp('(?:' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(?=[に 　]|$)', 'g');
+    roomNameRegex = new RegExp('(^|じゃ|[ 　「])(' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(で$|$|に?(?:来|集|きて|こい)|にて|[ 　」])', 'g');
   };
-  var replaceRulaLink = html => html.replace(roomNameRegex, s => `<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s]}')">${s}</a>`);
+  var replaceRulaLink = html => html.replace(roomNameRegex, (s, s1, s2, s3) => `${s1}<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s2]}')">${s2}</a>${s3}`);
 
   await ready(window, 'vueApp');
   if (location.host === 'gikopoipoi.net') {
