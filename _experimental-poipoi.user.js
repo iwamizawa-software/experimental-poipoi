@@ -225,11 +225,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         userDTO.name += parseInt(userDTO.id.slice(-3), 16);
     }
     // 自動あぼーん
-    if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoBlock))
-      setTimeout(async function () {
-        (await objectExists(vueApp, 'socket')).emit('user-block', userDTO.id);
+    if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoBlock) && vueApp.socket) {
+        vueApp.ignoreUser(userDTO.id);
+        vueApp.socket.emit('user-block', userDTO.id);
         systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
-      }, 0);
+    }
     // 自動一方あぼーん
     if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoIgnore))
       vueApp.ignoreUser(userDTO.id);
