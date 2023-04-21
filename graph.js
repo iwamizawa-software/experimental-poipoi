@@ -30,8 +30,9 @@ function Graph({currentRoom, connectedUsers}) {
   }
 }
 Graph.prototype.update = function ({userId, x, y}) {
-  this.users.get(userId).users.delete(userId);
-  if (this.nodes[y][x]?.users.set(userId))
+  if (this.users.get(userId)?.users.delete(userId))
+    this.users.delete(userId);
+  if (this.nodes[y]?.[x]?.users.set(userId))
     this.users.set(userId, this.nodes[y][x]);
 };
 
