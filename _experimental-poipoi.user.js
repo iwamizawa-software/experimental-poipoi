@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  46
+// @version  47
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -127,7 +127,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
   var toIHash = id => '◇' + btoa(id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
   var addIHash = (name, id) => experimentalConfig.numbering === 2 ? name.replace(/(◆.+)?$/, toIHash(id) + '$1') : name;
-  var match = (str, cond) => typeof str === 'string' && cond && (cond?.test?.(str) || cond?.split?.(',').some(s => str.indexOf(s) !== -1));
+  var match = (str, cond) => typeof str === 'string' && cond && (cond.test?.(str) || cond.split?.(',').some(s => str.indexOf(s) !== -1));
   
   // userscript CSS
   document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-label{display:none}#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
@@ -259,9 +259,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     chatLog.scrollTop = chatLog.scrollHeight - chatLog.clientHeight;
   };
   newMessageButton.style.pointerEvents = 'auto';
-  // NGワード
   var displayUserMessage = vueApp.displayUserMessage;
   vueApp.displayUserMessage = async function (user, msg) {
+    // NGワード
     if (user?.id && match(msg, experimentalConfig.wordFilter)) {
       if (user.id !== vueApp.myUserID && experimentalConfig.wordBlock) {
         (await objectExists(vueApp, 'socket')).emit('user-block', user.id);
@@ -269,6 +269,13 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       }
       if (experimentalConfig.wordBlock !== 2)
         return;
+    }
+    // 読み上げ許可リスト
+    if (vueApp.enableTextToSpeech && experimentalConfig.ttsAllowList && !match(user?.name, experimentalConfig.ttsAllowList)) {
+      vueApp.enableTextToSpeech = false;
+      var promise = displayUserMessage.apply(this, arguments);
+      vueApp.enableTextToSpeech = true;
+      return promise;
     }
     return displayUserMessage.apply(this, arguments);
   };

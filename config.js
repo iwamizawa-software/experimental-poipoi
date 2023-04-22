@@ -12,6 +12,7 @@
   hairControl: 0,
   autoBlock: '',
   autoIgnore: '',
+  ttsAllowList: '',
   wordFilter: '',
   wordBlock: 0,
   youtube: 0,
