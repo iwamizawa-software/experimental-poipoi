@@ -13,6 +13,7 @@
   autoBlock: '',
   autoIgnore: '',
   ttsAllowList: '',
+  ttsDenyList: '',
   wordFilter: '',
   wordBlock: 0,
   youtube: 0,

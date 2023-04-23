@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  47
+// @version  48
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -270,8 +270,14 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       if (experimentalConfig.wordBlock !== 2)
         return;
     }
-    // 読み上げ許可リスト
-    if (vueApp.enableTextToSpeech && experimentalConfig.ttsAllowList && !match(user?.name, experimentalConfig.ttsAllowList)) {
+    // 読み上げ許可拒否リスト
+    if (
+      vueApp.enableTextToSpeech && 
+      (
+        (experimentalConfig.ttsAllowList && !match(user?.name, experimentalConfig.ttsAllowList)) ||
+        (experimentalConfig.ttsDenyList && match(user?.name, experimentalConfig.ttsDenyList))
+      )
+    ) {
       vueApp.enableTextToSpeech = false;
       var promise = displayUserMessage.apply(this, arguments);
       vueApp.enableTextToSpeech = true;
