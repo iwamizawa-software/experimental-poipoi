@@ -590,6 +590,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
   var mention;
   var mentionNotification = async function (user, msg) {
     if (
+      window.Notification &&
       experimentalConfig.notifyMention &&
       !document.hasFocus() &&
       user &&
@@ -621,6 +622,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
   var accessNotification = async function (user, msg) {
     var notifyAccess = experimentalConfig.notifyAccess;
     if (
+      window.Notification &&
       (((notifyAccess & 1) && document.hasFocus()) || ((notifyAccess & 2) && !document.hasFocus())) &&
       !vueApp.ignoredUserIds.has(user.id)
     ) {
@@ -637,7 +639,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
   };
   // 配信通知
   var streamNotification = async function (user, index) {
-    if (experimentalConfig.notifyStream && !vueApp.showNotifications && !document.hasFocus()) {
+    if (window.Notification && experimentalConfig.notifyStream && !vueApp.showNotifications && !document.hasFocus()) {
       (new Notification(user.name, {
         // ChromeはNotification.iconにSVGを指定できない
         icon: await SVG2PNG(getCharacterPath(user)),
@@ -653,12 +655,14 @@ input{display:block;position:fixed;bottom:0;height:2em}
   // チェス通知
   var chess;
   var chessNotification = function () {
-    chess = new Notification(text('チェス', 'Chess'), {
-      tag: 'chess',
-      body: text('あなたの番です', "It's your turn."),
-      requireInteraction: true
-    });
-    chess.onclick = focus.bind(window);
+    if (window.Notification) {
+      chess = new Notification(text('チェス', 'Chess'), {
+        tag: 'chess',
+        body: text('あなたの番です', "It's your turn."),
+        requireInteraction: true
+      });
+      chess.onclick = focus.bind(window);
+    }
     mentionSound?.play?.();
   };
   var closeChessNotification = function () {
