@@ -42,6 +42,12 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       await {then: f => setTimeout(f, 1000)};
     return obj[key];
   };
+  var elementExists = async function (query) {
+    var element;
+    while (!(element = document.querySelector(query)))
+      await {then: f => setTimeout(f, 1000)};
+    return element;
+  };
   // ルーラリンク
   var roomNameToKey = {}, roomNameRegex = /0^/;
   var createRoomNameRegex = function () {
@@ -72,8 +78,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     var room = vueApp._i18n.messages.ja.room;
     Object.keys(room).forEach(key => room[key] = room[key].split(' | '));
     createRoomNameRegex();
-    var loginButton = document.getElementById('login-button');
-    if (loginButton) {
+    elementExists('#login-button').then(loginButton => {
       var select = document.createElement('select');
       Object.keys(vueApp._i18n.messages.en.room).map(key => ({
         value: key,
@@ -90,7 +95,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       };
       select.style.display = 'block';
       loginButton.before(select);
-    }
+    });
     window.vueApp.changeRoom = vueApp.changeRoom;
   } else {
     await ready(vueApp = window.vueApp, '_isMounted');
