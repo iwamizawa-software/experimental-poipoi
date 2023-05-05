@@ -20,12 +20,12 @@ document.getElementById('muted').onclick = async function () {
   document.body.innerHTML = '<select id="add"><option>音声追加 Add audio<option value="tab">ブラウザの音声 browser<option value="monitor">PCの音声 system</select><div id="msg"></div>';
   var add = document.getElementById('add');
   var msg = document.getElementById('msg');
-  (await navigator.mediaDevices.enumerateDevices()).forEach(device => {
+  (await navigator.mediaDevices.enumerateDevices()).forEach((device, i) => {
     if (device.kind !== 'audioinput' || /^$|default|communications/.test(device.deviceId))
       return;
     var opt = document.createElement('option');
     opt.value = device.deviceId;
-    opt.text = device.label;
+    opt.text = device.label || ('mic ' + i);
     add.add(opt);
   });
   add.onchange = async function () {
