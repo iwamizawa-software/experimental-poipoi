@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<title>Webステミキ Web Stereo Mix</title>
+</head>
+<body>
+<img src="mutetab.png">
+<p>このタブを右クリックしてサイトをミュートしてください。
+<p>Right-click this tab, and mute this website.
+<p><button id="muted">ミュートした (既にミュートになってる) I muted</button>
+<script>
+onunhandledrejection = onerror = event => {
+  alert(event.reason);
+};
+document.getElementById('muted').onclick = async function () {
+  this.remove();
+  document.body.insertAdjacentHTML('beforeend', '<p>マイクの使用を許可してください。この時点ではマイクは使用されません。<p>Allow using microphone.');
+  var stream = await navigator.mediaDevices.getUserMedia({audio:true});
+  stream.getTracks().forEach(t => t.stop());
+  document.body.innerHTML = '<select id="add"><option>音声追加 Add audio<option value="tab">ブラウザの音声 browser<option value="monitor">PCの音声 system</select><div id="msg"></div>';
+  var add = document.getElementById('add');
+  var msg = document.getElementById('msg');
+  (await navigator.mediaDevices.enumerateDevices()).forEach(device => {
+    if (device.kind !== 'audioinput' || /^$|default|communications/.test(device.label))
+      return;
+    var opt = document.createElement('option');
+    opt.value = device.deviceId;
+    opt.text = device.label;
+    add.add(opt);
+  });
+  add.onchange = async function () {
+    var selected = this.value;
+    this.selectedIndex = 0;
+    msg.innerHTML = '';
+    var stream;
+    if (selected === 'tab' || selected === 'monitor') {
+      msg.innerHTML = (selected === 'tab'
+        ? '<p>タブの音声を共有にチェックを入れてページを共有してください。映像は共有されません。<p>Check "Share audio", and share tab. Video is not shared.'
+        : '<p>システムの音声を共有にチェックを入れて画面全体を共有してください。映像は共有されません。<p>Check "Share audio", and share screen. Video is not shared.'
+      );
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: {displaySurface: selected},
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 2
+        }
+      });
+      stream.getVideoTracks().forEach(track => {
+        track.stop();
+        stream.removeTrack(track);
+      });
+      msg.innerHTML = '';
+      if (!stream.getAudioTracks().length) {
+        alert('音声が取得できなかった Audio track not found');
+        return;
+      }
+    } else {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: selected,
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false
+        }
+      });
+    }
+    var div = document.body.appendChild(document.createElement('div'));
+    div.appendChild(document.createElement('p')).textContent = stream.getAudioTracks()[0].label;
+    var closeBtn = div.firstChild.appendChild(document.createElement('button'));
+    closeBtn.textContent = '×';
+    stream.oninactive = closeBtn.onclick = function () {
+      audio.srcObject.getTracks().forEach(t => t.stop());
+      audio.srcObject = null;
+      div.remove();
+    };
+    var audio = div.appendChild(document.createElement('audio'));
+    audio.controls = true;
+    audio.srcObject = stream;
+    audio.play();
+  };
+};
+</script>
+</body>
+</html>
