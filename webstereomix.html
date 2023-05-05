@@ -71,6 +71,8 @@ document.getElementById('muted').onclick = async function () {
     var closeBtn = div.firstChild.appendChild(document.createElement('button'));
     closeBtn.textContent = '×';
     stream.oninactive = closeBtn.onclick = function () {
+      if (!audio.srcObject)
+        return;
       audio.srcObject.getTracks().forEach(t => t.stop());
       audio.srcObject = null;
       div.remove();
