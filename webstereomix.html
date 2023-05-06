@@ -31,7 +31,7 @@ document.getElementById('muted').onclick = async function () {
 <li>ブラウザもしくはPCの音声のVolumeを戻す
 </ol>
 </div>
-<p><select id="add"><option>音声追加 Add audio<option value="tab">ブラウザの音声 browser<option value="monitor">PCの音声 system</select>
+<p><select id="add"><option>音声追加 Add audio<option value="browser">ブラウザの音声 browser<option value="monitor">PCの音声 system</select>
 `;
   var add = document.getElementById('add');
   (await navigator.mediaDevices.enumerateDevices()).forEach((device, i) => {
@@ -46,7 +46,7 @@ document.getElementById('muted').onclick = async function () {
     var selected = this.value;
     this.selectedIndex = 0;
     var stream;
-    if (selected === 'tab' || selected === 'monitor') {
+    if (selected === 'browser' || selected === 'monitor') {
       stream = await navigator.mediaDevices.getDisplayMedia({
         video: {displaySurface: selected},
         audio: {
