@@ -681,7 +681,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
         var mutebtn = await elementExists('button.mute-unmute-button');
         if (!this.btn) {
           this.btn = document.createElement('button');
-          this.btn.textContent = text('Webステミキを使う', 'Use Web Stereo Mix');
+          this.btn.textContent = text('ステミキ', 'Stereo Mix');
           this.btn.onclick = this.open;
         }
         mutebtn.before(this.btn);
