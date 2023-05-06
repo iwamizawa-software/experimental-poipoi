@@ -682,9 +682,10 @@ input{display:block;position:fixed;bottom:0;height:2em}
         if (!this.btn) {
           this.btn = document.createElement('button');
           this.btn.textContent = text('ステミキ', 'Stereo Mix');
+          this.btn.style.marginTop = '10px';
           this.btn.onclick = this.open;
         }
-        mutebtn.before(this.btn);
+        mutebtn.after(this.btn);
       } else {
         this.btn?.remove();
       }
