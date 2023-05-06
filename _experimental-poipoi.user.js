@@ -683,6 +683,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
           this.btn = document.createElement('button');
           this.btn.textContent = text('ステミキ', 'Stereo Mix');
           this.btn.style.marginTop = '10px';
+          this.btn.style.display = 'block';
           this.btn.onclick = this.open;
         }
         mutebtn.after(this.btn);
