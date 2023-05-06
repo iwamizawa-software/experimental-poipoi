@@ -2,12 +2,13 @@
 <html lang="ja">
 <head>
 <title>Webステミキ Web Stereo Mix</title>
+<style>ol{display:none}:checked~ol{display:block}</style>
 </head>
 <body>
 <img src="mutetab.png">
-<p>このタブを右クリックしてサイトをミュートしてください。
+<p>このタブを右クリックして「サイトをミュート」してください。
 <p>Right-click this tab, and mute this website.
-<p><button id="muted">ミュートした (既にミュートになってる) I muted</button>
+<p><button id="muted">「サイトをミュート」した (既にミュートになってる) I muted</button>
 <script>
 onunhandledrejection = onerror = event => {
   alert(event.reason);
@@ -17,11 +18,24 @@ document.getElementById('muted').onclick = async function () {
   document.body.insertAdjacentHTML('beforeend', '<p>マイクの使用を許可してください。この時点ではマイクは使用されません。<p>Allow using microphone.');
   var stream = await navigator.mediaDevices.getUserMedia({audio:true});
   stream.getTracks().forEach(t => t.stop());
-  document.body.innerHTML = '<select id="add"><option>音声追加 Add audio<option value="tab">ブラウザの音声 browser<option value="monitor">PCの音声 system</select><div id="msg"></div>';
+  document.body.innerHTML = `
+<p>共有の選択が出たときは、「音声を共有」にチェックを入れて画面共有してください。映像は共有されません。
+<p>If "Share your screen" displayed, check "Share audio", and share screen. Video is not shared.
+<div>
+<input type="checkbox" id="showProcess"><label for="showProcess">マイクの音を聴きながら音量調節したい場合の手順</label>
+<ol>
+<li>ブラウザもしくはPCの音声を追加している場合は、それらのVolumeを0にする
+<li>サイトのミュートを解除する
+<li>マイクのVolumeを調節する
+<li>再びサイトのミュートをする
+<li>ブラウザもしくはPCの音声のVolumeを戻す
+</ol>
+</div>
+<p><select id="add"><option>音声追加 Add audio<option value="tab">ブラウザの音声 browser<option value="monitor">PCの音声 system</select>
+`;
   var add = document.getElementById('add');
-  var msg = document.getElementById('msg');
   (await navigator.mediaDevices.enumerateDevices()).forEach((device, i) => {
-    if (device.kind !== 'audioinput' || /^$|default|communications/.test(device.deviceId))
+    if (device.kind !== 'audioinput' || /default|communications/.test(device.deviceId))
       return;
     var opt = document.createElement('option');
     opt.value = device.deviceId;
@@ -31,13 +45,8 @@ document.getElementById('muted').onclick = async function () {
   add.onchange = async function () {
     var selected = this.value;
     this.selectedIndex = 0;
-    msg.innerHTML = '';
     var stream;
     if (selected === 'tab' || selected === 'monitor') {
-      msg.innerHTML = (selected === 'tab'
-        ? '<p>タブの音声を共有にチェックを入れてページを共有してください。映像は共有されません。<p>Check "Share audio", and share tab. Video is not shared.'
-        : '<p>システムの音声を共有にチェックを入れて画面全体を共有してください。映像は共有されません。<p>Check "Share audio", and share screen. Video is not shared.'
-      );
       stream = await navigator.mediaDevices.getDisplayMedia({
         video: {displaySurface: selected},
         audio: {
@@ -51,7 +60,6 @@ document.getElementById('muted').onclick = async function () {
         track.stop();
         stream.removeTrack(track);
       });
-      msg.innerHTML = '';
       if (!stream.getAudioTracks().length) {
         alert('音声が取得できなかった Audio track not found');
         return;
@@ -67,8 +75,11 @@ document.getElementById('muted').onclick = async function () {
       });
     }
     var div = document.body.appendChild(document.createElement('div'));
-    div.appendChild(document.createElement('p')).textContent = stream.getAudioTracks()[0].label;
-    var closeBtn = div.firstChild.appendChild(document.createElement('button'));
+    div.setAttribute('style', 'border:1px solid #000;width:fit-content;padding:5px');
+    var title = div.appendChild(document.createElement('p'));
+    title.textContent = stream.getAudioTracks()[0].label;
+    var closeBtn = title.appendChild(document.createElement('button'));
+    closeBtn.style.cssFloat = 'right';
     closeBtn.textContent = '×';
     stream.oninactive = closeBtn.onclick = function () {
       if (!audio.srcObject)
@@ -78,9 +89,19 @@ document.getElementById('muted').onclick = async function () {
       div.remove();
     };
     var audio = div.appendChild(document.createElement('audio'));
-    audio.controls = true;
+    audio.style.display = 'none';
     audio.srcObject = stream;
     audio.play();
+    var control = div.appendChild(document.createElement('p'));
+    control.textContent = 'Volume ';
+    var vol = control.appendChild(document.createElement('input'));
+    vol.type = 'range';
+    vol.min = 0;
+    vol.value = vol.max = 1;
+    vol.step = 'any';
+    vol.oninput = function () {
+      audio.volume = vol.value;
+    };
   };
 };
 </script>
