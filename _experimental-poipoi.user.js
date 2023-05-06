@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  49
+// @version  50
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -9,6 +9,7 @@
 
 document.querySelector('head').appendChild(document.createElement('script').appendChild(document.createTextNode('(' + async function inject() {
 
+  var version = '50';
   if (document.currentScript)
     document.currentScript.remove();
   var consolelog = function () {
@@ -100,6 +101,12 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   } else {
     await ready(vueApp = window.vueApp, '_isMounted');
     createRoomNameRegex();
+  }
+  if (version !== localStorage.getItem('experimentalVersion')) {
+    localStorage.setItem('experimentalVersion', version);
+    elementExists('#login-footer').then(loginFooter => {
+      loginFooter.insertAdjacentHTML('beforebegin', `<p><a href="${'https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/version.txt?' + version}" target="_blank">experimental-poipoi 更新履歴</a>`);
+    });
   }
   console.log('injected');
 
@@ -675,7 +682,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
   addEventListener('focus', closeChessNotification);
   addEventListener('mousedown', closeChessNotification);
   // ステミキ
-  window.wsm = {
+  var wsm = {
     show: async function (show) {
       if (show) {
         var mutebtn = await elementExists('button.mute-unmute-button');
