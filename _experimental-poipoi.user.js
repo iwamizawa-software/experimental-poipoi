@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  48
+// @version  49
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -674,6 +674,59 @@ input{display:block;position:fixed;bottom:0;height:2em}
   };
   addEventListener('focus', closeChessNotification);
   addEventListener('mousedown', closeChessNotification);
+  // ステミキ
+  window.wsm = {
+    show: async function (show) {
+      if (show) {
+        var mutebtn = await elementExists('button.mute-unmute-button');
+        if (!this.btn) {
+          this.btn = document.createElement('button');
+          this.btn.textContent = text('Webステミキを使う', 'Use Web Stereo Mix');
+          this.btn.onclick = this.open;
+        }
+        mutebtn.before(this.btn);
+      } else {
+        this.btn?.remove();
+      }
+    },
+    open: async function () {
+      if (!vueApp.outboundAudioProcessor) {
+        vueApp.showWarningToast('outboundAudioProcessor not found');
+        return;
+      }
+      var w = open('https://iwamizawa-software.github.io/experimental-poipoi/webstereomix.html', 'wsm');
+      if (!w) {
+        vueApp.showWarningToast(text('ポップアップを許可してからもう一度ボタンを押してください', 'Allow to popup, and press button again.'));
+        return;
+      }
+      await {then: resolve => vueApp.openDialog(text('Webステミキを画面共有してください。映像は変わりません。', 'Share Web Stereo Mix tab. Video is not changed.'), '', ['OK'], 0, resolve)};
+      try {
+        var stream = await navigator.mediaDevices.getDisplayMedia({
+          video: {displaySurface: 'browser'},
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+            channelCount: 2
+          }
+        });
+        if (!stream.getAudioTracks().length)
+          throw new Error('Audio track not found');
+      } catch (err) {
+        vueApp.showWarningToast(err.toString());
+        return;
+      }
+      stream.getVideoTracks().forEach(t => {
+        t.stop();
+        stream.removeTrack(t);
+      });
+      vueApp.outboundAudioProcessor.stream.getAudioTracks().forEach(t => t.stop());
+      vueApp.outboundAudioProcessor.source.disconnect();
+      vueApp.outboundAudioProcessor.stream = stream;
+      vueApp.outboundAudioProcessor.source = vueApp.outboundAudioProcessor.context.createMediaStreamSource(stream);
+      vueApp.outboundAudioProcessor.connectNodes();
+    }
+  };
   // socket event
   var streamStates = [];
   var socketEvent = function (eventName) {
@@ -707,6 +760,8 @@ input{display:block;position:fixed;bottom:0;height:2em}
       // 配信通知
       case 'server-update-current-room-state':
         streamStates = arguments[1].streams.map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
+        // ステミキ表示
+        wsm.show(arguments[1].streams.some(s => s.userId === vueApp.myUserID && s.isActive && s.isReady && s.withSound));
         break;
       case 'server-update-current-room-streams':
         var currentStates = arguments[1].map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
@@ -714,6 +769,8 @@ input{display:block;position:fixed;bottom:0;height:2em}
         streamStates = currentStates;
         if (index !== -1)
           streamNotification(vueApp.users[arguments[1][index].userId], index);
+        // ステミキ表示
+        wsm.show(arguments[1].some(s => s.userId === vueApp.myUserID && s.isActive && s.isReady && s.withSound));
         break;
       // 全部屋ﾙｰﾗ
       case 'server-room-list':
