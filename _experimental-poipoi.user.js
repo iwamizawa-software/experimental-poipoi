@@ -9,7 +9,6 @@
 
 document.querySelector('head').appendChild(document.createElement('script').appendChild(document.createTextNode('(' + async function inject() {
 
-  var version = '50';
   if (document.currentScript)
     document.currentScript.remove();
   var consolelog = function () {
@@ -102,12 +101,15 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     await ready(vueApp = window.vueApp, '_isMounted');
     createRoomNameRegex();
   }
-  if (version !== localStorage.getItem('experimentalVersion')) {
+  var versionURL = 'https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/version.txt';
+  fetch(versionURL, {method: 'head'}).then(async res => {
+    var prevVersion = localStorage.getItem('experimentalVersion');
+    var version = res.headers.get('content-length');
+    if (version === prevVersion)
+      return;
     localStorage.setItem('experimentalVersion', version);
-    elementExists('#login-footer').then(loginFooter => {
-      loginFooter.insertAdjacentHTML('beforebegin', `<p><a href="${'https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/version.txt?' + version}" target="_blank">experimental-poipoi 更新履歴</a>`);
-    });
-  }
+    (await elementExists('#login-footer')).insertAdjacentHTML('beforebegin', '<p><a href="' + versionURL + '?' + version + '" target="_blank">experimental-poipoi 更新履歴</a>');
+  });
   console.log('injected');
 
   Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
