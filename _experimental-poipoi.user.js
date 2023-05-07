@@ -710,6 +710,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
           this.addAudio = document.createElement('select');
           this.addAudio.innerHTML = `<option>${text('配信音声の追加', 'Add audio')}<option value="browser">${text('ブラウザの音声', 'browser')}<option value="monitor">${text('PCの音声', 'computer')}`;
           this.addAudio.style.display = 'block';
+          this.addAudio.style.marginTop = '10px';
           this.addAudio.onchange = this.add;
           (await navigator.mediaDevices.enumerateDevices()).forEach((device, i) => {
             if (device.kind !== 'audioinput' || /default|communications/.test(device.deviceId))
@@ -791,8 +792,9 @@ input{display:block;position:fixed;bottom:0;height:2em}
       vol.type = 'range';
       vol.className = 'input-volume';
       vol.min = 0;
-      vol.value = vol.max = gain.gain.value = 1;
+      vol.max = 1;
       vol.step = 'any';
+      vol.value = gain.gain.value = vueApp.outboundAudioProcessor.isMute ? 0 : 1;
       vol.oninput = function () {
         gain.gain.value = vol.value;
       };
