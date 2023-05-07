@@ -732,7 +732,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
       var stream;
       try {
         if (selected === 'browser' || selected === 'monitor') {
-          await asyncAlert(text('「音声を共有」をチェックして画面共有してください。映像は変わりません。', 'Check "Share audio", and share screen. Video is not changed.'));
+          await asyncAlert(text('「音声を共有」をチェックして画面共有してください。映像は変わりません。\nFirefoxは多分使えません。', 'Check "Share audio", and share screen. Video is not changed.\nMaybe Firefox cannot use "Share audio".'));
           stream = await navigator.mediaDevices.getDisplayMedia({
             video: {displaySurface: selected},
             audio: {
