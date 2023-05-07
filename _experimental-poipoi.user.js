@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  50
+// @version  51
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -133,6 +133,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (experimentalConfig.clearBubble)
       vueApp.socket.emit('user-msg', '');
   };
+  var asyncAlert = text => new Promise(resolve => vueApp.openDialog(text, '', ['OK'], 0, resolve));
   var createButtonContainer = function () {
     var fakePopup = document.createElement('div');
     fakePopup.className = 'popup';
@@ -684,58 +685,117 @@ input{display:block;position:fixed;bottom:0;height:2em}
   addEventListener('focus', closeChessNotification);
   addEventListener('mousedown', closeChessNotification);
   // ステミキ
+  var mute = vueApp.mute;
+  vueApp.mute = function () {
+    Array.from(document.querySelectorAll('.input-volume')).forEach(input => {
+      input.dataset.value = input.value;
+      input.value = 0;
+      input.oninput();
+    });
+    return mute.apply(this, arguments);
+  };
+  var unmute = vueApp.unmute;
+  vueApp.unmute = function () {
+    Array.from(document.querySelectorAll('.input-volume')).forEach(input => {
+      input.value = +input.dataset.value || 1;
+      input.oninput();
+    });
+    return unmute.apply(this, arguments);
+  };
   var wsm = {
     show: async function (show) {
       if (show) {
         var mutebtn = await elementExists('button.mute-unmute-button');
-        if (!this.btn) {
-          this.btn = document.createElement('button');
-          this.btn.textContent = text('ステミキ', 'Stereo Mix');
-          this.btn.style.marginTop = '10px';
-          this.btn.style.display = 'block';
-          this.btn.onclick = this.open;
+        if (!this.addAudio) {
+          this.addAudio = document.createElement('select');
+          this.addAudio.innerHTML = `<option>${text('配信音声の追加', 'Add audio')}<option value="browser">${text('ブラウザの音声', 'browser')}<option value="monitor">${text('PCの音声', 'computer')}`;
+          this.addAudio.style.display = 'block';
+          this.addAudio.onchange = this.add;
+          (await navigator.mediaDevices.enumerateDevices()).forEach((device, i) => {
+            if (device.kind !== 'audioinput' || /default|communications/.test(device.deviceId))
+              return;
+            var opt = document.createElement('option');
+            opt.value = device.deviceId;
+            opt.text = device.label || ('mic ' + i);
+            this.addAudio.add(opt);
+          });
         }
-        mutebtn.after(this.btn);
+        mutebtn.parentNode.after(this.addAudio);
       } else {
-        this.btn?.remove();
+        this.addAudio?.remove();
       }
     },
-    open: async function () {
+    add: async function () {
+      var selected = this.value;
+      this.selectedIndex = 0;
+      var stream;
+      try {
+        if (selected === 'browser' || selected === 'monitor') {
+          await asyncAlert(text('「音声を共有」をチェックして画面共有してください。映像は変わりません。', 'Check "Share audio", and share screen. Video is not changed.'));
+          stream = await navigator.mediaDevices.getDisplayMedia({
+            video: {displaySurface: selected},
+            audio: {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false,
+              channelCount: 2
+            }
+          });
+          stream.getVideoTracks().forEach(track => {
+            track.stop();
+            stream.removeTrack(track);
+          });
+          if (!stream.getAudioTracks().length)
+            throw new Error('Audio track not found');
+        } else {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              deviceId: selected,
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false
+            }
+          });
+        }
+      } catch (err) {
+        asyncAlert(text('音声が取得できなかった', 'Audio track not found'));
+        console.log(err);
+        return;
+      }
       if (!vueApp.outboundAudioProcessor) {
         vueApp.showWarningToast('outboundAudioProcessor not found');
+        stream.getTracks().forEach(t => t.stop());
         return;
       }
-      var w = open('https://iwamizawa-software.github.io/experimental-poipoi/webstereomix.html', 'wsm');
-      if (!w) {
-        vueApp.showWarningToast(text('ポップアップを許可してからもう一度ボタンを押してください', 'Allow to popup, and press button again.'));
-        return;
-      }
-      await {then: resolve => vueApp.openDialog(text('Webステミキを画面共有してください。映像は変わりません。', 'Share Web Stereo Mix tab. Video is not changed.'), '', ['OK'], 0, resolve)};
-      try {
-        var stream = await navigator.mediaDevices.getDisplayMedia({
-          video: {displaySurface: 'browser'},
-          audio: {
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false,
-            channelCount: 2
-          }
-        });
-        if (!stream.getAudioTracks().length)
-          throw new Error('Audio track not found');
-      } catch (err) {
-        vueApp.showWarningToast(err.toString());
-        return;
-      }
-      stream.getVideoTracks().forEach(t => {
-        t.stop();
-        stream.removeTrack(t);
-      });
-      vueApp.outboundAudioProcessor.stream.getAudioTracks().forEach(t => t.stop());
-      vueApp.outboundAudioProcessor.source.disconnect();
-      vueApp.outboundAudioProcessor.stream = stream;
-      vueApp.outboundAudioProcessor.source = vueApp.outboundAudioProcessor.context.createMediaStreamSource(stream);
-      vueApp.outboundAudioProcessor.connectNodes();
+      vueApp.outboundAudioProcessor.stream.addTrack(stream.getAudioTracks()[0]);
+      var gain = vueApp.outboundAudioProcessor.context.createGain();
+      vueApp.outboundAudioProcessor.context.createMediaStreamSource(stream).connect(gain);
+      gain.connect(vueApp.outboundAudioProcessor.pan);
+      var div = document.createElement('div');
+      this.after(div);
+      div.setAttribute('style', 'border:1px solid #000;width:fit-content;padding:5px');
+      var title = div.appendChild(document.createElement('p'));
+      title.textContent = stream.getAudioTracks()[0].label;
+      var closeBtn = title.appendChild(document.createElement('button'));
+      closeBtn.style.cssFloat = 'right';
+      closeBtn.textContent = '×';
+      stream.oninactive = closeBtn.onclick = function () {
+        stream.getTracks().forEach(t => t.stop());
+        gain.disconnect();
+        div.remove();
+        vueApp.outboundAudioProcessor?.stream.removeTrack(stream.getAudioTracks()[0]);
+      };
+      var control = div.appendChild(document.createElement('p'));
+      control.textContent = 'Volume ';
+      var vol = control.appendChild(document.createElement('input'));
+      vol.type = 'range';
+      vol.className = 'input-volume';
+      vol.min = 0;
+      vol.value = vol.max = gain.gain.value = 1;
+      vol.step = 'any';
+      vol.oninput = function () {
+        gain.gain.value = vol.value;
+      };
     }
   };
   // socket event
