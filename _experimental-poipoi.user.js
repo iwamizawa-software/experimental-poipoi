@@ -9,6 +9,9 @@
 
 document.querySelector('head').appendChild(document.createElement('script').appendChild(document.createTextNode('(' + async function inject() {
 
+  if (window.experimental)
+    return;
+  window.experimental = true;
   if (document.currentScript)
     document.currentScript.remove();
   var consolelog = function () {
@@ -490,7 +493,8 @@ html,body,#chatLog,input{margin:0;padding:0;box-sizing:border-box;width:100%;hei
 input{display:block;position:fixed;bottom:0;height:2em}
 </style>
 <style id="log-style">${experimentalConfig.logWindowCSS}</style>
-<script>window.interval = setInterval(function () {
+<script>window.experimental = true;
+window.interval = setInterval(function () {
   try {
     if (opener.logWindow !== window)
       throw 1;
