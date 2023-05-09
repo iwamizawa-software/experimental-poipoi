@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  51
+// @version  52
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -687,20 +687,28 @@ input{display:block;position:fixed;bottom:0;height:2em}
   // ステミキ
   var mute = vueApp.mute;
   vueApp.mute = function () {
-    Array.from(document.querySelectorAll('.input-volume')).forEach(input => {
-      input.dataset.value = input.value;
-      input.value = 0;
-      input.oninput();
-    });
+    try {
+      Array.from(document.querySelectorAll('.input-volume')).forEach(input => {
+        input.dataset.value = input.value;
+        input.value = 0;
+        input.disabled = true;
+        input.oninput();
+      });
+    } catch (err) {
+      asyncAlert(text('ミュートでエラーが発生した', 'failed to mute'));
+      console.log(err);
+    }
     return mute.apply(this, arguments);
   };
   var unmute = vueApp.unmute;
   vueApp.unmute = function () {
+    var result = unmute.apply(this, arguments);
     Array.from(document.querySelectorAll('.input-volume')).forEach(input => {
-      input.value = +input.dataset.value || 1;
+      input.value = input.dataset.value ? +input.dataset.value : 1;
+      input.disabled = false;
       input.oninput();
     });
-    return unmute.apply(this, arguments);
+    return result;
   };
   var wsm = {
     show: async function (show) {
@@ -708,7 +716,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
         var mutebtn = await elementExists('button.mute-unmute-button');
         if (!this.addAudio) {
           this.addAudio = document.createElement('select');
-          this.addAudio.innerHTML = `<option>${text('配信音声の追加', 'Add audio')}<option value="browser">${text('ブラウザの音声', 'browser')}<option value="monitor">${text('PCの音声', 'computer')}`;
+          this.addAudio.innerHTML = `<option>${text('配信音声の追加', 'Add voice')}<option value="browser">${text('ブラウザの音声', 'browser sound')}<option value="monitor">${text('PCの音声', 'speaker sound')}`;
           this.addAudio.style.display = 'block';
           this.addAudio.style.marginTop = '10px';
           this.addAudio.onchange = this.add;
@@ -722,8 +730,12 @@ input{display:block;position:fixed;bottom:0;height:2em}
           });
         }
         mutebtn.parentNode.after(this.addAudio);
+        this.streamVolume?.remove();
+        this.addVolume(this.streamVolume = document.createElement('div'), vueApp.outboundAudioProcessor.gain);
+        mutebtn.parentNode.before(this.streamVolume);
       } else {
         this.addAudio?.remove();
+        this.streamVolume?.remove();
       }
     },
     add: async function () {
@@ -732,7 +744,7 @@ input{display:block;position:fixed;bottom:0;height:2em}
       var stream;
       try {
         if (selected === 'browser' || selected === 'monitor') {
-          await asyncAlert(text('「音声を共有」をチェックして画面共有してください。映像は変わりません。\nFirefoxは多分使えません。', 'Check "Share audio", and share screen. Video is not changed.\nMaybe Firefox cannot use "Share audio".'));
+          await asyncAlert(text('「音声を共有」をチェックして画面共有してください。映像は変わりません。\nFirefoxとスマホは多分使えません。', 'Check "Share audio", and share screen. Video is not changed.\nMaybe Firefox and mobile cannot use "Share audio".'));
           stream = await navigator.mediaDevices.getDisplayMedia({
             video: {displaySurface: selected},
             audio: {
@@ -786,6 +798,9 @@ input{display:block;position:fixed;bottom:0;height:2em}
         div.remove();
         vueApp.outboundAudioProcessor?.stream.removeTrack(stream.getAudioTracks()[0]);
       };
+      wsm.addVolume(div, gain);
+    },
+    addVolume: function (div, gain) {
       var control = div.appendChild(document.createElement('p'));
       control.textContent = 'Volume ';
       var vol = control.appendChild(document.createElement('input'));
@@ -794,7 +809,8 @@ input{display:block;position:fixed;bottom:0;height:2em}
       vol.min = 0;
       vol.max = 1;
       vol.step = 'any';
-      vol.value = gain.gain.value = vueApp.outboundAudioProcessor.isMute ? 0 : 1;
+      vol.disabled = vueApp.outboundAudioProcessor.isMute;
+      vol.value = gain.gain.value = vol.disabled ? 0 : 1;
       vol.oninput = function () {
         gain.gain.value = vol.value;
       };
