@@ -784,7 +784,12 @@ window.interval = setInterval(function () {
         stream.getTracks().forEach(t => t.stop());
         return;
       }
-      vueApp.outboundAudioProcessor.stream.addTrack(stream.getAudioTracks()[0]);
+      var track = stream.getAudioTracks()[0];
+      vueApp.outboundAudioProcessor.stream.addTrack(track);
+      track.stop = function () {
+        closeBtn.click();
+        return track.__proto__.stop.apply(this, arguments);
+      };
       var gain = vueApp.outboundAudioProcessor.context.createGain();
       vueApp.outboundAudioProcessor.context.createMediaStreamSource(stream).connect(gain);
       gain.connect(vueApp.outboundAudioProcessor.pan);
@@ -801,6 +806,7 @@ window.interval = setInterval(function () {
         gain.disconnect();
         div.remove();
         vueApp.outboundAudioProcessor?.stream.removeTrack(stream.getAudioTracks()[0]);
+        stream.oninactive = closeBtn.onclick = null;
       };
       wsm.addVolume(div, gain);
     },
