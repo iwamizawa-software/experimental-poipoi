@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  52
+// @version  53
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -836,18 +836,22 @@ window.interval = setInterval(function () {
           var user = arguments[1];
           if (!user || user.id === vueApp.myUserID)
             return;
-          if (experimentalConfig.accessLog)
-            vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が入室', ' has joined the room'), null);
-          accessNotification(user, text('入室', 'join'));
+          if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
+            if (experimentalConfig.accessLog)
+              vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が入室', ' has joined the room'), null);
+            accessNotification(user, text('入室', 'join'));
+          }
         }, 0);
         break;
       case 'server-user-left-room':
         var user = vueApp.users[arguments[1]];
         if (!user || user.id === vueApp.myUserID)
           return;
-        if (experimentalConfig.accessLog)
-          vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が退室', ' has left the room'), null);
-        accessNotification(user, text('退室', 'leave'));
+        if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
+          if (experimentalConfig.accessLog)
+            vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が退室', ' has left the room'), null);
+          accessNotification(user, text('退室', 'leave'));
+        }
         var stream = vueApp.streams.find(s => s.userId === user.id);
         if (stream)
           stream.isActive = false;
