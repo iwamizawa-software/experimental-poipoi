@@ -36,3 +36,15 @@ Graph.prototype.update = function ({userId, x, y}) {
     this.users.set(userId, this.nodes[y][x]);
 };
 
+var physicalToLogical = function (x, y) {
+  var vueApp = _vueApp;
+  var room = vueApp.currentRoom, scale = vueApp.getCanvasScale();
+  var blockWidth = room.blockWidth || 80, blockHeight = room.blockHeight || 40;
+  x = ((x - vueApp.canvasGlobalOffset.x) / scale - room.originCoordinates.x) / blockWidth;
+  y = (room.originCoordinates.y - (blockHeight / 2) - (y - vueApp.canvasGlobalOffset.y) / scale) / blockHeight;
+  return {x: Math.floor(x - y), y: Math.floor(x + y)};
+}
+
+document.addEventListener('dblclick', event => {
+  console.log(physicalToLogical(event.offsetX, event.offsetY));
+});
