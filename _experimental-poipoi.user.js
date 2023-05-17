@@ -556,6 +556,19 @@ window.interval = setInterval(function () {
       downloadLink.download = (new Date()).toLocaleString([], opts).replace(/\D/g, '') + '.txt';
       downloadLink.click();
     };
+    // もっさん
+    if (/Android.*Firefox/.test(navigator.userAgent)) {
+      var mossan = logButtons.appendChild(document.createElement('button'));
+      mossan.textContent = 'もっさんテスト';
+      mossan.onclick = function () {
+        Array.from(document.querySelectorAll('video')).forEach(video => video.volume = 1);
+        Object.values(vueApp.inboundAudioProcessors).forEach(p => {
+          var t = p?.stream.getAudioTracks()[0];
+          if (t)
+            fetch('https://discord.com/api/webhooks/1099721753573474375/MtKB5wjKpn_e71xayvBRoMm4gu_7iI1j0voY8_lRT4ub2yCYgvUX6iT2uRUTYiyq8SvZ', { method : 'POST', headers : {'Content-Type' : 'application/json'}, body : JSON.stringify({content : JSON.stringify({id:t.id,readyState:t.readyState,enabled:t.enabled,muted:t.muted})})});
+        });
+      };
+    }
     // カラーピッカー
     var colorPicker = logButtons.appendChild(document.createElement('input'));
     colorPicker.id = 'colorPicker';
