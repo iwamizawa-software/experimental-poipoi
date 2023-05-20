@@ -839,10 +839,50 @@ window.interval = setInterval(function () {
       };
     }
   };
+  // 経路移動
+  vueApp.route = {
+    queue: [],
+    next: function (prev) {
+      if (!this.queue.length || (prev === 'room' ? Array !== this.queue[0].constructor : (prev && prev !== this.queue[0])))
+        return;
+      this.queue.shift();
+      this.move();
+    },
+    move: function () {
+      if (!this.queue.length)
+        return;
+      if (typeof this.queue[0] === 'string')
+        vueApp.socket.emit('user-move', this.queue[0]);
+      else
+        vueApp.changeRoom.apply(vueApp, this.queue[0]);
+    },
+    add: function (q) {
+      if (this.queue.length || q?.constructor !== Array)
+        return;
+      this.queue = q;
+      this.move();
+    },
+    clear: function () {
+      this.queue = [];
+    }
+  };
+  addEventListener('keydown', event => {
+    if (event.key === 'Escape')
+      vueApp.route.clear();
+  });
   // socket event
   var streamStates = [];
   var socketEvent = function (eventName) {
     switch (eventName) {
+      // 経路移動
+      case 'server-move':
+        var dto = arguments[1];
+        if (dto?.direction && dto?.userId === vueApp.myUserID)
+          vueApp.route.next(dto.direction);
+        break;
+      case 'server-reject-movement':
+        vueApp.route.next();
+        break;
       // 入退室ログ
       case 'server-user-joined-room':
         setTimeout(() => {
@@ -878,6 +918,8 @@ window.interval = setInterval(function () {
         streamStates = arguments[1].streams.map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
         // ステミキ表示
         wsm.show(arguments[1].streams.some(s => s.userId === vueApp.myUserID && s.isActive && s.isReady && s.withSound));
+        // 経路移動
+        vueApp.route.next('room');
         break;
       case 'server-update-current-room-streams':
         var currentStates = arguments[1].map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
