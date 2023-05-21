@@ -843,8 +843,7 @@ window.interval = setInterval(function () {
     }
   };
   // グラフ
-  window.graph = null;
-  var Graph = function ({currentRoom, connectedUsers}) {
+  var graph, Graph = function ({currentRoom, connectedUsers}) {
     this.nodes = eval('[' + ('[' + '{},'.repeat(currentRoom.size.x) + '],').repeat(currentRoom.size.y) + ']');
     this.room = currentRoom.id;
     currentRoom.blocked.forEach(({x, y}) => this.nodes[y][x] = null);
@@ -921,7 +920,6 @@ window.interval = setInterval(function () {
     return door;
   };
   var physicalToLogical = function (x, y) {
-    var vueApp = _vueApp;
     var room = vueApp.currentRoom, scale = vueApp.getCanvasScale();
     var blockWidth = room.blockWidth || 80, blockHeight = room.blockHeight || 40;
     x = ((x - vueApp.canvasGlobalOffset.x) / scale - room.originCoordinates.x) / blockWidth;
@@ -930,8 +928,7 @@ window.interval = setInterval(function () {
   };
   document.addEventListener('dblclick', event => {
     if (event.target.id === 'room-canvas') {
-      var from = vueApp.users[vueApp.myUserID], to = physicalToLogical(event.offsetX, event.offsetY);
-      console.log(JSON.stringify(to));
+      var from = vueApp.users[vueApp.myUserID], to = physicalToLogical(event.offsetX * devicePixelRatio, event.offsetY * devicePixelRatio);
       vueApp.route.add(graph?.search(from.logicalPositionX, from.logicalPositionY, to.x, to.y, from.direction));
     }
   });
