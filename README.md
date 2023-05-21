@@ -154,3 +154,4 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 - Alt+1でチャンネル1の動画配信を回転する (2, 3も対応)
 - チェスで自分の番が来たら通知
 - ステレオミキサー機能
+- ダブルクリックでその位置まで移動

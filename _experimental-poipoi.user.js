@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  53
+// @version  54
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -40,15 +40,16 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     });
     return {then: c=>{callback = c}};
   };
+  var sleep = t => ({then: f => setTimeout(f, t)});
   var objectExists = async function (obj, key) {
     while (!obj[key])
-      await {then: f => setTimeout(f, 1000)};
+      await sleep(1000);
     return obj[key];
   };
   var elementExists = async function (query) {
     var element;
     while (!(element = document.querySelector(query)))
-      await {then: f => setTimeout(f, 1000)};
+      await sleep(1000);
     return element;
   };
   // ルーラリンク
@@ -231,6 +232,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     // ログ窓タイトル変更
     if (logWindow && !logWindow.closed)
       logWindow.onresize();
+    // グラフ
+    graph = new Graph(dto);
     return r;
   };
   // ユーザー追加時
@@ -839,22 +842,120 @@ window.interval = setInterval(function () {
       };
     }
   };
+  // グラフ
+  var graph, Graph = function ({currentRoom, connectedUsers}) {
+    this.nodes = eval('[' + ('[' + '{},'.repeat(currentRoom.size.x) + '],').repeat(currentRoom.size.y) + ']');
+    this.room = currentRoom.id;
+    currentRoom.blocked.forEach(({x, y}) => this.nodes[y][x] = null);
+    var flag = [false];
+    for (var y = 0; y < currentRoom.size.y; y++)
+      for (var x = 0; x < currentRoom.size.x; x++) {
+        var node = this.nodes[y][x], tmp;
+        if (!node)
+          continue;
+        node.edges = new Map();
+        if (tmp = this.nodes[y][x - 1])
+          node.edges.set(tmp, {direction: 'left', reverse: 'right'});
+        if (tmp = this.nodes[y][x + 1])
+          node.edges.set(tmp, {direction: 'right', reverse: 'left'});
+        if (tmp = this.nodes[y - 1]?.[x])
+          node.edges.set(tmp, {direction: 'down', reverse: 'up'});
+        if (tmp = this.nodes[y + 1]?.[x])
+          node.edges.set(tmp, {direction: 'up', reverse: 'down'});
+        node.users = new Map();
+        node.flag = flag;
+      }
+    currentRoom.forbiddenMovements.forEach(({xFrom, yFrom, xTo, yTo}) => {
+      delete (this.nodes[yFrom][xFrom].edges.get(this.nodes[yTo][xTo]) || {}).direction;
+      delete (this.nodes[yTo][xTo].edges.get(this.nodes[yFrom][xFrom]) || {}).reverse;
+    });
+    connectedUsers.forEach(({id, position}) => this.nodes[position.y][position.x].users.set(id));
+    for (var id in currentRoom.doors) {
+      var door = currentRoom.doors[id];
+      this.nodes[door.y][door.x].door = {id, direction: door.direction};
+    }
+  };
+  Graph.prototype.update = function (userId, xFrom, yFrom, xTo, yTo) {
+    this.nodes[yFrom]?.[xFrom]?.users.delete(userId);
+    this.nodes[yTo]?.[xTo]?.users.set(userId);
+  };
+  Graph.prototype.search = function (xFrom, yFrom, xTo, yTo, direction) {
+    var target = this.nodes[yTo]?.[xTo];
+    if (!target)
+      return;
+    var from = this.nodes[yFrom]?.[xFrom];
+    if (!from || target === from)
+      return;
+    if (target.door)
+      return [[this.room, target.door.id]];
+    var queue = [{node: target, path: {length: 0}}], current, door, flag = target.flag = [true];
+    while (current = queue.shift()) {
+      var iterator = current.node.edges.entries();
+      for (var [node, edge] of iterator) {
+        if (node.flag[0] || !edge.reverse || (door && node.door && from !== node))
+          continue;
+        var i = current.path.length, child = {node, path: {length: i}};
+        if (i && current.path[i - 1] !== edge.reverse)
+          child.path[child.path.length++] = current.path[i - 1];
+        child.path[child.path.length++] = edge.reverse;
+        child.path.__proto__ = current.path;
+        if (from === node) {
+          if (direction !== edge.reverse)
+            child.path[child.path.length++] = edge.reverse;
+          flag[0] = false;
+          return Array.from(child.path).reverse();
+        }
+        node.flag = flag;
+        if (node.door) {
+          if (node.door.direction !== edge.reverse)
+            child.path[child.path.length++] = edge.reverse;
+          child.path[child.path.length++] = [this.room, node.door.id];
+          door = Array.from(child.path).reverse();
+          continue;
+        }
+        queue.push(child);
+      }
+    }
+    flag[0] = false;
+    return door;
+  };
+  var physicalToLogical = function (x, y) {
+    var vueApp = _vueApp;
+    var room = vueApp.currentRoom, scale = vueApp.getCanvasScale();
+    var blockWidth = room.blockWidth || 80, blockHeight = room.blockHeight || 40;
+    x = ((x - vueApp.canvasGlobalOffset.x) / scale - room.originCoordinates.x) / blockWidth;
+    y = (room.originCoordinates.y - (blockHeight / 2) - (y - vueApp.canvasGlobalOffset.y) / scale) / blockHeight;
+    return {x: Math.floor(x - y), y: Math.floor(x + y)};
+  };
+  document.addEventListener('dblclick', event => {
+    if (event.target.id === 'room-canvas') {
+      var from = vueApp.users[vueApp.myUserID], to = physicalToLogical(event.offsetX, event.offsetY);
+      vueApp.route.add(graph?.search(from.logicalPositionX, from.logicalPositionY, to.x, to.y, from.direction));
+    }
+  });
   // 経路移動
   vueApp.route = {
     queue: [],
     next: function (prev) {
-      if (!this.queue.length || (prev === 'room' ? Array !== this.queue[0].constructor : (prev && prev !== this.queue[0])))
+      if (!this.queue.length || (prev === 'room' ? Array !== this.queue[0].constructor : (prev && prev !== this.queue[0]))) {
+        this.clear();
         return;
+      }
       this.queue.shift();
       this.move();
     },
-    move: function () {
+    move: async function () {
       if (!this.queue.length)
         return;
-      if (typeof this.queue[0] === 'string')
+      if (typeof this.queue[0] === 'string') {
+        var t = (vueApp.characterId === 'shar_naito' ? 200 : 450) * (vueApp.currentRoom.id === 'long_st' ? 0.5 : 1) - (new Date()).getTime() + this.lastMovement;
+        if (t > 0)
+          await sleep(t);
         vueApp.socket.emit('user-move', this.queue[0]);
-      else
+        this.lastMovement = (new Date()).getTime();
+      } else {
         vueApp.changeRoom.apply(vueApp, this.queue[0]);
+      }
     },
     add: function (q) {
       if (this.queue.length || q?.constructor !== Array)
@@ -864,7 +965,8 @@ window.interval = setInterval(function () {
     },
     clear: function () {
       this.queue = [];
-    }
+    },
+    lastMovement: 0
   };
   addEventListener('keydown', event => {
     if (event.key === 'Escape')
@@ -874,19 +976,25 @@ window.interval = setInterval(function () {
   var streamStates = [];
   var socketEvent = function (eventName) {
     switch (eventName) {
-      // 経路移動
       case 'server-move':
-        var dto = arguments[1];
+        var dto = arguments[1], user = vueApp.users[dto.userId];
+        // グラフ
+        if (dto && user)
+          graph?.update(dto.userId, user.logicalPositionX, user.logicalPositionY, dto.x, dto.y);
+        // 経路移動
         if (dto?.direction && dto?.userId === vueApp.myUserID)
           vueApp.route.next(dto.direction);
         break;
       case 'server-reject-movement':
         vueApp.route.next();
         break;
-      // 入退室ログ
       case 'server-user-joined-room':
+        var user = arguments[1];
+        // グラフ
+        if (user)
+          graph?.update(user.id, null, null, user.position.x, user.position.y);
+        // 入室ログ
         setTimeout(() => {
-          var user = arguments[1];
           if (!user || user.id === vueApp.myUserID)
             return;
           if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
@@ -898,6 +1006,10 @@ window.interval = setInterval(function () {
         break;
       case 'server-user-left-room':
         var user = vueApp.users[arguments[1]];
+        // グラフ
+        if (user)
+          graph?.update(arguments[1], user.logicalPositionX, user.logicalPositionY, null, null);
+        // 退室ログ
         if (!user || user.id === vueApp.myUserID)
           return;
         if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
@@ -905,6 +1017,7 @@ window.interval = setInterval(function () {
             vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が退室', ' has left the room'), null);
           accessNotification(user, text('退室', 'leave'));
         }
+        // 配信通知
         var stream = vueApp.streams.find(s => s.userId === user.id);
         if (stream)
           stream.isActive = false;
@@ -913,8 +1026,8 @@ window.interval = setInterval(function () {
         // 呼び出し通知
         mentionNotification(vueApp.users[arguments[1]], arguments[2]);
         break;
-      // 配信通知
       case 'server-update-current-room-state':
+        // 配信通知
         streamStates = arguments[1].streams.map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
         // ステミキ表示
         wsm.show(arguments[1].streams.some(s => s.userId === vueApp.myUserID && s.isActive && s.isReady && s.withSound));
@@ -922,6 +1035,7 @@ window.interval = setInterval(function () {
         vueApp.route.next('room');
         break;
       case 'server-update-current-room-streams':
+        // 配信通知
         var currentStates = arguments[1].map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
         var index = currentStates.findIndex((s, i) => s && !streamStates[i] && !vueApp.takenStreams[i]);
         streamStates = currentStates;
