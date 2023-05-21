@@ -843,7 +843,8 @@ window.interval = setInterval(function () {
     }
   };
   // グラフ
-  var graph, Graph = function ({currentRoom, connectedUsers}) {
+  window.graph = null;
+  var Graph = function ({currentRoom, connectedUsers}) {
     this.nodes = eval('[' + ('[' + '{},'.repeat(currentRoom.size.x) + '],').repeat(currentRoom.size.y) + ']');
     this.room = currentRoom.id;
     currentRoom.blocked.forEach(({x, y}) => this.nodes[y][x] = null);
