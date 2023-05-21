@@ -886,8 +886,6 @@ window.interval = setInterval(function () {
     var from = this.nodes[yFrom]?.[xFrom];
     if (!from || target === from)
       return;
-    if (target.door)
-      return [[this.room, target.door.id]];
     var queue = [{node: target, path: {length: 0}}], current, door, flag = target.flag = [true];
     while (current = queue.shift()) {
       var iterator = current.node.edges.entries();
@@ -917,7 +915,7 @@ window.interval = setInterval(function () {
       }
     }
     flag[0] = false;
-    return door;
+    return door || (target.door && [[this.room, target.door.id]]);
   };
   var physicalToLogical = function (x, y) {
     var room = vueApp.currentRoom, scale = vueApp.getCanvasScale();
