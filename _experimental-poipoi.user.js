@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  54
+// @version  55
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -917,6 +917,21 @@ window.interval = setInterval(function () {
     flag[0] = false;
     return door || (target.door && [[this.room, target.door.id]]);
   };
+  Graph.prototype.escape = function ({x, y, direction}) {
+    var currentNode = this.nodes[y]?.[x];
+    if (!currentNode || currentNode.users.size < 2)
+      return;
+    var iterator = currentNode.edges.entries(), candidate = [], second = [];
+    for (var [node, edge] of iterator) {
+      if (!edge.direction || node.door)
+        continue;
+      var path = [edge.direction];
+      if (edge.direction !== direction)
+        path.push(edge.direction);
+      (node.users.size ? second : candidate).push(path);
+    }
+    return candidate.length ? candidate[Math.random() * candidate.length | 0] : second[Math.random() * second.length | 0];
+  };
   var physicalToLogical = function (x, y) {
     var room = vueApp.currentRoom, scale = vueApp.getCanvasScale();
     var blockWidth = room.blockWidth || 80, blockHeight = room.blockHeight || 40;
@@ -981,6 +996,11 @@ window.interval = setInterval(function () {
         // 経路移動
         if (dto?.direction && dto?.userId === vueApp.myUserID)
           vueApp.route.next(dto.direction);
+        // 重なり回避
+        if (experimentalConfig.escape) {
+          var myself = vueApp.users[vueApp.myUserID];
+          vueApp.route.add(graph.escape(dto?.userId === vueApp.myUserID ? dto : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}));
+        }
         break;
       case 'server-reject-movement':
         vueApp.route.next();
@@ -990,6 +1010,14 @@ window.interval = setInterval(function () {
         // グラフ
         if (user)
           graph?.update(user.id, null, null, user.position.x, user.position.y);
+        // 重なり回避
+        if (experimentalConfig.escape) {
+          var myself = vueApp.users[vueApp.myUserID];
+          vueApp.route.add(graph.escape(user.id === vueApp.myUserID
+            ? {x: user.position.x, y: user.position.y, direction: user.direction}
+            : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}
+          ));
+        }
         // 入室ログ
         setTimeout(() => {
           if (!user || user.id === vueApp.myUserID)

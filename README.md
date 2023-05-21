@@ -155,3 +155,4 @@ URL からインポートにhttps://raw.githubusercontent.com/iwamizawa-software
 - チェスで自分の番が来たら通知
 - ステレオミキサー機能
 - ダブルクリックでその位置まで移動
+- キャラの重なり回避

@@ -11,6 +11,7 @@
   withoutAnon: 0,
   notifyStream: 1,
   hairControl: 0,
+  escape: 0,
   autoBlock: '',
   autoIgnore: '',
   ttsAllowList: '',
