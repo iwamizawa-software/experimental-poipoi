@@ -931,6 +931,7 @@ window.interval = setInterval(function () {
   document.addEventListener('dblclick', event => {
     if (event.target.id === 'room-canvas') {
       var from = vueApp.users[vueApp.myUserID], to = physicalToLogical(event.offsetX, event.offsetY);
+      console.log(JSON.stringify(to));
       vueApp.route.add(graph?.search(from.logicalPositionX, from.logicalPositionY, to.x, to.y, from.direction));
     }
   });
