@@ -908,20 +908,31 @@ window.interval = setInterval(function () {
     flag[0] = false;
     return door || (target.door && [[this.room, target.door.id]]);
   };
-  Graph.prototype.escape = function ({x, y, direction}) {
+  Graph.prototype.escape = function ({x, y, direction}, far) {
     var currentNode = this.nodes[y]?.[x];
     if (!currentNode || currentNode.users.size < 2)
       return;
-    var iterator = currentNode.edges.entries(), candidate = [], second = [];
-    for (var [node, edge] of iterator) {
-      if (!edge.direction || node.door)
-        continue;
-      var path = [edge.direction];
-      if (edge.direction !== direction)
-        path.push(edge.direction);
-      (node.users.size ? second : candidate).push(path);
+    var candidate = [], second = [];
+    var queue = [{node: currentNode, path: {length: 0}}], current, flag = currentNode.flag = [true];
+    while (current = queue.shift()) {
+      var iterator = current.node.edges.entries();
+      for (var [node, edge] of iterator) {
+        if (node.flag[0] || !edge.direction || node.door)
+          continue;
+        var i = current.path.length, child = {node, path: {length: i}};
+        if ((current.path[i - 1] || direction) !== edge.direction)
+          child.path[child.path.length++] = edge.direction;
+        child.path[child.path.length++] = edge.direction;
+        child.path.__proto__ = current.path;
+        node.flag = flag;
+        queue.push(child);
+        (node.users.size || (far && child.path.length < 4) ? second : candidate).push(child.path);
+      }
+      if (!far)
+        break;
     }
-    return candidate.length ? candidate[Math.random() * candidate.length | 0] : second[Math.random() * second.length | 0];
+    flag[0] = false;
+    return Array.from(candidate.length ? candidate[Math.random() * candidate.length | 0] : second[Math.random() * second.length | 0]);
   };
   var physicalToLogical = function (x, y) {
     var room = vueApp.currentRoom, scale = vueApp.getCanvasScale();
@@ -990,7 +1001,7 @@ window.interval = setInterval(function () {
         // 重なり回避
         if (experimentalConfig.escape) {
           var myself = vueApp.users[vueApp.myUserID];
-          vueApp.route.add(graph.escape(dto?.userId === vueApp.myUserID ? dto : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}));
+          vueApp.route.add(graph.escape(dto?.userId === vueApp.myUserID ? dto : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}, experimentalConfig.escape === 2));
         }
         break;
       case 'server-reject-movement':
@@ -1007,7 +1018,7 @@ window.interval = setInterval(function () {
           vueApp.route.add(graph.escape(user.id === vueApp.myUserID
             ? {x: user.position.x, y: user.position.y, direction: user.direction}
             : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}
-          ));
+          , experimentalConfig.escape === 2));
         }
         // 入室ログ
         setTimeout(() => {
