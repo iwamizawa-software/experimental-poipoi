@@ -179,6 +179,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   configButton.textContent = 'config';
   var configEditor = document.body.appendChild(document.createElement('textarea'));
   configEditor.setAttribute('style', 'position:fixed;right:30px;top:54px;display:none;width:50vw;height:50vh;resize:vertical');
+  configEditor.spellcheck = false;
   var editing;
   configButton.onclick = function () {
     if (editing) {
