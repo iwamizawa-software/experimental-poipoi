@@ -952,6 +952,7 @@ window.interval = setInterval(function () {
   vueApp.route = {
     queue: [],
     next: function (prev) {
+      this.lastMovement = (new Date()).getTime();
       if (!this.queue.length || (prev === 'room' ? Array !== this.queue[0].constructor : (prev && prev !== this.queue[0]))) {
         this.clear();
         return;
@@ -963,11 +964,14 @@ window.interval = setInterval(function () {
       if (!this.queue.length)
         return;
       if (typeof this.queue[0] === 'string') {
-        var t = (vueApp.characterId === 'shar_naito' ? 300 : 500) * (vueApp.currentRoom.id === 'long_st' ? 0.5 : 1) - (new Date()).getTime() + this.lastMovement;
-        if (t > 0)
-          await sleep(t);
+        while (true) {
+          var t = (vueApp.characterId === 'shar_naito' ? 250 : 300) * (vueApp.currentRoom.id === 'long_st' ? 0.5 : 1) - (new Date()).getTime() + this.lastMovement;
+          if (t > 0)
+            await sleep(t);
+          else
+            break;
+        }
         vueApp.socket.emit('user-move', this.queue[0]);
-        this.lastMovement = (new Date()).getTime();
       } else {
         vueApp.changeRoom.apply(vueApp, this.queue[0]);
       }
@@ -980,11 +984,12 @@ window.interval = setInterval(function () {
     },
     clear: function () {
       this.queue = [];
+      this.lastMovement = (new Date()).getTime();
     },
     lastMovement: 0
   };
   addEventListener('keydown', event => {
-    if (event.key === 'Escape')
+    if (event.key === 'Escape' || !event.key.indexOf('Arrow'))
       vueApp.route.clear();
   });
   // socket event
