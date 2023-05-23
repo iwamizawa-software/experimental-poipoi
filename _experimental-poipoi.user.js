@@ -963,7 +963,7 @@ window.interval = setInterval(function () {
       if (!this.queue.length)
         return;
       if (typeof this.queue[0] === 'string') {
-        var t = (vueApp.characterId === 'shar_naito' ? 200 : 450) * (vueApp.currentRoom.id === 'long_st' ? 0.5 : 1) - (new Date()).getTime() + this.lastMovement;
+        var t = (vueApp.characterId === 'shar_naito' ? 300 : 500) * (vueApp.currentRoom.id === 'long_st' ? 0.5 : 1) - (new Date()).getTime() + this.lastMovement;
         if (t > 0)
           await sleep(t);
         vueApp.socket.emit('user-move', this.queue[0]);
