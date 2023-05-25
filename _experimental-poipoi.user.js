@@ -241,7 +241,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoBlock) && vueApp.socket) {
         vueApp.ignoreUser(userDTO.id);
         vueApp.socket.emit('user-block', userDTO.id);
-        systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
+        if (!experimentalConfig.withoutBlockMsg)
+          systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
     }
     // 自動一方あぼーん
     if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoIgnore))
@@ -278,7 +279,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (user?.id && match(msg, experimentalConfig.wordFilter)) {
       if (user.id !== vueApp.myUserID && experimentalConfig.wordBlock) {
         (await objectExists(vueApp, 'socket')).emit('user-block', user.id);
-        systemMessage(user.name + text('をNGワードあぼーんした', ' has been blocked by filtering'));
+        if (!experimentalConfig.withoutBlockMsg)
+          systemMessage(user.name + text('をNGワードあぼーんした', ' has been blocked by filtering'));
       }
       if (experimentalConfig.wordBlock !== 2)
         return;
@@ -1032,7 +1034,7 @@ window.interval = setInterval(function () {
             return;
           if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
             if (experimentalConfig.accessLog)
-              vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が入室', ' has joined the room'), null);
+              systemMessage(addIHash(user.name, user.id) + text('が入室', ' has joined the room'));
             accessNotification(user, text('入室', 'join'));
           }
         }, 0);
@@ -1047,7 +1049,7 @@ window.interval = setInterval(function () {
           return;
         if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
           if (experimentalConfig.accessLog)
-            vueApp.writeMessageToLog('SYSTEM', addIHash(user.name, user.id) + text('が退室', ' has left the room'), null);
+            systemMessage(addIHash(user.name, user.id) + text('が退室', ' has left the room'));
           accessNotification(user, text('退室', 'leave'));
         }
         // 配信通知

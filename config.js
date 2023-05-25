@@ -18,6 +18,7 @@
   ttsDenyList: '',
   wordFilter: '',
   wordBlock: 0,
+  withoutBlockMsg: 0,
   youtube: 0,
   useCookie: 0,
   voiceLog: 0,
