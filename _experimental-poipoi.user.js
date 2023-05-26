@@ -55,14 +55,16 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // ルーラリンク
   var roomNameToKey = {}, roomNameRegex = /0^/;
   var createRoomNameRegex = function () {
-    Object.keys(vueApp.$i18next.options.resources.en.common.room).forEach(key => {
-      var roomName = vueApp.$i18next.t('room.' + key, {lng: 'ja'}).split(' ');
-      roomNameToKey[roomName = roomName[1] || roomName[0]] = key;
-      var halfSize = roomName.replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt() - (0xFF01 - 0x21)));
-      roomNameToKey[halfSize] = key;
-      roomNameToKey[key] = key;
-    });
-    roomNameRegex = new RegExp('(^|じゃ|[ 　「])(' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(で$|$|に?(?:来|集|きて|こい|行)|にて|[ 　」])', 'g');
+    if(!!vueApp.$18next){
+      Object.keys(vueApp.$i18next.options.resources.en.common.room).forEach(key => {
+        var roomName = vueApp.$i18next.t('room.' + key, {lng: 'ja'}).split(' ');
+        roomNameToKey[roomName = roomName[1] || roomName[0]] = key;
+        var halfSize = roomName.replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt() - (0xFF01 - 0x21)));
+        roomNameToKey[halfSize] = key;
+        roomNameToKey[key] = key;
+      });
+      roomNameRegex = new RegExp('(^|じゃ|[ 　「])(' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(で$|$|に?(?:来|集|きて|こい|行)|にて|[ 　」])', 'g');
+      }
   };
   var replaceRulaLink = html => html.replace(roomNameRegex, (s, s1, s2, s3) => `${s1}<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s2]}')">${s2}</a>${s3}`);
 
