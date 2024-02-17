@@ -1,0 +1,8 @@
+What country is this national flag?https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/800px-Flag_of_the_United_Kingdom_%281-2%29.svg.png	UK	U.K.	United Kingdom	United Kingdom of Great Britain and Northern Ireland
+What country is this national flag?https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Flag_of_France_%282020%E2%80%93present%29.svg/512px-Flag_of_France_%282020%E2%80%93present%29.svg.png	France	French Republic
+What country is this national flag?https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/1280px-Flag_of_Italy.svg.png	Italy	Italian Republic	Republic of Italy
+What country is this national flag?https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Canada.svg/800px-Flag_of_Canada.svg.png	Canada
+What country is this national anthem?https://www.youtube.com/watch?v=UctriMuXYS0	China	People's Republic of China
+What country is this national anthem?https://youtu.be/XZSWPDPABIs	Germany	Federal Republic of Germany
+What country is this national anthem?https://www.youtube.com/watch?v=w5x_9KEogM8&t=34s	USA	U.S.A.	United States of America	US	U.S.	United States	America
+10	What country is this national anthem?https://youtu.be/k3IQC3HCg-w?t=4	Soviet Union	Union of Soviet Socialist Republics	USSR

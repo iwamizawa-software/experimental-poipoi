@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <title>問い合わせ Contact</title>
+    <style>textarea{display:block;width:80%;height:60vh}</style>
+  </head>
+  <body>
+    <h1>スクリプトに関する問い合わせ Contact experimental-poipoi author</h1>
+    <ul>
+      <li>名前（任意）Name (optional)
+      <li>返信先（返信が欲しい場合）Reply to (optional)
+      <li>内容 Message
+    </ul>
+    <textarea></textarea>
+    <button>送信 Submit</button>
+    <script>
+const textarea = document.querySelector('textarea');
+document.querySelector('button').onclick = async function () {
+  this.disabled = true;
+  try {
+    await (async () => {
+      if (/^\s*$/.test(textarea.value))
+        throw new Error('内容を入力してください。Empty message.');
+      const now = (new Date()).getTime();
+      if (now - localStorage.getItem('lastSentMessage') < 60 * 60 * 1000)
+        throw new Error('1時間に1回送信できます。Once every hour.');
+      await fetch(
+        'https://discord.com/api/webhooks/1208335752451334144/BNvZs4TiCkXXV82why0TgZ3krkuAZeonP4eNfyXFmebGfd7tLimyGAohO4KnqPjnKuBa',
+        {
+          method: 'POST',
+          headers: {'Content-Type' : 'application/json'},
+          body: JSON.stringify({content : textarea.value})
+        }
+      );
+      localStorage.setItem('lastSentMessage', now);
+      alert('送信しました。Done.');
+      this.remove();
+    })();
+  } catch (err) {
+    alert(err);
+  }
+  this.disabled = false;
+};
+    </script>
+  </body>
+</html>

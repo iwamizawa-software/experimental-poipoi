@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<title>クイズ</title>
+<style>
+.dark,.dark img{filter:invert()}
+.dark :not(img,.player *){background:#ccc}
+.dark .correct{background:#a95}
+.dark .incorrect{background:#5aa}
+body{margin:0;margin-bottom:100%}
+#ready,.ready #notice{display:none}
+.ready #ready{display:block}
+#settings li{margin:10px}
+#settings{border-bottom:1px solid #000;margin:0;font-size:20px}
+#main{display:flex;flex-direction:row}
+#main *{font-size:var(--font-size)}
+#players{width:30%;--height:calc(var(--font-size) * 3);position:relative}
+#players figure{float:left;width:var(--height);height:var(--height);margin:0;position:relative;overflow:hidden}
+#players figure img{position:absolute;}
+#players p{margin:0}
+.player{white-space: nowrap;overflow:hidden;background:#fff;width:100%;position:absolute;border:1px solid #000;top:calc(var(--rank) * var(--height));height:var(--height);transition-duration:2s;transition-property:top}
+#title,#quiz,#finish{width:70%;padding:var(--font-size);display:none}
+.title #title,.quiz #quiz,.finish #finish{display:block;word-wrap:break-word}
+.point{position:absolute;bottom:0;right:0;background:inherit}
+.correct{background:#acf}
+.incorrect{background:#faa}
+.quizImage{border:1px solid #000;width:fit-content;height:40vh;overflow:hidden;resize:both;}
+#quizImage{max-width:100%;height:100%;object-fit:contain}
+#closed p:before{content:'A. ';font-weight:bold}
+#showSettings{position:fixed;bottom:10px;right:10px;font-size:20px}
+</style>
+<script src="https://iwamizawa-software.github.io/disable-timer-throttling/timer.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+<script>
+var t = (en, ja) => location.search === '?en' ? en : ja;
+if (t(1, 0))
+  document.title = 'Quiz';
+document.write(`
+<p id="notice">${t('Loading', 'ロード中')}</p>
+<div id="ready">
+<ul id="settings">
+<li>Version <span data-bind="version"></span></li>
+<li>${t('Load quiz file', '問題ファイル読み込み')}<input type="file" id="file" accept=".txt"></li>
+<li>${t('Quiz file encoding', '問題ファイル文字コード')}<select id="encoding"><option selected>UTF-8<option>Shift_JIS<option>EUC-JP<option>UTF-16</select></li>
+<li><input type="button" value="${t('Check URL error (heavy)', 'URLエラーチェック (重い)')}" id="checkError"></li>
+<li><input type="button" value="${t('Reset result', 'ポイントリセット')}" id="reset"></li>
+<li>${t('Number of questions', '出題数')}<input type="text" value="10" id="maxQuestions">${t('', '問')}</li>
+<li>${t('Number of qualified players', '')}<input type="text" value="1" id="maxAnswers">${t('', '人正解したら締切')}</li>
+<li>${t('1st point bonus x', '1人目の正答者の点数')}<input type="text" value="3" id="firstBonus">${t('', '倍')}</li>
+<li>${t('2nd point bonus x', '2人目の正答者の点数')}<input type="text" value="2" id="secondBonus">${t('', '倍')}</li>
+<li>${t('Time limit', '回答時間')}<input type="text" value="60" id="time">${t('seconds', '秒')}</li>
+<li>${t('Player list font size', '回答者一覧の文字サイズ')}<input type="text" value="36" id="playersFontSize" data-target="players">px</li>
+<li>${t('Quiz font size', 'クイズの文字サイズ')}<input type="text" value="36" id="quizFontSize" data-target="main">px</li>
+<li><label><input type="checkbox" id="random" checked>${t('Random question', 'ランダムに出題')}</label></li>
+<li><label><input type="checkbox" id="autoplay" checked>${t('Auto next', '自動的に次の問題に進む')}</label></li>
+<li><label><input type="checkbox" id="dark">${t('Dark mode', 'ダークモード')}</label></li>
+<li><button id="msg">${t('Set message to winner', '優勝者へのメッセージ')}</button></li>
+<li><button id="hideSettings">${t('Hide settings', '設定を隠す')}</button></li>
+</ul>
+<div id="main">
+<div id="players">
+</div>
+<div id="title">
+<h1 data-bind="quiz.title">${t('Quiz', 'クイズ')}</h1>
+<p>${t('<span data-bind="settings.maxQuestions">10</span> questions ', '全<span data-bind="quiz.data.length">10</span>問中<span data-bind="settings.maxQuestions">10</span>問出題 ')}<input type="button" value="${t('Start', 'スタート')}" id="start"></p>
+</div>
+<div id="quiz">
+<p style="float:left;margin:0"><input type="button" value="${t('Next', '次の問題')}" id="next">
+<p style="float:right;margin:0">${t('Time limit ', '残り')}<span data-bind="current.time">60</span>${t(' seconds', '秒')} <input type="button" value="${t('+15', '＋15秒')}" id="extend"></p>
+<h1 style="clear:both"><span data-bind="quiz.title"></span><br>${t('', '第')}<span data-bind="current.count">1</span>${t(' / ', '問 / 全')}<span data-bind="settings.maxQuestions">10</span>${t('', '問')} (<span data-bind="current.quiz.point">1</span>${t(' points', '点問題')})</h1>
+<div class="quizImage" style="display:none"><img id="quizImage"></div>
+<p data-bind="current.displayed"></p>
+<div id="closed" style="display:none"><p data-bind="current.quiz.correctText"></p></div>
+</div>
+<div id="finish">
+<h1 data-bind="quiz.title">${t('Quiz', 'クイズ')}</h1>
+<p data-bind="current.winner"></p>
+</div>
+</div>
+<button id="showSettings">${t('Settings', '設定')}</button>
+</div>
+<div style="display:none"><div id="youtube"></div></div>
+`);
+</script>
+<script src="quiz.js"></script>
+</body>
+</html>

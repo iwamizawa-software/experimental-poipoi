@@ -1,0 +1,8 @@
+どこの国旗でしょうか？https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/800px-Flag_of_the_United_Kingdom_%281-2%29.svg.png,イギリス,グレートブリテン及び北アイルランド連合王国
+どこの国旗でしょうか？https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Flag_of_France_%282020%E2%80%93present%29.svg/512px-Flag_of_France_%282020%E2%80%93present%29.svg.png,フランス,フランス共和国
+どこの国旗でしょうか？https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/1280px-Flag_of_Italy.svg.png,イタリア,イタリア共和国
+どこの国旗でしょうか？https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Canada.svg/800px-Flag_of_Canada.svg.png,カナダ
+どこの国歌でしょうか？https://www.youtube.com/watch?v=UctriMuXYS0,中国,中華人民共和国
+どこの国歌でしょうか？https://youtu.be/XZSWPDPABIs,ドイツ,ドイツ連邦共和国
+どこの国歌でしょうか？https://www.youtube.com/watch?v=w5x_9KEogM8&t=34s,アメリカ,アメリカ合衆国
+10,どこの国歌でしょうか？https://youtu.be/k3IQC3HCg-w?t=4,ソ連,ソビエト,ソビエト連邦,ソビエト社会主義共和国連邦
