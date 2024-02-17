@@ -26,14 +26,14 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   contactButton.onclick = () => open(WEBSITE_PATH + 'contact.html');
   var handleButtonClick = event => {
     if (event.target?.id === 'login-button')
-      removeDisableButton();
+      removeDisableButtonContainer();
   };
   var handleEnterKey = event => {
     if (event.key === 'Enter' && document.getElementById('login-form')?.contains(event.target))
-      removeDisableButton();
+      removeDisableButtonContainer();
   };
-  var removeDisableButton = function () {
-    disableButton.remove();
+  var removeDisableButtonContainer = function () {
+    disableButtonContainer.remove();
     document.removeEventListener('click', handleButtonClick);
     document.removeEventListener('keydown', handleEnterKey);
   };
