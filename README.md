@@ -8,7 +8,7 @@
 
 ## 問い合わせ
 
-問い合わせはIssuesか[こちらから](https://iwamizawa-software.github.io/experimental-poipoi/contact.html)
+問い合わせはIssuesか[こちらから](https://form1ssl.fc2.com/form/?id=019f176bae31cba6)
 
 ## 導入方法
 

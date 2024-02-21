@@ -23,7 +23,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var contactButton = document.createElement('button');
   disableButtonContainer.append(contactButton);
   contactButton.textContent = '問い合わせ Contact';
-  contactButton.onclick = () => open(WEBSITE_PATH + 'contact.html');
+  contactButton.onclick = () => open('https://form1ssl.fc2.com/form/?id=019f176bae31cba6', '_blank', 'noreferrer');
   var handleButtonClick = event => {
     if (event.target?.id === 'login-button')
       removeDisableButtonContainer();
