@@ -181,8 +181,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     return cond.some(c => {
       if (!c)
         return false;
-      if (/^\/.+\/[dgimsuy]*$/i.test(c)) {
-        var regex = new RegExp(c.slice(1, -1));
+      if (/^\/.+\/([dgimsuy]*)$/i.test(c)) {
+        var regex = new RegExp(c.slice(1, -(1 + RegExp.$1.length)), RegExp.$1);
         return regex.test(nospace) || regex.test(str);
       } else {
         return nospace.indexOf(c) !== -1 || str.indexOf(c) !== -1;
