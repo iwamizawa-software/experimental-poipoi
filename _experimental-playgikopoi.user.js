@@ -123,7 +123,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     return cond.some(c => {
       if (!c)
         return false;
-      if (c[0] === '/' && c[c.length - 1] === '/') {
+      if (/^\/.+\/[dgimsuy]*$/i.test(c)) {
         var regex = new RegExp(c.slice(1, -1));
         return regex.test(nospace) || regex.test(str);
       } else {
