@@ -1,4 +1,5 @@
 (function () {
+  window.text = window.text || String;
   var config = [
     {
       name: text('実験的機能', 'Experimental Config'),
@@ -6,10 +7,10 @@
     },
     {
       key: 'numbering',
-      name: text('名前の表示', 'Display name'),
+      name: text('名前に識別子を付ける', 'Add identifier to name'),
       description: text('番号や白トリップはログインするたびに変わるランダムな値のため個人の特定には利用できません。', 'The number and white trip are random values.'),
       type: [
-        text('何もしない', 'Normal'),
+        'OFF',
         text('名無しに番号を振る', 'Assign a number to anon'),
         text('全員に疑似白トリップを付ける', 'Add white trip')
       ],
@@ -17,9 +18,9 @@
     },
     {
       key: 'escape',
-      name: text('キャラが重なったときに逃げるか', 'Escape'),
+      name: text('キャラが重なったときに逃げる', 'Escape from overlapping'),
       type: [
-        text('逃げない', 'Stay'),
+        'OFF',
         text('１歩逃げる', 'Escape to a step'),
         text('遠くに逃げる', 'Escape to far away')
       ],
@@ -145,11 +146,11 @@
     },
     {
       key: 'clearBubbleAtLogin',
-      name: text('入室時の吹き出し', 'Bubble at entering room'),
+      name: text('入室時吹き出しを消す', 'Clear bubbles at entering room'),
       type: [
-        text('消さない', 'Show'),
-        text('開発前だけ消す', 'Clear on Kanrinin street'),
-        text('全部の部屋で消す', 'Clear')
+        'OFF',
+        text('開発前だけ消す', 'Clear bubbles on Kanrinin street only'),
+        'ON'
       ],
       value: 0
     },
@@ -200,7 +201,7 @@
       key: 'notifyAccess',
       name: text('入退室通知', 'Enter and leave notifications'),
       type: [
-        text('通知しない', 'No'),
+        'OFF',
         text('アクティブ時のみ', 'Active'),
         text('非アクティブ時のみ', 'Inactive'),
         text('常に通知', 'Always')
@@ -492,13 +493,16 @@
         append('h2').textContent = item.name;
         if (item.description)
           append('p').textContent = item.description;
+        var changeColor = () => select.style.backgroundColor = {ON: '#afa', OFF: '#faa'}[select.value] || '';
         var select = append('select', {
           id: item.key,
           onchange: function () {
             update(item.key, select.selectedIndex);
+            changeColor();
           }
         });
         item.type?.forEach?.(option => select.appendChild(document.createElement('option')).text = option);
+        queueMicrotask(changeColor);
         break;
     }
     defaultValue[item.key] = item.value;
