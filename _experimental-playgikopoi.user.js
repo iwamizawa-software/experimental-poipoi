@@ -181,8 +181,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       dto.currentRoom.backgroundColor = experimentalConfig.roomColor;
     // 部屋名をログ出力
     var roomName = vueApp._i18n.t('room.' + dto?.currentRoom?.id);
+    var numberOfUsers = (dto.connectedUsers.some(u => u.id === vueApp.myUserID) ? 0 : 1) + dto.connectedUsers.length;
     if (experimentalConfig.logRoomName && lastRoomName !== roomName)
-      systemMessage(text(roomName + 'に入室', 'Entered to ' + roomName));
+      systemMessage(text(`${roomName}に入室 (${numberOfUsers}人)`, `Entered to  ${roomName} (${numberOfUsers} users)`));
     lastRoomName = roomName;
     // 入室時吹き出しを読み上げない
     var enableTTS = vueApp.enableTextToSpeech;
