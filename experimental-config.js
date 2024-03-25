@@ -318,8 +318,7 @@
     },
     {
       key: 'youtube',
-      name: 'YouTube for GYAHAHA',
-      description: "GYAHAHA's smartphone only set ON.",
+      name: 'Open iframe YouTube player on click YouTube URL',
       type: 'onoff',
       value: 0
     },
