@@ -698,6 +698,7 @@ window.interval = setInterval(function () {
     // 設定
     var configButton = logButtons.appendChild(document.createElement('button')), configWindow;
     configButton.textContent = text('設定', 'Config');
+    configButton.id = 'configButton';
     configButton.onclick = function () {
       if (configWindow && !configWindow.closed) {
         try {
@@ -1311,6 +1312,10 @@ window.interval = setInterval(function () {
         return;
       } else if (t.value.startsWith('#block ')) {
         vueApp.socket.emit('user-block', t.value.slice(7));
+        t.value = '';
+        return;
+      } else if (t.value === '#config') {
+        document.getElementById('configButton')?.click();
         t.value = '';
         return;
       } else if (t.value === '#ikaoni') {
