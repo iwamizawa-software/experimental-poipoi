@@ -13,8 +13,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var consolelog = function () {
     var log = Array.from(arguments).map(err => err.stack ? err.message + '\n' + err.stack : err).join('\n');
     console.log(log);
-    if (experimentalConfig?.debugWebHook)
-      fetch(experimentalConfig.debugWebHook, { method : 'POST', headers : {'Content-Type' : 'application/json'}, body : JSON.stringify({content : log})});
+    if (experimentalConfig?.debugWebhook?.startsWith('https://discord.com/api/webhooks/'))
+      fetch(experimentalConfig.debugWebhook, { method : 'POST', headers : {'Content-Type' : 'application/json'}, body : JSON.stringify({content : log})});
   };
   window.onunhandledrejection = event => { consolelog(event.reason);};
   Object.defineProperty(console, 'error', {

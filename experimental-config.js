@@ -323,8 +323,8 @@
       value: 0
     },
     {
-      key: 'secretCharacter',
-      name: '???',
+      key: 'debugWebhook',
+      name: 'Webhook URL for debug',
       type: 'input',
       value: ''
     },
