@@ -278,6 +278,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // ユーザー追加時
   var addUser = vueApp.addUser;
   vueApp.addUser = function (userDTO) {
+    // 偽ナンバリング
+    if (match(userDTO.name, ['/^' + vueApp.toDisplayName('') + '\\d+$/']))
+      userDTO.name = '(' + userDTO.name + ')';
     // 名無しナンバリング
     if (experimentalConfig.numbering && typeof userDTO.id === 'string') {
       userDTO.name = vueApp.toDisplayName(userDTO.name);
