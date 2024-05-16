@@ -7,9 +7,9 @@
 // @match    https://gikopoi.hu/*
 // ==/UserScript==
 
+window.experimentalVersion = +document.currentScript?.textContent?.match(/@version\s+(\d+)/)?.[1];
 document.querySelector('head').appendChild(document.createElement('script').appendChild(document.createTextNode('(' + async function inject() {
 
-  var version = +document.currentScript?.textContent?.match(/@version\s+(\d+)/)?.[1];
   document.currentScript?.remove();
   if (window.experimental)
     return;
@@ -25,13 +25,13 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   disableButtonContainer.append(contactButton);
   contactButton.textContent = '問い合わせ Contact';
   contactButton.onclick = () => open('https://form1ssl.fc2.com/form/?id=019f176bae31cba6', '_blank', 'noreferrer');
-  if (+localStorage.getItem('experimentalVersion') < version) {
+  if (+localStorage.getItem('experimentalVersion') < window.experimentalVersion) {
     var changelogButton = document.createElement('button');
     disableButtonContainer.append(changelogButton);
     changelogButton.textContent = '新機能 Whats new';
     changelogButton.onclick = () => {
       open(WEBSITE_PATH + 'changelog.txt', '_blank', 'noreferrer');
-      localStorage.setItem('experimentalVersion', version);
+      localStorage.setItem('experimentalVersion', window.experimentalVersion);
     };
   }
   var handleButtonClick = event => {
