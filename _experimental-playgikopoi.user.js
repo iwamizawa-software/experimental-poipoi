@@ -134,7 +134,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
   // キャラ付ログ
   var characterLogCSS = document.createElement('style');
-  characterLogCSS.textContent = ':root{--characterlog-size:25px}.message:not(.system-message):before{content: "";display:inline-block;background-size:contain;background-repeat:no-repeat;vertical-align:bottom;margin-right:5px}';
+  characterLogCSS.textContent = ':root{--characterlog-size:25px}.message:not(.system-message):before{content: "";width:var(--characterlog-size);height:var(--characterlog-size);display:inline-block;background-size:contain;background-repeat:no-repeat;vertical-align:bottom;margin-right:5px}';
   document.querySelector('head').append(characterLogCSS);
   var loadCharacterIcon = function (name) {
     var data = characterIconData[name] || (characterIconData[name] = {type: '.svg', x: -50, y: 24, width: 190});
@@ -149,7 +149,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       var ctx = canvas.getContext('2d');
       var ratio = data.width * 1.2 / this.width;
       ctx.drawImage(this, data.x * 1.2, data.y * 1.2, this.width * ratio, this.height * ratio);
-      characterLogCSS.textContent += `[data-character-id=${name}]:before{width:var(--characterlog-size);height:var(--characterlog-size);background-image:url(${canvas.toDataURL()});}`;
+      characterLogCSS.textContent += `[data-character-id=${name}]:before{background-image:url(${canvas.toDataURL()});}`;
       logWindow?.onstorage?.();
     };
   };
