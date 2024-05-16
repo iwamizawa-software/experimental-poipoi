@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  79
+// @version  80
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -9,6 +9,7 @@
 
 document.querySelector('head').appendChild(document.createElement('script').appendChild(document.createTextNode('(' + async function inject() {
 
+  var version = +document.currentScript?.textContent?.match(/@version\s+(\d+)/)?.[1];
   document.currentScript?.remove();
   if (window.experimental)
     return;
@@ -24,6 +25,15 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   disableButtonContainer.append(contactButton);
   contactButton.textContent = '問い合わせ Contact';
   contactButton.onclick = () => open('https://form1ssl.fc2.com/form/?id=019f176bae31cba6', '_blank', 'noreferrer');
+  if (+localStorage.getItem('experimentalVersion') < version) {
+    var changelogButton = document.createElement('button');
+    disableButtonContainer.append(changelogButton);
+    changelogButton.textContent = '新機能 Whats new';
+    changelogButton.onclick = () => {
+      open(WEBSITE_PATH + 'changelog.txt', '_blank', 'noreferrer');
+      localStorage.setItem('experimentalVersion', version);
+    };
+  }
   var handleButtonClick = event => {
     if (event.target?.id === 'login-button')
       removeDisableButtonContainer();
@@ -122,6 +132,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   vueApp.toDisplayName = name => name || vueApp.$i18next.t('default_user_name');
   var room = vueApp.$i18next.options.resources.ja.common.room;
   createRoomNameRegex();
+  var characterIconData = {};
   elementExists('#login-button').then(loginButton => {
     var select = document.createElement('select');
     Object.keys(vueApp.$i18next.options.resources.en.common.room).map(key => {
@@ -142,6 +153,16 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     };
     select.style.display = 'block';
     loginButton.before(select);
+    Array.from(document.querySelectorAll('#character-selection label img')).forEach(img => {
+      var name = img.previousElementSibling.value;
+      characterIconData[name] = {
+        type: img.src.slice(-4),
+        x: +img.style.left.slice(0, -1),
+        y: +img.style.top.slice(0, -1),
+        width: +img.style.width.slice(0, -1)
+      };
+      characterIconData[name + '_alt'] = Object.assign({}, characterIconData[name]);
+    });
   });
   console.log('injected');
 
@@ -189,6 +210,27 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       }
     });
   };
+  // キャラ付ログ
+  var characterLogCSS = document.createElement('style');
+  characterLogCSS.textContent = ':root{--characterlog-size:25px}.message:not(.system-message):before{content: "";display:inline-block;background-size:contain;background-repeat:no-repeat;vertical-align:bottom;margin-right:5px}';
+  document.querySelector('head').append(characterLogCSS);
+  var loadCharacterIcon = function (name) {
+    var data = characterIconData[name] || (characterIconData[name] = {type: '.svg', x: -50, y: 24, width: 190});
+    if (data.loaded)
+      return;
+    data.loaded = true;
+    var img = new Image();
+    img.src = '/characters/' + name.replace(/_alt$/, '') + '/front-standing' + (name.endsWith('_alt') ? '-alt' : '') + data.type;
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 120;
+      var ctx = canvas.getContext('2d');
+      var ratio = data.width * 1.2 / this.width;
+      ctx.drawImage(this, data.x * 1.2, data.y * 1.2, this.width * ratio, this.height * ratio);
+      characterLogCSS.textContent += `[data-character-id=${name}]:before{width:var(--characterlog-size);height:var(--characterlog-size);background-image:url(${canvas.toDataURL()});}`;
+      logWindow?.onstorage?.();
+    };
+  };
   // userscript CSS
   document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-label{display:none}#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
   // config
@@ -199,7 +241,12 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     vnCSS.textContent = (experimentalConfig.vtuberNiconico & 1 ? '.vtuber-character{display:none}' : '') +
                         (experimentalConfig.vtuberNiconico & 2 ? '.nico-nico-messages-container{display:none}' : '') +
                         (experimentalConfig.hideVoiceButton ? '#voiceButton{display:none}' : '') +
-                        (experimentalConfig.brightness ? '#room-canvas{filter: brightness(' + experimentalConfig.brightness + ')}' : '');
+                        (experimentalConfig.brightness ? '#room-canvas{filter: brightness(' + experimentalConfig.brightness + ')}' : '') +
+                        (experimentalConfig.outdoor ? 'h1,#character-selection,#canvas-container,.changelog{display:none}' : '');
+    if (experimentalConfig.iconSize)
+      characterLogCSS.textContent = characterLogCSS.textContent.replace(/--characterlog-size:\d+px/, '--characterlog-size:' + experimentalConfig.iconSize + 'px');
+    characterLogCSS.media = experimentalConfig.displayIcon ? '' : 'a';
+    logWindow?.onstorage?.();
     if (experimentalConfig.hasOwnProperty('roomColor') && vueApp.currentRoom) {
       vueApp.currentRoom.backgroundColor = experimentalConfig.roomColor;
       vueApp.isRedrawRequired = true;
@@ -364,7 +411,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var chatLog, isAtBottom = () => (chatLog.scrollHeight - chatLog.clientHeight) - chatLog.scrollTop < 5;
   var newMessageButtonContainer = document.createElement('div');
   newMessageButtonContainer.id = 'new-message-button-container';
-  newMessageButtonContainer.setAttribute('style', 'height:0;position:relative;top:-80px;text-align:center;width:100%;user-select:none;pointer-events:none');
+  newMessageButtonContainer.setAttribute('style', 'height:0;position:relative;top:-40px;text-align:center;width:100%;user-select:none;pointer-events:none');
   var newMessageButton = newMessageButtonContainer.appendChild(createButtonContainer()).appendChild(document.createElement('button'));
   newMessageButton.onclick = () => {
     chatLog.scrollTop = chatLog.scrollHeight - chatLog.clientHeight;
@@ -443,6 +490,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       vueApp.socket.emit('user-msg', '');
     return v;
   };
+  // 自動色分け
+  var saveTripColor = () => localStorage.setItem('experimentalColor', Array.from(document.querySelectorAll('.tripColor')).reduce((html, style) => html + style.outerHTML, ''));
+  document.querySelector('head').insertAdjacentHTML('beforeend', localStorage.getItem('experimentalColor') || '');
+  var setLogColor = () => {
+  };
   // ログ右クリックメニュー
   var logMenu = document.body.appendChild(document.createElement('select'));
   var selectedMessage = {};
@@ -451,24 +503,35 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     switch (logMenu.value) {
       case 'color':
         var colorPicker = document.getElementById('colorPicker');
-        var style = (document.getElementById('color-' + selectedMessage.userId) || document.querySelector('head').appendChild(document.createElement('style')));
-        style.id = 'color-' + selectedMessage.userId;
+        var styleId = selectedMessage.trip || selectedMessage.userId;
+        var attrName = selectedMessage.trip ? 'data-trip' : 'data-user-id';
+        var style = (document.getElementById('color-' + styleId) || document.querySelector('head').appendChild(document.createElement('style')));
+        style.id = 'color-' + styleId;
+        if (selectedMessage.trip)
+          style.className = 'tripColor';
         if (logWindow && !logWindow.closed) {
           var logDoc = logWindow.document;
           var style2 = (logDoc.getElementById(style.id) || logDoc.querySelector('head').appendChild(logDoc.createElement('style')));
           style2.id = style.id;
         }
         (colorPicker.onchange = colorPicker.oninput = function () {
-          style.textContent = `[data-user-id="${selectedMessage.userId}"],[data-user-id="${selectedMessage.userId}"] .message-author{color:${colorPicker.value}}`;
+          style.textContent = `[${attrName}="${styleId}"],[${attrName}="${styleId}"] .message-author{color:${colorPicker.value}}`;
           if (style2)
             style2.textContent = style.textContent;
+          if (style.className === 'tripColor')
+            saveTripColor();
         })();
         colorPicker.click();
         break;
       case 'uncolor':
+        document.getElementById('color-' + selectedMessage.trip)?.remove();
         document.getElementById('color-' + selectedMessage.userId)?.remove();
-        if (logWindow && !logWindow.closed)
+        if (logWindow && !logWindow.closed) {
+          logWindow.document.getElementById('color-' + selectedMessage.trip)?.remove();
           logWindow.document.getElementById('color-' + selectedMessage.userId)?.remove();
+        }
+        if (selectedMessage.trip)
+          saveTripColor();
         break;
       case 'ignore':
         vueApp.ignoreUser(selectedMessage.userId);
@@ -506,6 +569,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (!event.ctrlKey && event.target.classList.contains('message-author')) {
       selectedMessage = {
         userId: event.target.parentNode.dataset.userId,
+        trip: event.target.parentNode.dataset.trip || '',
         body: event.target.parentNode.querySelector('.message-body')?.textContent || ''
       };
       logMenu.innerHTML = `
@@ -538,6 +602,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
   // ログ追加時
   var writeLogToWindow;
+  var autoColorIndex = 0;
   HTMLDivElement.prototype.appendChild = function (aChild) {
     if (this.id === 'chatLog') {
       try {
@@ -548,6 +613,23 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         var messageBody = aChild.querySelector('.message-body>span') || aChild.querySelector('.message-body');
         if (messageBody && !aChild.querySelector('.message-body a') && (messageBodyHTML = replaceRulaLink(messageBody.innerHTML)) !== messageBody.innerHTML)
           messageBody.innerHTML = messageBodyHTML;
+        if (aChild.dataset.userId && aChild.dataset.userId !== 'null') {
+          // キャラ付ログ
+          var user = vueApp.users[aChild.dataset.userId];
+          if (user)
+            loadCharacterIcon(aChild.dataset.characterId = user.character?.characterName + (user.isAlternateCharacter ? '_alt' : ''));
+          // 自動色分け
+          if (/◆(.{10})/.test(user?.name))
+            aChild.dataset.trip = RegExp.$1;
+          if (experimentalConfig.autoColor && !document.getElementById('color-' + (aChild.dataset.trip || aChild.dataset.userId))) {
+            var colorList = experimentalConfig.autoColorList || ['#ff8000', '#008000', '#0080ff', '#8060ff', '#ff60ff'];
+            var style = document.querySelector('head').appendChild(document.createElement('style'));
+            style.id = 'color-' + aChild.dataset.userId;
+            style.textContent = `[data-user-id="${aChild.dataset.userId}"],[data-user-id="${aChild.dataset.userId}"] .message-author{color:${colorList[autoColorIndex++ % colorList.length]}}`;
+            if (logWindow && !logWindow.closed)
+              logWindow.document.querySelector('head').append(style.cloneNode(true));
+          }
+        }
         // ログ窓に書き出し
         if (writeLogToWindow)
           writeLogToWindow(aChild);
@@ -594,7 +676,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     }
     // ログ窓
     var logButtons = createButtonContainer();
-    document.getElementById('chatLog').after(logButtons);
+    logButtons.setAttribute('style', 'all:unset;display:flex;order:4');
+    document.getElementById('chat-log-container').after(logButtons);
     writeLogToWindow = function (div) {
       if (!logWindow || logWindow.closed)
         return;
@@ -628,7 +711,8 @@ html,body,#chatLog,input{margin:0;padding:0;box-sizing:border-box;width:100%;hei
 .message-timestamp,.ignored-message{display:none}
 input{display:block;position:fixed;bottom:0;height:2em}
 </style>
-<style id="log-style">${experimentalConfig.logWindowCSS}</style>
+<style id="log-style"></style>
+${Array.from(document.querySelectorAll('style[id^=color]')).reduce((html, style) => html + style.outerHTML, '')}
 <script>window.experimental = true;
 window.interval = setInterval(function () {
   try {
@@ -663,8 +747,10 @@ window.interval = setInterval(function () {
         logWindow.document.body.lastElementChild.focus();
       };
       logWindow.onstorage = function () {
-        logWindow.document.getElementById('log-style').textContent = experimentalConfig.logWindowCSS;
+        if (!this.closed)
+          logWindow.document.getElementById('log-style').textContent = experimentalConfig.logWindowCSS + (experimentalConfig.displayIcon ? characterLogCSS.textContent : '');
       };
+      logWindow.onstorage();
       logWindow.vueApp = window.vueApp;
       logWindow.document.close();
     };
@@ -751,8 +837,8 @@ window.interval = setInterval(function () {
   }
   // 呼び出し通知
   var getCharacterPath = user => {
-    var name = user.characterId || (user.character && user.character.characterName);
-    return 'characters/' + name + '/front-standing.' + (vueApp.allCharacters.find(c=>c.characterName===name) || {format:'svg'}).format;
+    var name = user.characterId || user.character?.characterName;
+    return 'characters/' + name + '/front-standing' + (user.isAlternateCharacter ? '-alt' : '') + '.' + (vueApp.allCharacters.find(c=>c.characterName===name) || {format:'svg'}).format;
   }
   var pngCache = {};
   var SVG2PNG = async function (url) {

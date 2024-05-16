@@ -65,6 +65,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   await ready(window, 'vueApp');
   await ready(window.vueApp, '_isMounted');
   createRoomNameRegex();
+  var characterIconData = {"giko":{"type":".svg","x":-50,"y":24,"width":190},"naito":{"type":".svg","x":-48,"y":13,"width":190},"shii":{"type":".svg","x":-50,"y":24,"width":190},"hikki":{"type":".svg","x":-44,"y":-12,"width":190},"tinpopo":{"type":".svg","x":-50,"y":26,"width":190},"shobon":{"type":".svg","x":-50,"y":-20,"width":190},"nida":{"type":".svg","x":-50,"y":27,"width":190},"salmon":{"type":".svg","x":17,"y":-54,"width":190},"giko_hat":{"type":".svg","x":-50,"y":10,"width":190},"shii_hat":{"type":".svg","x":-50,"y":10,"width":190},"shobon_hat":{"type":".svg","x":-41,"y":-20,"width":190},"furoshiki":{"type":".svg","x":-50,"y":24,"width":190},"golden_furoshiki":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shii":{"type":".svg","x":-50,"y":24,"width":190},"sakura_furoshiki_shii":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shobon":{"type":".svg","x":-41,"y":-20,"width":190},"naitoapple":{"type":".svg","x":-50,"y":10,"width":190},"shii_pianica":{"type":".svg","x":-46,"y":24,"width":190},"shii_uniform":{"type":".svg","x":-50,"y":24,"width":190},"hungry_giko":{"type":".svg","x":-45,"y":15,"width":190},"rikishi_naito":{"type":".svg","x":-30,"y":-18,"width":170},"hentai_giko":{"type":".svg","x":-45,"y":33,"width":170},"dark_naito_walking":{"type":".svg","x":-48,"y":13,"width":190},"takenoko":{"type":".svg","x":0,"y":0,"width":100},"kaminarisama_naito":{"type":".svg","x":-48,"y":13,"width":190},"panda_naito":{"type":".svg","x":-48,"y":13,"width":190},"wild_panda_naito":{"type":".svg","x":-48,"y":13,"width":190},"funkynaito":{"type":".png","x":-48,"y":13,"width":190},"molgiko":{"type":".png","x":-80,"y":-70,"width":190},"tikan_giko":{"type":".svg","x":-50,"y":24,"width":190},"hotsuma_giko":{"type":".svg","x":-50,"y":24,"width":190},"dokuo":{"type":".svg","x":-58,"y":-33,"width":190},"onigiri":{"type":".svg","x":-38,"y":20,"width":170},"tabako_dokuo":{"type":".svg","x":-58,"y":-33,"width":190},"himawari":{"type":".svg","x":-47,"y":0,"width":190},"zonu":{"type":".svg","x":-70,"y":-46,"width":190},"george":{"type":".svg","x":-48,"y":13,"width":190},"chotto_toorimasu_yo":{"type":".svg","x":-54,"y":-34,"width":190},"tokita_naito":{"type":".svg","x":-40,"y":4,"width":170},"pumpkinhead":{"type":".svg","x":-74,"y":34,"width":230},"naito_yurei":{"type":".svg","x":-48,"y":13,"width":190},"shiinigami":{"type":".svg","x":-100,"y":2,"width":280},"youkanman":{"type":".svg","x":-46,"y":-50,"width":180},"baba_shobon":{"type":".svg","x":-50,"y":-20,"width":190},"uzukumari":{"type":".svg","x":-98,"y":-69,"width":190},"giko_basketball":{"type":".svg","x":-50,"y":24,"width":190},"giko_shamisen":{"type":".svg","x":-50,"y":24,"width":190},"mikan_naito":{"type":".svg","x":-48,"y":13,"width":190},"shii_syakuhati":{"type":".svg","x":-50,"y":24,"width":190},"taiko_naito":{"type":".svg","x":-48,"y":13,"width":190},"mitsugiko":{"type":".svg","x":-90,"y":-50,"width":190},"giko_cop":{"type":".png","x":-50,"y":24,"width":190},"giko_batman":{"type":".png","x":-50,"y":24,"width":190},"giko_hungover":{"type":".png","x":-50,"y":24,"width":190},"giko_islam":{"type":".png","x":-50,"y":24,"width":190},"shii_islam":{"type":".png","x":-50,"y":24,"width":190},"giko_shroom":{"type":".png","x":-55,"y":24,"width":190},"bif_alien":{"type":".png","x":-54,"y":-34,"width":190},"bif_wizard":{"type":".png","x":-54,"y":-34,"width":190},"winter_shii":{"type":".svg","x":-50,"y":0,"width":190},"longcat":{"type":".png","x":-50,"y":-50,"width":190},"hotaru":{"type":".png","x":-58,"y":0,"width":190},"mona":{"type":".png","x":-50,"y":33,"width":190},"foe":{"type":".svg","x":-50,"y":-50,"width":190},"kimono_giko":{"type":".svg","x":-50,"y":24,"width":190},"kimono_shii":{"type":".svg","x":-50,"y":24,"width":190},"shar_naito":{"type":".svg","x":-48,"y":13,"width":190},"ika":{"type":".svg","x":0,"y":18,"width":100},"giko_gold":{"type":".png","x":-50,"y":24,"width":190},"naito_npc":{"type":".png","x":-50,"y":0,"width":190},"habbo":{"type":".png","x":-40,"y":-40,"width":190},"blankchan":{"type":".png","x":-50,"y":24,"width":190},"goatse":{"type":".png","x":-50,"y":24,"width":190},"onigiri_alt":{"type":".svg","x":-38,"y":20,"width":170},"shobon_alt":{"type":".svg","x":-50,"y":-20,"width":190},"himawari_alt":{"type":".svg","x":-47,"y":0,"width":190},"george_alt":{"type":".svg","x":-48,"y":13,"width":190},"furoshiki_alt":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shobon_alt":{"type":".svg","x":-41,"y":-20,"width":190},"tokita_naito_alt":{"type":".svg","x":-40,"y":4,"width":170},"youkanman_alt":{"type":".svg","x":-46,"y":-50,"width":180},"baba_shobon_alt":{"type":".svg","x":-50,"y":-20,"width":190},"takenoko_alt":{"type":".svg","x":0,"y":0,"width":100}};
   elementExists('#login-button').then(loginButton => {
     var select = document.createElement('select');
     Object.keys(vueApp._i18n.messages.en.room).map(key => ({
@@ -131,6 +132,27 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       }
     });
   };
+  // キャラ付ログ
+  var characterLogCSS = document.createElement('style');
+  characterLogCSS.textContent = ':root{--characterlog-size:25px}.message:not(.system-message):before{content: "";display:inline-block;background-size:contain;background-repeat:no-repeat;vertical-align:bottom;margin-right:5px}';
+  document.querySelector('head').append(characterLogCSS);
+  var loadCharacterIcon = function (name) {
+    var data = characterIconData[name] || (characterIconData[name] = {type: '.svg', x: -50, y: 24, width: 190});
+    if (data.loaded)
+      return;
+    data.loaded = true;
+    var img = new Image();
+    img.src = '/characters/' + name.replace(/_alt$/, '') + '/front-standing' + (name.endsWith('_alt') ? '-alt' : '') + data.type;
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 120;
+      var ctx = canvas.getContext('2d');
+      var ratio = data.width * 1.2 / this.width;
+      ctx.drawImage(this, data.x * 1.2, data.y * 1.2, this.width * ratio, this.height * ratio);
+      characterLogCSS.textContent += `[data-character-id=${name}]:before{width:var(--characterlog-size);height:var(--characterlog-size);background-image:url(${canvas.toDataURL()});}`;
+      logWindow?.onstorage?.();
+    };
+  };
   // userscript CSS
   document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-label{display:none}#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
   // config
@@ -141,7 +163,12 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     vnCSS.textContent = (experimentalConfig.vtuberNiconico & 1 ? '.vtuber-character{display:none}' : '') +
                         (experimentalConfig.vtuberNiconico & 2 ? '.nico-nico-messages-container{display:none}' : '') +
                         (experimentalConfig.hideVoiceButton ? '#voiceButton{display:none}' : '') +
-                        (experimentalConfig.brightness ? '#room-canvas{filter: brightness(' + experimentalConfig.brightness + ')}' : '');
+                        (experimentalConfig.brightness ? '#room-canvas{filter: brightness(' + experimentalConfig.brightness + ')}' : '') +
+                        (experimentalConfig.outdoor ? 'h1,#character-selection,#canvas-container,.changelog{display:none}' : '');
+    if (experimentalConfig.iconSize)
+      characterLogCSS.textContent = characterLogCSS.textContent.replace(/--characterlog-size:\d+px/, '--characterlog-size:' + experimentalConfig.iconSize + 'px');
+    characterLogCSS.media = experimentalConfig.displayIcon ? '' : 'a';
+    logWindow?.onstorage?.();
     if (experimentalConfig.hasOwnProperty('roomColor') && vueApp.currentRoom) {
       vueApp.currentRoom.backgroundColor = experimentalConfig.roomColor;
       vueApp.isRedrawRequired = true;
@@ -305,7 +332,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var chatLog, isAtBottom = () => (chatLog.scrollHeight - chatLog.clientHeight) - chatLog.scrollTop < 5;
   var newMessageButtonContainer = document.createElement('div');
   newMessageButtonContainer.id = 'new-message-button-container';
-  newMessageButtonContainer.setAttribute('style', 'height:0;position:relative;top:-80px;text-align:center;width:100%;user-select:none;pointer-events:none');
+  newMessageButtonContainer.setAttribute('style', 'height:0;position:relative;top:-40px;text-align:center;width:100%;user-select:none;pointer-events:none');
   var newMessageButton = newMessageButtonContainer.appendChild(createButtonContainer()).appendChild(document.createElement('button'));
   newMessageButton.onclick = () => {
     chatLog.scrollTop = chatLog.scrollHeight - chatLog.clientHeight;
@@ -374,6 +401,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       vueApp.socket.emit('user-msg', '');
     return v;
   };
+  // 自動色分け
+  var saveTripColor = () => localStorage.setItem('experimentalColor', Array.from(document.querySelectorAll('.tripColor')).reduce((html, style) => html + style.outerHTML, ''));
+  document.querySelector('head').insertAdjacentHTML('beforeend', localStorage.getItem('experimentalColor') || '');
+  var setLogColor = () => {
+  };
   // ログ右クリックメニュー
   var logMenu = document.body.appendChild(document.createElement('select'));
   var selectedMessage = {};
@@ -382,24 +414,35 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     switch (logMenu.value) {
       case 'color':
         var colorPicker = document.getElementById('colorPicker');
-        var style = (document.getElementById('color-' + selectedMessage.userId) || document.querySelector('head').appendChild(document.createElement('style')));
-        style.id = 'color-' + selectedMessage.userId;
+        var styleId = selectedMessage.trip || selectedMessage.userId;
+        var attrName = selectedMessage.trip ? 'data-trip' : 'data-user-id';
+        var style = (document.getElementById('color-' + styleId) || document.querySelector('head').appendChild(document.createElement('style')));
+        style.id = 'color-' + styleId;
+        if (selectedMessage.trip)
+          style.className = 'tripColor';
         if (logWindow && !logWindow.closed) {
           var logDoc = logWindow.document;
           var style2 = (logDoc.getElementById(style.id) || logDoc.querySelector('head').appendChild(logDoc.createElement('style')));
           style2.id = style.id;
         }
         (colorPicker.onchange = colorPicker.oninput = function () {
-          style.textContent = `[data-user-id="${selectedMessage.userId}"],[data-user-id="${selectedMessage.userId}"] .message-author{color:${colorPicker.value}}`;
+          style.textContent = `[${attrName}="${styleId}"],[${attrName}="${styleId}"] .message-author{color:${colorPicker.value}}`;
           if (style2)
             style2.textContent = style.textContent;
+          if (style.className === 'tripColor')
+            saveTripColor();
         })();
         colorPicker.click();
         break;
       case 'uncolor':
+        document.getElementById('color-' + selectedMessage.trip)?.remove();
         document.getElementById('color-' + selectedMessage.userId)?.remove();
-        if (logWindow && !logWindow.closed)
+        if (logWindow && !logWindow.closed) {
+          logWindow.document.getElementById('color-' + selectedMessage.trip)?.remove();
           logWindow.document.getElementById('color-' + selectedMessage.userId)?.remove();
+        }
+        if (selectedMessage.trip)
+          saveTripColor();
         break;
       case 'ignore':
         vueApp.ignoreUser(selectedMessage.userId);
@@ -437,6 +480,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (!event.ctrlKey && event.target.classList.contains('message-author')) {
       selectedMessage = {
         userId: event.target.parentNode.dataset.userId,
+        trip: event.target.parentNode.dataset.trip || '',
         body: event.target.parentNode.querySelector('.message-body')?.textContent || ''
       };
       logMenu.innerHTML = `
@@ -469,6 +513,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   };
   // ログ追加時
   var writeLogToWindow;
+  var autoColorIndex = 0;
   HTMLDivElement.prototype.appendChild = function (aChild) {
     if (this.id === 'chatLog') {
       try {
@@ -479,6 +524,23 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         var messageBody = aChild.querySelector('.message-body>span') || aChild.querySelector('.message-body');
         if (messageBody && !aChild.querySelector('.message-body a') && (messageBodyHTML = replaceRulaLink(messageBody.innerHTML)) !== messageBody.innerHTML)
           messageBody.innerHTML = messageBodyHTML;
+        if (aChild.dataset.userId && aChild.dataset.userId !== 'null') {
+          // キャラ付ログ
+          var user = vueApp.users[aChild.dataset.userId];
+          if (user)
+            loadCharacterIcon(aChild.dataset.characterId = user.character?.characterName + (user.isAlternateCharacter ? '_alt' : ''));
+          // 自動色分け
+          if (/◆(.{10})/.test(user?.name))
+            aChild.dataset.trip = RegExp.$1;
+          if (experimentalConfig.autoColor && !document.getElementById('color-' + (aChild.dataset.trip || aChild.dataset.userId))) {
+            var colorList = experimentalConfig.autoColorList || ['#ff8000', '#008000', '#0080ff', '#8060ff', '#ff60ff'];
+            var style = document.querySelector('head').appendChild(document.createElement('style'));
+            style.id = 'color-' + aChild.dataset.userId;
+            style.textContent = `[data-user-id="${aChild.dataset.userId}"],[data-user-id="${aChild.dataset.userId}"] .message-author{color:${colorList[autoColorIndex++ % colorList.length]}}`;
+            if (logWindow && !logWindow.closed)
+              logWindow.document.querySelector('head').append(style.cloneNode(true));
+          }
+        }
         // ログ窓に書き出し
         if (writeLogToWindow)
           writeLogToWindow(aChild);
@@ -525,7 +587,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     }
     // ログ窓
     var logButtons = createButtonContainer();
-    document.getElementById('chatLog').after(logButtons);
+    logButtons.setAttribute('style', 'all:unset;display:flex;order:4');
+    document.getElementById('chat-log-container').after(logButtons);
     writeLogToWindow = function (div) {
       if (!logWindow || logWindow.closed)
         return;
@@ -559,7 +622,8 @@ html,body,#chatLog,input{margin:0;padding:0;box-sizing:border-box;width:100%;hei
 .message-timestamp,.ignored-message{display:none}
 input{display:block;position:fixed;bottom:0;height:2em}
 </style>
-<style id="log-style">${experimentalConfig.logWindowCSS}</style>
+<style id="log-style"></style>
+${Array.from(document.querySelectorAll('style[id^=color]')).reduce((html, style) => html + style.outerHTML, '')}
 <script>window.experimental = true;
 window.interval = setInterval(function () {
   try {
@@ -594,8 +658,10 @@ window.interval = setInterval(function () {
         logWindow.document.body.lastElementChild.focus();
       };
       logWindow.onstorage = function () {
-        logWindow.document.getElementById('log-style').textContent = experimentalConfig.logWindowCSS;
+        if (!this.closed)
+          logWindow.document.getElementById('log-style').textContent = experimentalConfig.logWindowCSS + (experimentalConfig.displayIcon ? characterLogCSS.textContent : '');
       };
+      logWindow.onstorage();
       logWindow.vueApp = window.vueApp;
       logWindow.document.close();
     };
@@ -682,8 +748,8 @@ window.interval = setInterval(function () {
   }
   // 呼び出し通知
   var getCharacterPath = user => {
-    var name = user.characterId || (user.character && user.character.characterName);
-    return 'characters/' + name + '/front-standing.' + (vueApp.allCharacters.find(c=>c.characterName===name) || {format:'svg'}).format;
+    var name = user.characterId || user.character?.characterName;
+    return 'characters/' + name + '/front-standing' + (user.isAlternateCharacter ? '-alt' : '') + '.' + (vueApp.allCharacters.find(c=>c.characterName===name) || {format:'svg'}).format;
   }
   var pngCache = {};
   var SVG2PNG = async function (url) {

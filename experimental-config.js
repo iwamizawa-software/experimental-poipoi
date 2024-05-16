@@ -33,6 +33,23 @@
       value: '2'
     },
     {
+      key: 'autoComplete',
+      name: text('Tabキーでメンションの名前を補完', 'Name autocomplete by Tab key'),
+      description: text('IME変換中は機能しません。複数候補がいる場合はTabキーを押すたびに切り替わります。', 'When there are two or more candidates, the name is toggled each to press Tab key.'),
+      type: 'onoff',
+      value: 0
+    },
+    {
+      name: text('見た目', 'Display'),
+      type: 'separator'
+    },
+    {
+      key: 'hideVoiceButton',
+      name: text('音声入力ボタンを消す', 'Hide voiceinput button'),
+      type: 'onoff',
+      value: 0
+    },
+    {
       key: 'vtuberNiconico',
       name: text('VTuberモードとニコ動モード', 'VTuber and Niconico mode'),
       type: [
@@ -44,17 +61,34 @@
       value: 0
     },
     {
-      key: 'autoComplete',
-      name: text('Tabキーでメンションの名前を補完', 'Name autocomplete by Tab key'),
-      description: text('IME変換中は機能しません。複数候補がいる場合はTabキーを押すたびに切り替わります。', 'When there are two or more candidates, the name is toggled each to press Tab key.'),
+      key: 'outdoor',
+      name: text('タイトルとキャラ選択とマップを消す', 'Hide gikopoipoi parts'),
       type: 'onoff',
       value: 0
     },
     {
-      key: 'hideVoiceButton',
-      name: text('音声入力ボタンを消す', 'Hide voiceinput button'),
+      key: 'displayIcon',
+      name: text('ログにキャラを表示', 'Display character in log'),
       type: 'onoff',
       value: 0
+    },
+    {
+      key: 'iconSize',
+      name: text('ログのキャラサイズ', 'Character size in log'),
+      type: 'input',
+      value: 25
+    },
+    {
+      key: 'autoColor',
+      name: text('自動でログを色分けする', 'Auto colored log'),
+      type: 'onoff',
+      value: 0
+    },
+    {
+      key: 'autoColorList',
+      name: text('自動ログ色リスト', 'Palette of auto colored log'),
+      type: 'color',
+      value: ['#ff8000', '#008000', '#0080ff', '#8060ff', '#ff60ff']
     },
     {
       name: text('名前指定系', 'Name list'),
@@ -293,7 +327,7 @@
       key: 'userCSS',
       name: 'User CSS',
       type: 'textarea',
-      value: '.message {\n}'
+      value: ''
     },
     {
       key: 'logWindowCSS',
@@ -346,9 +380,17 @@
         case 'input':
           element.value = value;
           break;
+        case 'color':
         case 'list':
           element.innerHTML = '';
-          value?.forEach?.(option => element.appendChild(document.createElement('option')).text = option);
+          value?.forEach?.(value => {
+            var option = element.appendChild(document.createElement('option'));
+            option.text = value;
+            if (item.type === 'color') {
+              option.style.color = value;
+              option.style.fontWeight = 'bold';
+            }
+          });
           break;
         default:
           if (item.type?.constructor === Array)
@@ -379,6 +421,8 @@
   var append = function (tagName, attr) {
     var element = document.body.appendChild(document.createElement(tagName));
     Object.assign(element, attr);
+    if (tagName !== 'h1' && tagName !== 'hr')
+      element.style.display
     return element;
   };
   var fileMenu = append('select');
@@ -412,7 +456,16 @@
     switch (item.type) {
       case 'separator':
         append('hr');
-        append('h1').textContent = item.name;
+        append('h1', {
+          textContent: item.name,
+          onclick: function () {
+            var element = this.nextElementSibling;
+            while (element && element.tagName !== 'HR') {
+              element.style.display = element.style.display ? '' : 'none';
+              element = element.nextElementSibling;
+            }
+          }
+        });
         if (item.description)
           append('p').textContent = item.description;
         return;
@@ -436,6 +489,7 @@
           }
         });
         break;
+      case 'color':
       case 'list':
         append('h2').textContent = item.name;
         if (item.description)
@@ -462,7 +516,12 @@
                 return;
               }
             }
-            select.appendChild(document.createElement('option')).text = addText.value;
+            var option = select.insertBefore(document.createElement('option'), select.firstChild);
+            option.text = addText.value;
+            if (item.type === 'color') {
+              option.style.color = addText.value;
+              option.style.fontWeight = 'bold';
+            }
             addText.value = '';
             update(item.key, Array.from(select.options).map(option => option.value));
           }
@@ -470,7 +529,7 @@
         append('br');
         var select = append('select', {
           id: item.key,
-          size: 4
+          size: 6
         });
         select.setAttribute('style', 'width:20em;box-sizing:border-box');
         append('input', {
@@ -507,4 +566,6 @@
     defaultValue[item.key] = item.value;
   });
   load(defaultValue);
+  document.querySelector('head').appendChild(document.createElement('style')).textContent = 'h1{color:#06f;cursor:pointer;text-decoration:underline;margin:0;padding:10px 0}';
+  Array.from(document.getElementsByTagName('h1')).forEach(h1 => h1.click());
 })();

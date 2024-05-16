@@ -1,0 +1,67 @@
+2024/5/16	ログにキャラを表示する、ログを自動で色分けする、マップを消すオプション
+2023/12/7	#ikaoniコマンド
+2023/11/20	吹き出しクリックで削除、吹き出しNGワード
+2023/8/29	#quizコマンド
+2023/8/26	ブラウザバックを止めるオプション
+2023/8/22	チェス最後の手を赤く表示
+2023/8/21	チェス棋譜
+2023/6/21	ログイン時吹き出し非表示オプション
+2023/6/14	名前オートコンプリート、入室時吹き出しを読み上げない
+2023/6/13	Vtuberニコ動モード無効化オプション
+2023/6/12	URL短縮機能
+2023/6/11	配信事故防止用配信停止権限付与
+2023/6/2	ログイン時#henshinするオプション
+2023/5/30	ログに部屋名を出力するオプション
+2023/5/22	重なり回避
+2023/5/21	ダブルクリックでその位置まで移動
+2023/5/14	入退室通知と入退室ログで名無しを除外するオプション
+2023/5/6	ステレオミキサー
+2023/4/23	読み上げ許可拒否リスト
+2023/3/26	NGワード機能と自動一方あぼーん
+2023/2/24	ルーラリンク
+2023/1/22	チェス通知
+2023/1/21	配信動画回転機能
+2023/1/12	入室時部屋選択
+2022/12/31	クッキーで保存するオプション
+2022/12/26	ログを色分け
+2022/9/11	全部屋ﾙｰﾗ可能
+2022/8/6	内藤髪制御
+2022/6/25	配信通知
+2022/6/22	疑似白トリップ
+2022/6/12	ログ窓追加
+2022/6/11	音声入力
+2022/6/5	名無しナンバリング、自動あぼーん、動画配信を別タブで開く、メンション通知機能、ログ右クリックメニュー
+
+2024/5/16	Display icon in log, Auto colored log, Hide map
+2023/12/7	#ikaoni
+2023/11/20	Delete bubble by click
+2023/8/29	#quiz
+2023/8/26	Stop backward
+2023/8/22	Display lastest movement of chess
+2023/8/21	Chess notation
+2023/6/21	Hide bubble at login
+2023/6/14	Name autocomplete
+2023/6/13	Disable vtuber and niconico
+2023/6/12	URL shortener
+2023/6/11	Streaming stopper
+2023/6/2	henshin at login
+2023/5/30	Output room name to log
+2023/5/22	Escape
+2023/5/21	Double-click moving
+2023/5/14	Notification without anon
+2023/5/6	Stereo mix
+2023/4/23	TTS allow/deny list
+2023/3/26	Word filter, Auto ignore
+2023/2/24	Rula link
+2023/1/22	Chess notification
+2023/1/21	Rotate streaming video
+2023/1/12	Select room at login
+2022/12/31	Use cookie mode
+2022/12/26	Set color in log
+2022/9/11	Rulable all room
+2022/8/6	Naito's hair control
+2022/6/25	Streaming notification
+2022/6/22	Add identifier to name
+2022/6/12	Log Window
+2022/6/11	Voice input
+2022/6/5	Numbering anon, Auto block, Open streaming to new tab, Mention notification, Log contextmenu
