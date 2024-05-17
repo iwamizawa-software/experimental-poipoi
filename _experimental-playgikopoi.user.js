@@ -756,7 +756,7 @@ window.interval = setInterval(function () {
   // 呼び出し通知
   var getCharacterPath = user => {
     var name = user.characterId || user.character?.characterName;
-    return 'characters/' + name + '/front-standing' + (user.isAlternateCharacter ? '-alt' : '') + '.' + (vueApp.allCharacters.find(c=>c.characterName===name) || {format:'svg'}).format;
+    return 'characters/' + name + '/front-standing.' + (vueApp.allCharacters.find(c=>c.characterName===name) || {format:'svg'}).format;
   }
   var pngCache = {};
   var SVG2PNG = async function (url) {
