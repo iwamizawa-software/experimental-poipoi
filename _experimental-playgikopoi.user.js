@@ -317,7 +317,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         vueApp.users[id].message = '';
       vueApp.resetBubbleImages();
     // 動画回転
-    } else if (event.altKey && [0, 1, 1, 1][event.key]) {
+    } else if (event.altKey && /^[1-9]$/.test(event.key)) {
       var video = document.getElementById('received-video-' + (event.key - 1));
       if (video)
         video.style.transform = 'rotate(' + (video.dataset.rotate = (+(video.dataset.rotate || 0) + 90) % 360) + 'deg)';
@@ -1149,6 +1149,8 @@ window.interval = setInterval(function () {
         document.getElementById('configButton')?.click();
         t.value = '';
         return;
+      } else if (t.value === '#ver') {
+        t.value = window.experimentalVersion;
       }
     }
     return sendMessageToServer.apply(this, arguments);
