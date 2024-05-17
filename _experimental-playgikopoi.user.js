@@ -524,6 +524,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         var messageBody = aChild.querySelector('.message-body>span') || aChild.querySelector('.message-body');
         if (messageBody && !aChild.querySelector('.message-body a') && (messageBodyHTML = replaceRulaLink(messageBody.innerHTML)) !== messageBody.innerHTML)
           messageBody.innerHTML = messageBodyHTML;
+        if (!this.childNodes.length)
+          Array.from(document.querySelectorAll('style[id^=color-]:not(.tripColor)')).forEach(style => style.remove());
         if (aChild.dataset.userId && aChild.dataset.userId !== 'null') {
           // キャラ付ログ
           var user = vueApp.users[aChild.dataset.userId];
