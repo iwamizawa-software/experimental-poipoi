@@ -215,13 +215,13 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var characterLogCSS = document.createElement('style');
   characterLogCSS.textContent = ':root{--characterlog-size:25px}.message:not(.system-message):before{content: "";width:var(--characterlog-size);height:var(--characterlog-size);display:inline-block;background-size:contain;background-repeat:no-repeat;vertical-align:bottom;margin-right:5px}';
   document.querySelector('head').append(characterLogCSS);
-  var loadCharacterIcon = function (name) {
+  var loadCharacterIcon = function (name, notAlt) {
     var data = characterIconData[name] || (characterIconData[name] = {type: '.svg', x: -50, y: 24, width: 190});
     if (data.loaded)
       return;
     data.loaded = true;
     var img = new Image();
-    img.src = '/characters/' + name.replace(/_alt$/, '') + '/front-standing' + (name.endsWith('_alt') ? '-alt' : '') + data.type;
+    img.src = '/characters/' + name.replace(/_alt$/, '') + '/front-standing' + (!notAlt && name.endsWith('_alt') ? '-alt' : '') + data.type;
     img.onload = function () {
       var canvas = document.createElement('canvas');
       canvas.width = canvas.height = 120;
@@ -231,6 +231,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       characterLogCSS.textContent += `[data-character-id=${name}]:before{background-image:url(${canvas.toDataURL()});}`;
       logWindow?.onstorage?.();
     };
+    if (!notAlt)
+      img.onerror = function () {
+        data.loaded = false;
+        loadCharacterIcon(name, true);
+      };
   };
   // userscript CSS
   document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-label{display:none}#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
