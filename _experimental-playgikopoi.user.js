@@ -159,7 +159,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       };
   };
   // userscript CSS
-  document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-label{display:none}#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}';
+  document.querySelector('head').appendChild(document.createElement('style')).textContent = '#chat-log-label{display:none}#chat-log-container{flex-direction:column}#enableSpeech:checked+button{background-color:#9f6161}.inactive-message:before{opacity:0.5}';
   // config
   var userCSS = document.querySelector('head').appendChild(document.createElement('style')), mentionSound, experimentalConfig;
   var vnCSS = document.querySelector('head').appendChild(document.createElement('style'));
@@ -534,8 +534,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         if (aChild.dataset.userId && aChild.dataset.userId !== 'null') {
           // キャラ付ログ
           var user = vueApp.users[aChild.dataset.userId];
-          if (user)
+          if (user) {
             loadCharacterIcon(aChild.dataset.characterId = user.character?.characterName + (user.isAlternateCharacter ? '_alt' : ''));
+            if (user.isInactive)
+              aChild.classList.add('inactive-message');
+          }
           // 自動色分け
           if (/◆(.{10})/.test(user?.name))
             aChild.dataset.trip = RegExp.$1;
