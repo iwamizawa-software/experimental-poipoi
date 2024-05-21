@@ -57,6 +57,16 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       localStorage.removeItem('disableScript');
       location.reload();
     };
+    var resetButton = document.createElement('button');
+    resetButton.textContent = 'リセット Reset';
+    resetButton.onclick = () => {
+      if (confirm('スクリプトの設定をリセットしますか？ Do you clear config of script?')) {
+        localStorage.removeItem('experimentalConfig');
+        alert('リセットしました Done');
+        disableButton.click();
+      }
+    };
+    disableButton.after(resetButton);
     return;
   } else {
     disableButton.textContent = 'バグったら押す Disable script';
