@@ -127,9 +127,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     abonQueue.push(id);
     if (abonQueue.length > 1)
       return;
-    while (id = abonQueue.shift()) {
-      (await objectExists(vueApp, 'socket')).emit('user-block', id);
-      await sleep(500);
+    while (abonQueue.length) {
+      (await objectExists(vueApp, 'socket')).emit('user-block', abonQueue[0]);
+      await sleep(250);
+      abonQueue.shift();
     }
   };
   // ルーラリンク
