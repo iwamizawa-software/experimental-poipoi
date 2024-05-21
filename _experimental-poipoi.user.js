@@ -112,6 +112,16 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       await sleep(1000);
     return element;
   };
+  var abonQueue = [];
+  var abon = async function (id) {
+    abonQueue.push(id);
+    if (abonQueue.length > 1)
+      return;
+    while (id = abonQueue.shift()) {
+      (await objectExists(vueApp, 'socket')).emit('user-block', id);
+      await sleep(500);
+    }
+  };
   // ルーラリンク
   var roomNameToKey = {}, roomNameRegex = /0^/;
   var createRoomNameRegex = function () {
@@ -346,7 +356,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     // 自動あぼーん
     if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoBlock) && vueApp.socket) {
         vueApp.ignoreUser(userDTO.id);
-        vueApp.socket.emit('user-block', userDTO.id);
+        abon(userDTO.id);
         if (!experimentalConfig.withoutBlockMsg)
           systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
     }
@@ -434,7 +444,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         if (experimentalConfig.wordBlock === 3)
           vueApp.ignoreUser(user.id);
         else
-          (await objectExists(vueApp, 'socket')).emit('user-block', user.id);
+          abon(user.id);
         if (!experimentalConfig.withoutBlockMsg)
           systemMessage(user.name + text('をNGワードあぼーんした', ' has been blocked by filtering'));
       }
@@ -1331,7 +1341,7 @@ window.interval = setInterval(function () {
     this.stopCount = users.length;
     this.dead = [];
     this.users = [];
-    users.forEach(u => setTimeout(()=>vueApp.socket.emit('user-block', u.id), 0));
+    users.forEach(u => setTimeout(()=>abon(u.id), 0));
   };
   nimado.count = function (userCount) {
     if (!this.stopCount)
