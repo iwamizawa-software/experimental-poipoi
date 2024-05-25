@@ -828,7 +828,7 @@ window.interval = setInterval(function () {
     configButton.onclick = function () {
       if (configWindow && !configWindow.closed) {
         try {
-          configWindow.location.href;
+          configWindow.text();
           configWindow.focus();
           return;
         } catch (err) {}

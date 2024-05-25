@@ -70,7 +70,8 @@
       key: 'displayIcon',
       name: text('ログにキャラを表示', 'Display character in log'),
       type: 'onoff',
-      value: 0
+      value: 0,
+      relations: ['iconSize']
     },
     {
       key: 'iconSize',
@@ -82,7 +83,8 @@
       key: 'autoColor',
       name: text('自動でログを色分けする', 'Auto colored log'),
       type: 'onoff',
-      value: 0
+      value: 0,
+      relations: ['autoColorList']
     },
     {
       key: 'autoColorList',
@@ -217,7 +219,8 @@
       key: 'notifyMention',
       name: text('メンション通知', 'Mention notification'),
       type: 'onoff',
-      value: 1
+      value: 1,
+      relations: ['replyMsg', 'mentionSound', 'mentionVolume']
     },
     {
       key: 'replyMsg',
@@ -426,11 +429,16 @@
     load(reader.result);
     update();
   };
-  var append = function (tagName, attr) {
-    var element = document.body.appendChild(document.createElement(tagName));
+  var divs = {};
+  var append = function (tagName, group, attr) {
+    var parent = document.body;
+    if (typeof group === 'string') {
+      parent = divs[group] || (divs[group] = append('div'));
+    } else {
+      attr = group;
+    }
+    var element = parent.appendChild(document.createElement(tagName));
     Object.assign(element, attr);
-    if (tagName !== 'h1' && tagName !== 'hr')
-      element.style.display
     return element;
   };
   var fileMenu = append('select');
@@ -479,17 +487,17 @@
         return;
       case 'textarea':
       case 'input':
-        append('h2').textContent = item.name;
+        append('h2', item.key).textContent = item.name;
         if (item.description)
-          append('p').textContent = item.description;
-        var input = append(item.type, {id: item.key, spellcheck: false});
+          append('p', item.key).textContent = item.description;
+        var input = append(item.type, item.key, {id: item.key, spellcheck: false});
         if (item.type === 'input') {
           input.type = 'text';
           input.style.width = '30em';
         } else {
           input.setAttribute('style', 'width:50em;height:8em');
         }
-        append('input', {
+        append('input', item.key, {
           type: 'button',
           value: 'Apply',
           onclick: function () {
@@ -499,10 +507,10 @@
         break;
       case 'color':
       case 'list':
-        append('h2').textContent = item.name;
+        append('h2', item.key).textContent = item.name;
         if (item.description)
-          append('p').textContent = item.description;
-        var addText = append('input', {
+          append('p', item.key).textContent = item.description;
+        var addText = append('input', item.key, {
           type: 'text',
           onkeypress: function (event) {
             if (event.key === 'Enter')
@@ -510,7 +518,7 @@
           }
         });
         addText.setAttribute('style', 'width:20em;box-sizing:border-box');
-        var addButton = append('input', {
+        var addButton = append('input', item.key, {
           type: 'button',
           value: 'Add',
           onclick: function () {
@@ -534,13 +542,13 @@
             update(item.key, Array.from(select.options).map(option => option.value));
           }
         });
-        append('br');
-        var select = append('select', {
+        append('br', item.key);
+        var select = append('select', item.key, {
           id: item.key,
           size: 6
         });
         select.setAttribute('style', 'width:20em;box-sizing:border-box');
-        append('input', {
+        append('input', item.key, {
           type: 'button',
           value: 'Delete',
           onclick: function () {
@@ -556,24 +564,28 @@
       default:
         if (item.type?.constructor !== Array)
           break;
-        append('h2').textContent = item.name;
+        append('h2', item.key).textContent = item.name;
         if (item.description)
-          append('p').textContent = item.description;
-        var changeColor = () => select.style.backgroundColor = {ON: '#afa', OFF: '#faa'}[select.value] || '';
-        var select = append('select', {
+          append('p', item.key).textContent = item.description;
+        var changeStyle = () => {
+          select.style.backgroundColor = {ON: '#afa', OFF: '#faa'}[select.value] || '';
+          if (item.relations)
+            item.relations.forEach(id => document.getElementById(id).parentNode.className = select.value === 'ON' ? '' : 'hide');
+        };
+        var select = append('select', item.key, {
           id: item.key,
           onchange: function () {
             update(item.key, select.selectedIndex);
-            changeColor();
+            changeStyle();
           }
         });
         item.type?.forEach?.(option => select.appendChild(document.createElement('option')).text = option);
-        queueMicrotask(changeColor);
+        queueMicrotask(changeStyle);
         break;
     }
     defaultValue[item.key] = item.value;
   });
   load(defaultValue);
-  document.querySelector('head').appendChild(document.createElement('style')).textContent = 'h1{color:#06f;cursor:pointer;text-decoration:underline;margin:0;padding:10px 0}';
+  document.querySelector('head').appendChild(document.createElement('style')).textContent = 'h1{color:#06f;cursor:pointer;text-decoration:underline;margin:0;padding:10px 0}.hide{display:none}';
   Array.from(document.getElementsByTagName('h1')).forEach(h1 => h1.click());
 })();
