@@ -129,7 +129,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       return;
     while (abonQueue.length) {
       (await objectExists(vueApp, 'socket')).emit('user-block', abonQueue[0]);
-      await sleep(250);
+      await sleep(100);
       abonQueue.shift();
     }
   };
@@ -370,12 +370,15 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (userDTO.id !== vueApp.myUserID && match(processedName, experimentalConfig.autoBlock) && vueApp.socket) {
         vueApp.ignoreUser(userDTO.id);
         abon(userDTO.id);
+        userDTO.aboned = true;
         if (!experimentalConfig.withoutBlockMsg)
           systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
     }
     // 自動一方あぼーん
-    if (userDTO.id !== vueApp.myUserID && match(processedName, experimentalConfig.autoIgnore))
+    if (userDTO.id !== vueApp.myUserID && match(processedName, experimentalConfig.autoIgnore)) {
       vueApp.ignoreUser(userDTO.id);
+      userDTO.aboned = true;
+    }
     // 吹き出しNGワード
     if (match(userDTO.lastRoomMessage, experimentalConfig.bubbleFilter))
       queueMicrotask(() => {if (vueApp.users[userDTO.id]) vueApp.users[userDTO.id].message = '';});
@@ -1625,6 +1628,11 @@ window.interval = setInterval(function () {
         setTimeout(() => {
           if (!user || user.id === vueApp.myUserID)
             return;
+          if (user.aboned) {
+            if (vueApp.users[user.id])
+              vueApp.users[user.id].aboned = true;
+            return;
+          }
           if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
             if (experimentalConfig.accessLog)
               systemMessage(addIHash(user.name, user.id) + text('が入室', ' has joined the room') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
@@ -1638,7 +1646,7 @@ window.interval = setInterval(function () {
         if (user)
           graph?.update(arguments[1], user.logicalPositionX, user.logicalPositionY, null, null);
         // 退室ログ
-        if (!user || user.id === vueApp.myUserID)
+        if (!user || user.id === vueApp.myUserID || user.aboned)
           return;
         if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
           if (experimentalConfig.accessLog)

@@ -269,12 +269,15 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (userDTO.id !== vueApp.myUserID && match(processedName, experimentalConfig.autoBlock) && vueApp.socket) {
         vueApp.ignoreUser(userDTO.id);
         vueApp.socket.emit('user-block', userDTO.id);
+        userDTO.aboned = true;
         if (!experimentalConfig.withoutBlockMsg)
           systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
     }
     // 自動一方あぼーん
-    if (userDTO.id !== vueApp.myUserID && match(processedName, experimentalConfig.autoIgnore))
+    if (userDTO.id !== vueApp.myUserID && match(processedName, experimentalConfig.autoIgnore)) {
       vueApp.ignoreUser(userDTO.id);
+      userDTO.aboned = true;
+    }
     // 吹き出しNGワード
     if (match(userDTO.lastRoomMessage, experimentalConfig.bubbleFilter))
       queueMicrotask(() => {if (vueApp.users[userDTO.id]) vueApp.users[userDTO.id].message = '';});
@@ -1325,6 +1328,11 @@ window.interval = setInterval(function () {
         setTimeout(() => {
           if (!user || user.id === vueApp.myUserID)
             return;
+          if (user.aboned) {
+            if (vueApp.users[user.id])
+              vueApp.users[user.id].aboned = true;
+            return;
+          }
           if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
             if (experimentalConfig.accessLog)
               systemMessage(addIHash(user.name, user.id) + text('が入室', ' has joined the room') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
@@ -1340,7 +1348,7 @@ window.interval = setInterval(function () {
         // 退室ログ
         if (!user || user.id === vueApp.myUserID)
           return;
-        if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
+        if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName('')) || user.aboned) {
           if (experimentalConfig.accessLog)
             systemMessage(addIHash(user.name, user.id) + text('が退室', ' has left the room') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
           accessNotification(user, text('退室', 'leave'));
