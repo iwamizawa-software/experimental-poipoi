@@ -543,7 +543,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
           if (/◆(.{10})/.test(user?.name))
             aChild.dataset.trip = RegExp.$1;
           if (experimentalConfig.autoColor && (!aChild.dataset.trip || !document.getElementById('color-' + aChild.dataset.trip)) && !document.getElementById('color-' + aChild.dataset.userId)) {
-            var colorList = experimentalConfig.autoColorList || ['#ff8000', '#008000', '#0080ff', '#8060ff', '#ff60ff'];
+            var colorList = experimentalConfig.autoColorList?.length ? experimentalConfig.autoColorList : ['#ff8000', '#008000', '#0080ff', '#8060ff', '#ff60ff'];
             var style = document.querySelector('head').appendChild(document.createElement('style'));
             style.id = 'color-' + aChild.dataset.userId;
             style.textContent = `[data-user-id="${aChild.dataset.userId}"],[data-user-id="${aChild.dataset.userId}"] .message-author{color:${colorList[autoColorIndex++ % colorList.length]}}`;

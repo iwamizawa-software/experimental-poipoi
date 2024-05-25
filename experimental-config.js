@@ -87,6 +87,7 @@
     {
       key: 'autoColorList',
       name: text('自動ログ色リスト', 'Palette of auto colored log'),
+      description: text('自動色分けで使う色をカラーコードで指定します。', 'Set hex colors for auto colored log.'),
       type: 'color',
       value: ['#ff8000', '#008000', '#0080ff', '#8060ff', '#ff60ff']
     },
