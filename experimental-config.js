@@ -248,7 +248,7 @@
         text('非アクティブ時のみ', 'Inactive'),
         text('常に通知', 'Always')
       ],
-      value: 1
+      value: 0
     },
     {
       key: 'accessLog',
