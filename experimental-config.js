@@ -122,6 +122,13 @@
       description: text('両端を半角スラッシュ(/)にすると正規表現として扱われます。', 'You can set /test/ as RegExp.')
     },
     {
+      key: 'filteringHelper',
+      name: text('フィルタリング補助', 'Filtering Helper'),
+      description: text('指定した文字を消してから自動あぼーんやNGワード判定します。例：「./ー」と指定するとア.ホ、ア/ホ、アーホが全てアホと見なされる', 'Remove set characters from tested message. (When set "/_", f/*/*/k or f_*_*_k is same as f**k.)'),
+      type: 'input',
+      value: ''
+    },
+    {
       key: 'autoBlock',
       name: text('自動相互一方あぼーん', 'Auto block'),
       description: text('名前を部分一致で指定します。例：無だけ指定すると名無しさんと無職くんをあぼーん', 'Partial Match'),
