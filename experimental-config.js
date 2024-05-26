@@ -214,7 +214,7 @@
     {
       key: 'displayMsgInterval',
       name: text('発言間隔秒数と平均値をログに表示する', 'Add time of message interval to log'),
-      description: text('設定値を決めるための参考として使います。', 'Reference for config'),
+      description: text('設定値を決めるための参考として使います。1番目は発言間隔、2番目は平均値が表示されます。', 'Reference for config'),
       type: 'onoff',
       value: 0
     },
