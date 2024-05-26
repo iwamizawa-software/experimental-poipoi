@@ -30,7 +30,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     var changelogButton = document.createElement('button');
     disableButtonContainer.append(changelogButton);
     changelogButton.textContent = '新機能 Whats new';
-    changelogButton.style.backgroundColor = '#754848';
+    changelogButton.style.backgroundColor = '#c88';
     changelogButton.onclick = () => {
       open(WEBSITE_PATH + 'changelog.txt', '_blank', 'noreferrer');
       localStorage.setItem('experimentalVersion', window.experimentalVersion);
