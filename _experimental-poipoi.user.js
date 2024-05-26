@@ -217,19 +217,27 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var toIHash = id => '◇' + btoa(id.replace(/-/g, '').replace(/../g, function (s) {return String.fromCharCode('0x' + s)})).slice(0, 6);
   var addIHash = (name, id) => experimentalConfig.numbering === 2 ? name.replace(/(◆.+)?$/, toIHash(id) + '$1') : name;
   var removeSpace = str => str.replace(/[\u{0009}-\u{000D}\u{0020}\u{0085}\u{00A0}\u{00AD}\u{034F}\u{061C}\u{070F}\u{115F}\u{1160}\u{1680}\u{17B4}\u{17B5}\u{180E}\u{2000}-\u{200F}\u{2028}-\u{202F}\u{205F}-\u{206F}\u{2800}\u{3000}\u{3164}\u{FEFF}\u{FFA0}\u{110B1}\u{1BCA0}-\u{1BCA3}\u{1D159}\u{1D173}-\u{1D17A}\u{E0000}-\u{E0FFF}]/gu, '');
-  var removeWorkaround = str => experimentalConfig.filteringHelper ? (str + '').split('').filter(c => !experimentalConfig.filteringHelper.includes(c)).join('') : str;
-  var match = (str, cond) => {
+  var match = (str, cond, removeWorkaround) => {
     if (!cond || cond.constructor !== Array || typeof str !== 'string')
       return false;
-    var nospace = removeSpace(str || '');
+    var targets = [];
+    var nospace = removeSpace(str);
+    if (nospace !== str)
+      targets.push(nospace);
+    if (removeWorkaround) {
+      var removed = nospace.split('').filter(c => !removeWorkaround.includes(c)).join('');
+      if (removed !== nospace)
+        targets.push(removed);
+    }
+    targets.push(str);
     return cond.some(c => {
       if (!c)
         return false;
       if (/^\/.+\/([dgimsuy]*)$/i.test(c)) {
         var regex = new RegExp(c.slice(1, -(1 + RegExp.$1.length)), RegExp.$1);
-        return regex.test(nospace) || regex.test(str);
+        return targets.some(target => regex.test(target));
       } else {
-        return nospace.indexOf(c) !== -1 || str.indexOf(c) !== -1;
+        return targets.some(target => target.includes(c));
       }
     });
   };
@@ -366,8 +374,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (match(userDTO.name, ['' + /[SＳ][YＹ][SＳ][TＴ][EＥ][MＭ]/]))
       userDTO.name += '(偽)';
     // 自動あぼーん
-    var processedName = removeWorkaround(userDTO.name);
-    if (userDTO.id !== vueApp.myUserID && match(processedName, experimentalConfig.autoBlock) && vueApp.socket) {
+    if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoBlock, experimentalConfig.filteringHelper) && vueApp.socket) {
         vueApp.ignoreUser(userDTO.id);
         abon(userDTO.id);
         userDTO.aboned = true;
@@ -375,7 +382,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
           systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
     }
     // 自動一方あぼーん
-    if (userDTO.id !== vueApp.myUserID && match(processedName, experimentalConfig.autoIgnore)) {
+    if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoIgnore, experimentalConfig.filteringHelper)) {
       vueApp.ignoreUser(userDTO.id);
       userDTO.aboned = true;
     }
@@ -455,7 +462,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (vueApp.streamSlotIdInWhichIWantToStream !== null && /^(?:配信停止|stop streaming)$/i.test(msg) && match(vueApp.users[user?.id]?.name, experimentalConfig.streamStopper))
       vueApp.stopStreaming();
     // NGワード
-    if (user?.id && match(removeWorkaround(msg), experimentalConfig.wordFilter)) {
+    if (user?.id && match(msg, experimentalConfig.wordFilter, experimentalConfig.filteringHelper)) {
       if (user.id !== vueApp.myUserID && experimentalConfig.wordBlock) {
         if (experimentalConfig.wordBlock === 3)
           vueApp.ignoreUser(user.id);
