@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  80
+// @version  81
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -30,6 +30,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     var changelogButton = document.createElement('button');
     disableButtonContainer.append(changelogButton);
     changelogButton.textContent = '新機能 Whats new';
+    changelogButton.style.backgroundColor = '#754848';
     changelogButton.onclick = () => {
       open(WEBSITE_PATH + 'changelog.txt', '_blank', 'noreferrer');
       localStorage.setItem('experimentalVersion', window.experimentalVersion);
@@ -358,6 +359,23 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     graph = new Graph(dto);
     return r;
   };
+  // 無視解除時
+  var unignoreUser = vueApp.unignoreUser;
+  vueApp.unignoreUser = function (userId) {
+    if (experimentalConfig.ignoreAll) {
+      var trip = vueApp.users?.[userId]?.name?.match(/◆.{10}/)?.[0];
+      if (trip) {
+        if (!experimentalConfig.unignoreList)
+          experimentalConfig.unignoreList = [];
+        if (!experimentalConfig.unignoreList.some(name => trip.includes(name))) {
+          experimentalConfig.unignoreList.push(trip);
+          modifyConfig(experimentalConfig);
+          configWindow?.load?.(experimentalConfig);
+        }
+      }
+    }
+    return unignoreUser.apply(this, arguments);
+  };
   // ユーザー追加時
   var addUser = vueApp.addUser;
   vueApp.addUser = function (userDTO) {
@@ -382,7 +400,13 @@ document.querySelector('head').appendChild(document.createElement('script').appe
           systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
     }
     // 自動一方あぼーん
-    if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoIgnore, experimentalConfig.filteringHelper)) {
+    if (
+      userDTO.id !== vueApp.myUserID &&
+      (
+        match(userDTO.name, experimentalConfig.autoIgnore, experimentalConfig.filteringHelper) ||
+        (experimentalConfig.ignoreAll && !match(userDTO.name, experimentalConfig.unignoreList))
+      )
+    ) {
       vueApp.ignoreUser(userDTO.id);
       userDTO.aboned = true;
     }
@@ -684,7 +708,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     return Node.prototype.appendChild.call(this, aChild);
   };
   // ログイン時
-  var logWindow;
+  var logWindow, configWindow;
   var onlogin = function () {
     // 音声入力
     var textbox = document.getElementById('input-textbox');
@@ -829,7 +853,7 @@ window.interval = setInterval(function () {
     colorPicker.type = 'color';
     colorPicker.setAttribute('style', 'visibility:hidden;width:0;padding:0;border:0');
     // 設定
-    var configButton = logButtons.appendChild(document.createElement('button')), configWindow;
+    var configButton = logButtons.appendChild(document.createElement('button'));
     configButton.textContent = text('設定', 'Config');
     configButton.id = 'configButton';
     configButton.onclick = function () {

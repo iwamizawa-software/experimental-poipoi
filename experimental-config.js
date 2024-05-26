@@ -126,7 +126,7 @@
     {
       key: 'filteringHelper',
       name: text('フィルタリング補助', 'Filtering Helper'),
-      description: text('指定した文字を消してから自動あぼーんやNGワード判定します。例：「./ー」と指定するとア.ホ、ア/ホ、アーホが全てアホと見なされる', 'Remove set characters from tested message. (When set "/_", f/*/*/k or f_*_*_k is same as f**k.)'),
+      description: text('指定した文字を消してから自動あぼーんやNGワード判定します。例：「./ー」と指定するとア.ホ、ア/ホ、アーホが全てアホと見なされる', 'Remove set characters before filtering. (When set "/_", f/*/*/k or f_*_*_k is same as f**k.)'),
       type: 'input',
       value: ''
     },
@@ -160,6 +160,21 @@
         text('一方あぼーん', 'Ignore')
       ],
       value: 0
+    },
+    {
+      key: 'ignoreAll',
+      name: text('ホワイトリスト型自動一方あぼーん', 'Allowlist mode'),
+      description: text('指定した名前の人以外全員一方あぼーんします。', 'Ignore everyone without allowlist members.'),
+      type: 'onoff',
+      value: 0,
+      relations: ['unignoreList']
+      
+    },
+    {
+      key: 'unignoreList',
+      name: text('ホワイトリスト', 'Allowlist'),
+      type: 'list',
+      value: []
     },
     {
       key: 'withoutBlockMsg',
@@ -413,10 +428,15 @@
   var update = function (key, value) {
     if (key)
       currentValue[key] = value;
-    if (window.opener)
-      opener.modifyConfig(currentValue);
-    else
+    if (window.opener) {
+      try {
+        opener.modifyConfig(currentValue);
+      } catch (err) {
+        alert(text('設定の適用に失敗しました。ギコっぽいぽいを開きなおしてください。', 'Failed to save config. Open gikopoipoi again.'));
+      }
+    } else {
       console.log(currentValue);
+    }
   };
   var downloadLink = document.createElement('a'), file = document.createElement('input'), reader = new FileReader();
   file.type = 'file';
