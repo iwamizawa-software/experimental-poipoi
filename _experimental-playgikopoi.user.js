@@ -585,6 +585,13 @@ document.querySelector('head').appendChild(document.createElement('script').appe
             if (logWindow && !logWindow.closed)
               logWindow.document.querySelector('head').append(style.cloneNode(true));
           }
+          // 発言間隔秒数
+          if (messageBody && user && experimentalConfig.spammer && experimentalConfig.displayMsgInterval && user.commentInterval && user.commentInterval !== Infinity) {
+            var values = [user.commentInterval];
+            if (user.commentIntervalAverage && user.commentIntervalAverage !== Infinity)
+              values.push(user.commentIntervalAverage);
+            messageBody.innerHTML += ` (${values.map(v => (v + '').replace(/(\.\d)\d+$/, '$1')).join(' ')})`;
+          }
         }
         // ログ窓に書き出し
         if (writeLogToWindow)
@@ -1317,6 +1324,14 @@ window.interval = setInterval(function () {
       vueApp.isRedrawRequired = true;
     }
   });
+  var COMMENT_TIMES_LENGTH = 4
+  var recordInterval = function (user) {
+    if (!user.commentTimes)
+      user.commentTimes = Array(COMMENT_TIMES_LENGTH).fill(-Infinity);
+    user.commentTimes.push(user.lastCommentTime = (new Date()).getTime());
+    if (user.commentTimes.length > COMMENT_TIMES_LENGTH)
+      user.commentTimes.shift();
+  };
   // socket event
   var streamStates = [];
   var moved = false;
@@ -1363,6 +1378,9 @@ window.interval = setInterval(function () {
               vueApp.users[user.id].aboned = true;
             return;
           }
+          // 最終発言時間
+          if (vueApp.users[user.id])
+            recordInterval(vueApp.users[user.id]);
           if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
             if (experimentalConfig.accessLog)
               systemMessage(addIHash(user.name, user.id) + text('が入室', ' has joined the room') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
@@ -1394,8 +1412,29 @@ window.interval = setInterval(function () {
         var user = vueApp.users[arguments[1]];
         if (!user)
           return;
+        if (user.id === vueApp.myUserID)
+          break;
         // 最終発言時間
-        user.lastCommentTime = (new Date()).getTime();
+        if (arguments[2])
+          recordInterval(user);
+        // 連投あぼーん
+        if (arguments[2] && experimentalConfig.spammer && user.commentTimes.length > 1) {
+          user.commentInterval = (user.lastCommentTime - user.commentTimes[user.commentTimes.length - 2]) / 1000;
+          user.commentIntervalAverage = (user.lastCommentTime - user.commentTimes[0]) / (user.commentTimes.length - 1) / 1000;
+          var causeByAverage = experimentalConfig.minMsgIntervalAverage && +experimentalConfig.minMsgIntervalAverage > user.commentIntervalAverage;
+          if ((experimentalConfig.minMsgInterval && +experimentalConfig.minMsgInterval > user.commentInterval) || causeByAverage) {
+            var tail = ' (' + (causeByAverage ? 'Avg. ' + user.commentIntervalAverage : user.commentInterval) + ')';
+            if (experimentalConfig.spammer === 1 && !vueApp.ignoredUserIds.has(user.id)) {
+              vueApp.ignoreUser(user.id);
+              if (!experimentalConfig.hideSpamAbonMsg)
+                systemMessage(user.name + text('を連投一方あぼーんした', ' has been ignored because of spam') + tail);
+            } else if (experimentalConfig.spammer === 2) {
+              abon(user.id);
+              if (!experimentalConfig.hideSpamAbonMsg)
+                systemMessage(user.name + text('を連投相互あぼーんした', ' has been blocked because of spam') + tail);
+            }
+          }
+        }
         // 呼び出し通知
         mentionNotification(user, arguments[2]);
         break;

@@ -162,6 +162,16 @@
       value: 0
     },
     {
+      key: 'withoutBlockMsg',
+      name: text('SYSTEMのあぼーんメッセージを非表示', 'Hide blocking message'),
+      type: 'onoff',
+      value: 0
+    },
+    {
+      name: text('特殊な自動あぼーん', 'Optional auto ignore/block'),
+      type: 'separator'
+    },
+    {
       key: 'ignoreAll',
       name: text('ホワイトリスト型自動一方あぼーん', 'Allowlist mode'),
       description: text('指定した名前の人以外全員一方あぼーんします。', 'Ignore everyone without allowlist members.'),
@@ -177,8 +187,40 @@
       value: []
     },
     {
-      key: 'withoutBlockMsg',
-      name: text('SYSTEMのあぼーんメッセージを非表示', 'Invisible block message'),
+      key: 'spammer',
+      name: text('連投あぼーん', 'Spammer'),
+      type: [
+        'OFF',
+        text('一方あぼーん', 'Auto ignore'),
+        text('相互あぼーん', 'Auto block')
+      ],
+      value: 0,
+      relations: ['minMsgInterval', 'minMsgIntervalAverage', 'displayMsgInterval', 'hideSpamAbonMsg']
+    },
+    {
+      key: 'minMsgInterval',
+      name: text('発言間隔秒数', 'Lower limit of message interval (seconds)'),
+      description: text('指定した秒数以下の発言をした人を自動あぼーんします。(小数点使用可)', 'Block or ignore user below the limit.'),
+      type: 'input',
+      value: ''
+    },
+    {
+      key: 'minMsgIntervalAverage',
+      name: text('平均発言間隔秒数', 'Lower limit of message interval (average)'),
+      description: text('1回の発言は速くないが平均的に速い人を自動あぼーんします。', 'Judge by average value.'),
+      type: 'input',
+      value: ''
+    },
+    {
+      key: 'displayMsgInterval',
+      name: text('発言間隔秒数と平均値をログに表示する', 'Add time of message interval to log'),
+      description: text('設定値を決めるための参考として使います。', 'Reference for config'),
+      type: 'onoff',
+      value: 0
+    },
+    {
+      key: 'hideSpamAbonMsg',
+      name: text('連投あぼーんメッセージを非表示', 'Hide spam blocking message'),
       type: 'onoff',
       value: 0
     },
@@ -590,7 +632,7 @@
         var changeStyle = () => {
           select.style.backgroundColor = {ON: '#afa', OFF: '#faa'}[select.value] || '';
           if (item.relations)
-            item.relations.forEach(id => document.getElementById(id).parentNode.className = select.value === 'ON' ? '' : 'hide');
+            item.relations.forEach(id => document.getElementById(id).parentNode.className = select.value === 'OFF' ? 'hide' : '');
         };
         var select = append('select', item.key, {
           id: item.key,
