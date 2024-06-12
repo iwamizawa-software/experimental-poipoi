@@ -70,7 +70,14 @@ document.querySelector('head').appendChild(document.createElement('script').appe
               var pipButton = document.createElement('button');
               pipButton.className = 'experimental-buttons';
               pipButton.textContent = 'PIP';
-              pipButton.onclick = () => div.parentNode.querySelector('[id^=received-video]')?.requestPictureInPicture();
+              pipButton.onclick = () => {
+                var video = div.parentNode.querySelector('[id^=received-video]');
+                if (video) {
+                  video.requestPictureInPicture();
+                  // iOS用
+                  video.onleavepictureinpicture = () => video.play();
+                }
+              }
               div.insertBefore(pipButton, div.firstChild);
             }
           } else {
