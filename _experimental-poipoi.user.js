@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  82
+// @version  83
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -112,24 +112,57 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     return {then: c=>{callback = c}};
   };
   var sleep = t => ({then: f => setTimeout(f, t)});
-  var objectExists = async function (obj, key) {
+  var getObjectAsync = async function (obj, key) {
     while (!obj[key])
       await sleep(1000);
     return obj[key];
   };
-  var elementExists = async function (query) {
-    var element;
-    while (!(element = document.querySelector(query)))
-      await sleep(1000);
-    return element;
-  };
+  var observedSelectors = [];
+  var observer = new MutationObserver(() => {
+    observedSelectors = observedSelectors.filter(obj => {
+      var element = document.querySelector(obj.selector);
+      if (element)
+        obj.resolve(element);
+      else
+        return true;
+    });
+    if (!observedSelectors.length)
+      observer.disconnect();
+  });
+  var querySelectorAsync = async selector => document.querySelector(selector) || new Promise(resolve => {
+    if (!observedSelectors.length)
+      observer.observe(document.body, {subtree: true, childList: true});
+    observedSelectors.push({selector, resolve});
+  });
+  // PIP
+  if (HTMLVideoElement.prototype.requestPictureInPicture) {
+    querySelectorAsync('#video-streams').then(element => {
+      var observer = new MutationObserver(() => {
+        Array.from(element.querySelectorAll('.stream-buttons')).forEach(div => {
+          var experimentalButtons = Array.from(div.querySelectorAll('.experimental-buttons'));
+          if (div.querySelector('[id^=drop-stream-button]') && div.parentNode.querySelector('[id^=video-container]')?.style.display === '') {
+            if (!experimentalButtons.length) {
+              var pipButton = document.createElement('button');
+              pipButton.className = 'experimental-buttons';
+              pipButton.textContent = 'PIP';
+              pipButton.onclick = () => div.parentNode.querySelector('[id^=received-video]')?.requestPictureInPicture();
+              div.insertBefore(pipButton, div.firstChild);
+            }
+          } else {
+            experimentalButtons.forEach(button => button.remove());
+          }
+        });
+      });
+      observer.observe(element, {subtree: true, childList: true});
+    });
+  }
   var abonQueue = [];
   var abon = async function (id) {
     abonQueue.push(id);
     if (abonQueue.length > 1)
       return;
     while (abonQueue.length) {
-      (await objectExists(vueApp, 'socket')).emit('user-block', abonQueue[0]);
+      (await getObjectAsync(vueApp, 'socket')).emit('user-block', abonQueue[0]);
       await sleep(100);
       abonQueue.shift();
     }
@@ -156,7 +189,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var room = vueApp.$i18next.options.resources.ja.common.room;
   createRoomNameRegex();
   var characterIconData = {};
-  elementExists('#login-button').then(loginButton => {
+  querySelectorAsync('#login-button').then(loginButton => {
     var select = document.createElement('select');
     Object.keys(vueApp.$i18next.options.resources.en.common.room).map(key => {
       var nihongo = vueApp.$i18next.options.resources.ja.common.room[key];
@@ -347,12 +380,12 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       logWindow.onresize();
     // デフォで変身
     if (experimentalConfig.henshin && !henshined) {
-      objectExists(vueApp, 'socket').then(socket => socket.emit('user-msg', '#henshin'));
+      getObjectAsync(vueApp, 'socket').then(socket => socket.emit('user-msg', '#henshin'));
       henshined = true;
     }
     // デフォで吹き出し位置変更
     if (experimentalConfig.bubblePosition && !bubbleChanged) {
-      objectExists(vueApp, 'socket').then(socket => socket.emit('user-bubble-position', ['up', 'right',  'left',  'down'][experimentalConfig.bubblePosition]));
+      getObjectAsync(vueApp, 'socket').then(socket => socket.emit('user-bubble-position', ['up', 'right',  'left',  'down'][experimentalConfig.bubblePosition]));
       bubbleChanged = true;
     }
     // グラフ
@@ -1050,7 +1083,7 @@ window.interval = setInterval(function () {
   var wsm = {
     show: async function (show) {
       if (show) {
-        var mutebtn = await elementExists('button.mute-unmute-button');
+        var mutebtn = await querySelectorAsync('button.mute-unmute-button');
         if (!this.addAudio) {
           this.addAudio = document.createElement('select');
           this.addAudio.innerHTML = `<option>${text('配信音声の追加', 'Add voice')}<option value="browser">${text('ブラウザの音声', 'browser sound')}<option value="monitor">${text('PCの音声', 'speaker sound')}`;
@@ -1802,7 +1835,7 @@ window.interval = setInterval(function () {
     if (vueApp.socket)
       vueApp.socket.prependAny(socketEvent);
   } else {
-    (await objectExists(vueApp, 'socket')).prependAny(socketEvent);
+    (await getObjectAsync(vueApp, 'socket')).prependAny(socketEvent);
   }
 
 } + ')()')).parentNode);

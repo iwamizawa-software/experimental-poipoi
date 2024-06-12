@@ -37,16 +37,60 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     return {then: c=>{callback = c}};
   };
   var sleep = t => ({then: f => setTimeout(f, t)});
-  var objectExists = async function (obj, key) {
+  var getObjectAsync = async function (obj, key) {
     while (!obj[key])
       await sleep(1000);
     return obj[key];
   };
-  var elementExists = async function (query) {
-    var element;
-    while (!(element = document.querySelector(query)))
-      await sleep(1000);
-    return element;
+  var observedSelectors = [];
+  var observer = new MutationObserver(mutations => {
+    observedSelectors = observedSelectors.filter(obj => {
+      var element = document.querySelector(obj.selector);
+      if (element)
+        obj.resolve(element);
+      else
+        return true;
+    });
+    if (!observedSelectors.length)
+      observer.disconnect();
+  });
+  var querySelectorAsync = async selector => document.querySelector(selector) || new Promise(resolve => {
+    if (!observedSelectors.length)
+      observer.observe(document.body, {subtree: true, childList: true});
+    observedSelectors.push({selector, resolve});
+  });
+  // PIP
+  if (HTMLVideoElement.prototype.requestPictureInPicture) {
+    querySelectorAsync('#video-streams').then(element => {
+      var observer = new MutationObserver(() => {
+        Array.from(element.querySelectorAll('.stream-buttons')).forEach(div => {
+          var experimentalButtons = Array.from(div.querySelectorAll('.experimental-buttons'));
+          if (div.querySelector('[id^=drop-stream-button]') && div.parentNode.querySelector('[id^=video-container]')?.style.display === '') {
+            if (!experimentalButtons.length) {
+              var pipButton = document.createElement('button');
+              pipButton.className = 'experimental-buttons';
+              pipButton.textContent = 'PIP';
+              pipButton.onclick = () => div.parentNode.querySelector('[id^=received-video]')?.requestPictureInPicture();
+              div.insertBefore(pipButton, div.firstChild);
+            }
+          } else {
+            experimentalButtons.forEach(button => button.remove());
+          }
+        });
+      });
+      observer.observe(element, {subtree: true, childList: true});
+    });
+  }
+  var abonQueue = [];
+  var abon = async function (id) {
+    abonQueue.push(id);
+    if (abonQueue.length > 1)
+      return;
+    while (abonQueue.length) {
+      (await getObjectAsync(vueApp, 'socket')).emit('user-block', abonQueue[0]);
+      await sleep(100);
+      abonQueue.shift();
+    }
   };
   // ルーラリンク
   var roomNameToKey = {}, roomNameRegex = /0^/;
@@ -66,7 +110,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   await ready(window.vueApp, '_isMounted');
   createRoomNameRegex();
   var characterIconData = {"giko":{"type":".svg","x":-50,"y":24,"width":190},"naito":{"type":".svg","x":-48,"y":13,"width":190},"shii":{"type":".svg","x":-50,"y":24,"width":190},"hikki":{"type":".svg","x":-44,"y":-12,"width":190},"tinpopo":{"type":".svg","x":-50,"y":26,"width":190},"shobon":{"type":".svg","x":-50,"y":-20,"width":190},"nida":{"type":".svg","x":-50,"y":27,"width":190},"salmon":{"type":".svg","x":17,"y":-54,"width":190},"giko_hat":{"type":".svg","x":-50,"y":10,"width":190},"shii_hat":{"type":".svg","x":-50,"y":10,"width":190},"shobon_hat":{"type":".svg","x":-41,"y":-20,"width":190},"furoshiki":{"type":".svg","x":-50,"y":24,"width":190},"golden_furoshiki":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shii":{"type":".svg","x":-50,"y":24,"width":190},"sakura_furoshiki_shii":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shobon":{"type":".svg","x":-41,"y":-20,"width":190},"naitoapple":{"type":".svg","x":-50,"y":10,"width":190},"shii_pianica":{"type":".svg","x":-46,"y":24,"width":190},"shii_uniform":{"type":".svg","x":-50,"y":24,"width":190},"hungry_giko":{"type":".svg","x":-45,"y":15,"width":190},"rikishi_naito":{"type":".svg","x":-30,"y":-18,"width":170},"hentai_giko":{"type":".svg","x":-45,"y":33,"width":170},"dark_naito_walking":{"type":".svg","x":-48,"y":13,"width":190},"takenoko":{"type":".svg","x":0,"y":0,"width":100},"kaminarisama_naito":{"type":".svg","x":-48,"y":13,"width":190},"panda_naito":{"type":".svg","x":-48,"y":13,"width":190},"wild_panda_naito":{"type":".svg","x":-48,"y":13,"width":190},"funkynaito":{"type":".png","x":-48,"y":13,"width":190},"molgiko":{"type":".png","x":-80,"y":-70,"width":190},"tikan_giko":{"type":".svg","x":-50,"y":24,"width":190},"hotsuma_giko":{"type":".svg","x":-50,"y":24,"width":190},"dokuo":{"type":".svg","x":-58,"y":-33,"width":190},"onigiri":{"type":".svg","x":-38,"y":20,"width":170},"tabako_dokuo":{"type":".svg","x":-58,"y":-33,"width":190},"himawari":{"type":".svg","x":-47,"y":0,"width":190},"zonu":{"type":".svg","x":-70,"y":-46,"width":190},"george":{"type":".svg","x":-48,"y":13,"width":190},"chotto_toorimasu_yo":{"type":".svg","x":-54,"y":-34,"width":190},"tokita_naito":{"type":".svg","x":-40,"y":4,"width":170},"pumpkinhead":{"type":".svg","x":-74,"y":34,"width":230},"naito_yurei":{"type":".svg","x":-48,"y":13,"width":190},"shiinigami":{"type":".svg","x":-100,"y":2,"width":280},"youkanman":{"type":".svg","x":-46,"y":-50,"width":180},"baba_shobon":{"type":".svg","x":-50,"y":-20,"width":190},"uzukumari":{"type":".svg","x":-98,"y":-69,"width":190},"giko_basketball":{"type":".svg","x":-50,"y":24,"width":190},"giko_shamisen":{"type":".svg","x":-50,"y":24,"width":190},"mikan_naito":{"type":".svg","x":-48,"y":13,"width":190},"shii_syakuhati":{"type":".svg","x":-50,"y":24,"width":190},"taiko_naito":{"type":".svg","x":-48,"y":13,"width":190},"mitsugiko":{"type":".svg","x":-90,"y":-50,"width":190},"giko_cop":{"type":".png","x":-50,"y":24,"width":190},"giko_batman":{"type":".png","x":-50,"y":24,"width":190},"giko_hungover":{"type":".png","x":-50,"y":24,"width":190},"giko_islam":{"type":".png","x":-50,"y":24,"width":190},"shii_islam":{"type":".png","x":-50,"y":24,"width":190},"giko_shroom":{"type":".png","x":-55,"y":24,"width":190},"bif_alien":{"type":".png","x":-54,"y":-34,"width":190},"bif_wizard":{"type":".png","x":-54,"y":-34,"width":190},"winter_shii":{"type":".svg","x":-50,"y":0,"width":190},"longcat":{"type":".png","x":-50,"y":-50,"width":190},"hotaru":{"type":".png","x":-58,"y":0,"width":190},"mona":{"type":".png","x":-50,"y":33,"width":190},"foe":{"type":".svg","x":-50,"y":-50,"width":190},"kimono_giko":{"type":".svg","x":-50,"y":24,"width":190},"kimono_shii":{"type":".svg","x":-50,"y":24,"width":190},"shar_naito":{"type":".svg","x":-48,"y":13,"width":190},"ika":{"type":".svg","x":0,"y":18,"width":100},"giko_gold":{"type":".png","x":-50,"y":24,"width":190},"naito_npc":{"type":".png","x":-50,"y":0,"width":190},"habbo":{"type":".png","x":-40,"y":-40,"width":190},"blankchan":{"type":".png","x":-50,"y":24,"width":190},"goatse":{"type":".png","x":-50,"y":24,"width":190},"onigiri_alt":{"type":".svg","x":-38,"y":20,"width":170},"shobon_alt":{"type":".svg","x":-50,"y":-20,"width":190},"himawari_alt":{"type":".svg","x":-47,"y":0,"width":190},"george_alt":{"type":".svg","x":-48,"y":13,"width":190},"furoshiki_alt":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shobon_alt":{"type":".svg","x":-41,"y":-20,"width":190},"tokita_naito_alt":{"type":".svg","x":-40,"y":4,"width":170},"youkanman_alt":{"type":".svg","x":-46,"y":-50,"width":180},"baba_shobon_alt":{"type":".svg","x":-50,"y":-20,"width":190},"takenoko_alt":{"type":".svg","x":0,"y":0,"width":100}};
-  elementExists('#login-button').then(loginButton => {
+  querySelectorAsync('#login-button').then(loginButton => {
     var select = document.createElement('select');
     Object.keys(vueApp._i18n.messages.en.room).map(key => ({
       value: key,
@@ -245,12 +289,12 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       logWindow.onresize();
     // デフォで変身
     if (experimentalConfig.henshin && !henshined) {
-      objectExists(vueApp, 'socket').then(socket => socket.emit('user-msg', '#henshin'));
+      getObjectAsync(vueApp, 'socket').then(socket => socket.emit('user-msg', '#henshin'));
       henshined = true;
     }
     // デフォで吹き出し位置変更
     if (experimentalConfig.bubblePosition && !bubbleChanged) {
-      objectExists(vueApp, 'socket').then(socket => socket.emit('user-bubble-position', ['up', 'right',  'left',  'down'][experimentalConfig.bubblePosition]));
+      getObjectAsync(vueApp, 'socket').then(socket => socket.emit('user-bubble-position', ['up', 'right',  'left',  'down'][experimentalConfig.bubblePosition]));
       bubbleChanged = true;
     }
     // グラフ
@@ -389,7 +433,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         if (experimentalConfig.wordBlock === 3)
           vueApp.ignoreUser(user.id);
         else
-          (await objectExists(vueApp, 'socket')).emit('user-block', user.id);
+          (await getObjectAsync(vueApp, 'socket')).emit('user-block', user.id);
         if (!experimentalConfig.withoutBlockMsg)
           systemMessage(user.name + text('をNGワードあぼーんした', ' has been blocked by filtering'));
       }
@@ -1496,7 +1540,7 @@ window.interval = setInterval(function () {
     if (vueApp.socket)
       vueApp.socket.prependAny(socketEvent);
   } else {
-    (await objectExists(vueApp, 'socket')).prependAny(socketEvent);
+    (await getObjectAsync(vueApp, 'socket')).prependAny(socketEvent);
   }
 
 } + ')()')).parentNode);
