@@ -318,6 +318,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     vnCSS.textContent = (experimentalConfig.vtuberNiconico & 1 ? '.vtuber-character{display:none}' : '') +
                         (experimentalConfig.vtuberNiconico & 2 ? '.nico-nico-messages-container{display:none}' : '') +
                         (experimentalConfig.hideVoiceButton ? '#voiceButton{display:none}' : '') +
+                        (experimentalConfig.hideLogWindowButton ? '#logWindowButton{display:none}' : '') +
+                        (experimentalConfig.hideClearButton ? '#clearButton{display:none}' : '') +
+                        (experimentalConfig.hideSaveButton ? '#saveButton{display:none}' : '') +
+                        (experimentalConfig.hideConfigButton ? '#configButton{display:none}' : '') +
+                        (experimentalConfig.hidePIP ? '.experimental-buttons{display:none}' : '') +
                         (experimentalConfig.brightness ? '#room-canvas{filter: brightness(' + experimentalConfig.brightness + ')}' : '') +
                         (experimentalConfig.outdoor ? 'h1,#character-selection,#canvas-container,.changelog{display:none}' : '');
     if (experimentalConfig.iconSize)
@@ -805,6 +810,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         logWindow.document.title = text('↓ 新しいメッセージ', '↓ New Messages');
     };
     var logWindowButton = logButtons.appendChild(document.createElement('button'));
+    logWindowButton.id = 'logWindowButton';
     logWindowButton.textContent = text('ログ窓', 'Log Window');
     logWindowButton.onclick = function () {
       if (logWindow && !logWindow.closed) {
@@ -877,10 +883,12 @@ window.interval = setInterval(function () {
     });
     // ログクリアボタン
     var clearLog = logButtons.appendChild(document.createElement('button'));
+    clearLog.id = 'clearButton';
     clearLog.textContent = text('クリア', 'Clear');
     clearLog.onclick = vueApp.clearLog;
     // ログ保存ボタン
     var download = logButtons.appendChild(document.createElement('button'));
+    download.id = 'saveButton';
     download.textContent = text('保存', 'Save');
     var downloadLink = document.createElement('a');
     download.onclick = function () {

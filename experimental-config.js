@@ -44,10 +44,45 @@
       type: 'separator'
     },
     {
+      name: text('いらないボタン', 'Hide button'),
+      description: text('設定ボタンを消した場合は#configコマンドで出せます。', 'Use #config command instead of button.'),
+      type: 'title'
+    },
+    {
       key: 'hideVoiceButton',
-      name: text('音声入力ボタンを消す', 'Hide voiceinput button'),
-      type: 'onoff',
-      value: 0
+      name: text('音声入力', 'Voice Input'),
+      type: 'checkbox',
+      value: false
+    },
+    {
+      key: 'hideLogWindowButton',
+      name: text('ログ窓', 'Log Window'),
+      type: 'checkbox',
+      value: false
+    },
+    {
+      key: 'hideClearButton',
+      name: text('ログクリア', 'Clear Log'),
+      type: 'checkbox',
+      value: false
+    },
+    {
+      key: 'hideSaveButton',
+      name: text('ログ保存', 'Save Log'),
+      type: 'checkbox',
+      value: false
+    },
+    {
+      key: 'hideConfigButton',
+      name: text('設定', 'Config'),
+      type: 'checkbox',
+      value: false
+    },
+    {
+      key: 'hidePIP',
+      name: 'PIP',
+      type: 'checkbox',
+      value: false
     },
     {
       key: 'vtuberNiconico',
@@ -440,10 +475,13 @@
       alert(err);
     }
     config.forEach(item => {
-      if (item.type === 'separator' || !obj.hasOwnProperty(item.key))
+      if (!obj.hasOwnProperty(item.key))
         return;
       var element = document.getElementById(item.key), value = obj[item.key];
       switch (item.type) {
+        case 'checkbox':
+          element.checked = value;
+          break;
         case 'textarea':
         case 'input':
           element.value = value;
@@ -547,6 +585,24 @@
         if (item.description)
           append('p').textContent = item.description;
         return;
+      case 'title':
+        append('h2').textContent = item.name;
+        if (item.description)
+          append('p').textContent = item.description;
+        return;
+      case 'checkbox':
+        append('label').append(
+          append('input',{
+            id: item.key,
+            type: 'checkbox',
+            checked: item.value,
+            onchange: function () {
+              update(item.key, this.checked);
+            }
+          }),
+          item.name
+        );
+        break;
       case 'textarea':
       case 'input':
         append('h2', item.key).textContent = item.name;
@@ -648,6 +704,6 @@
     defaultValue[item.key] = item.value;
   });
   load(defaultValue);
-  document.querySelector('head').appendChild(document.createElement('style')).textContent = 'h1{color:#06f;cursor:pointer;text-decoration:underline;margin:0;padding:10px 0}.hide{display:none}';
+  document.querySelector('head').appendChild(document.createElement('style')).textContent = 'h1{color:#06f;cursor:pointer;text-decoration:underline;margin:0;padding:10px 0}.hide{display:none}label{padding:10px;display:inline-block}';
   Array.from(document.getElementsByTagName('h1')).forEach(h1 => h1.click());
 })();
