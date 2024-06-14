@@ -148,7 +148,7 @@
     },
     {
       key: 'streamStopper',
-      name: text('配信停止権限付与', 'Streaming stopper list'),
+      name: text('配信事故防止', 'Streaming stopper list'),
       description: text('ここに追加された名前の人が配信停止と発言すると自分の配信を止めることができます。', 'Listed persons can stop my streaming to say "stop streaming".'),
       type: 'list',
       value: []
