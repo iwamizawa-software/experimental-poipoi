@@ -20,12 +20,16 @@
 ### Chromeの場合
 
 1. [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ja)をインストール
-2. Chromeを一度閉じて開きなおす
-3. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をクリックしてインストール
+2. chrome://extensions/ をアドレスバーにコピペして開く
+3. 右上のデベロッパーモードのスイッチをONにする
+4. Chromeを一度閉じて開きなおす
+5. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をクリックしてインストール
 
 ### Edgeの場合
 
 1. [Tampermonkey](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)をインストール
+2. edge://extensions/ をアドレスバーにコピペして開く
+3. 左下あたりの開発者モードのスイッチをONにする
 2. Edgeを一度閉じて開きなおす
 3. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をクリックしてインストール
 
