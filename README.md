@@ -10,6 +10,8 @@
 
 問い合わせはIssuesか[こちらから](https://form1ssl.fc2.com/form/?id=019f176bae31cba6)
 
+## [Chrome, Edge, Kiwi Browserでスクリプトが使えなくなった方へ](https://iwamizawa-software.github.io/experimental-poipoi/chrome.html)
+
 ## 導入方法
 
 ### スマホの場合
