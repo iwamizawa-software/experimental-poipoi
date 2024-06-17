@@ -2,6 +2,8 @@
 
 [ぽいぽい](https://gikopoipoi.net/)に実験的機能を追加するuserscript
 
+**[Chrome, Edge, Kiwi Browserでスクリプトが使えなくなった方へ](https://iwamizawa-software.github.io/experimental-poipoi/chrome.html)**
+
 ## ライセンス
 
 [![CC0](https://licensebuttons.net/p/zero/1.0/88x31.png) ](https://creativecommons.org/publicdomain/zero/1.0/deed.ja)
@@ -9,8 +11,6 @@
 ## 問い合わせ
 
 問い合わせはIssuesか[こちらから](https://form1ssl.fc2.com/form/?id=019f176bae31cba6)
-
-## [Chrome, Edge, Kiwi Browserでスクリプトが使えなくなった方へ](https://iwamizawa-software.github.io/experimental-poipoi/chrome.html)
 
 ## 導入方法
 
