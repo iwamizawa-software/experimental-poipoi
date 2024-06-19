@@ -32,8 +32,8 @@
 1. [Tampermonkey](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)をインストール
 2. edge://extensions/ をアドレスバーにコピペして開く
 3. 左下あたりの開発者モードのスイッチをONにする
-2. Edgeを一度閉じて開きなおす
-3. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をクリックしてインストール
+4. Edgeを一度閉じて開きなおす
+5. [experimental-poipoi](https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/experimental-poipoi.user.js)をクリックしてインストール
 
 ### Firefoxの場合
 

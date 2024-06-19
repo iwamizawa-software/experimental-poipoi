@@ -950,7 +950,7 @@ window.interval = setInterval(function () {
     vueApp.connectToServer = async function () {
       // 内藤髪制御
       if (localStorage.getItem('characterId') === 'naito' && experimentalConfig.hairControl) {
-        vueApp.characterId = experimentalConfig.hairControl === 1 ? 'naito' : 'funkynaito';
+        arguments[2] = vueApp.characterId = experimentalConfig.hairControl === 1 ? 'naito' : 'funkynaito';
         vueApp.selectedCharacter = vueApp.allCharacters.find(c => c.characterName === vueApp.characterId);
       }
       var r = await connectToServer.apply(this, arguments);
