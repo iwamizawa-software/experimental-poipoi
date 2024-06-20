@@ -499,8 +499,10 @@
           });
           break;
         default:
-          if (item.type?.constructor === Array)
+          if (item.type?.constructor === Array) {
             element.selectedIndex = value;
+            element.onchange?.();
+          }
       }
     });
     Object.assign(currentValue, obj);
@@ -692,8 +694,9 @@
         };
         var select = append('select', item.key, {
           id: item.key,
-          onchange: function () {
-            update(item.key, select.selectedIndex);
+          onchange: function (event) {
+            if (event)
+              update(item.key, select.selectedIndex);
             changeStyle();
           }
         });

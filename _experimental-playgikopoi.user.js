@@ -260,10 +260,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     apply();
   };
   var configText = document.cookie.match(/experimentalConfig=([^;]+)/);
-  experimentalConfig = Function('return (' + (
-    (configText?.[1] ? decodeURIComponent(configText[1]) : localStorage.getItem('experimentalConfig')) ||
-    await (await fetch(GITHUB_PATH + 'config.json?t=' + (new Date).getTime())).text()
-  ) + ')')();
+  experimentalConfig = Object.assign(
+    await fetch(GITHUB_PATH + 'config.json?t=' + (new Date).getTime()).then(res => res.json()).catch(err => {console.log(err); return ({})}),
+    Function('return (' + (configText?.[1] ? decodeURIComponent(configText[1]) : localStorage.getItem('experimentalConfig')) + ')')()
+  );
   ['ttsAllowList', 'ttsDenyList', 'autoBlock', 'autoIgnore', 'wordFilter'].forEach(key => {
     if (experimentalConfig[key] && experimentalConfig[key].constructor !== Array)
       experimentalConfig[key] = experimentalConfig[key].split?.(',') || [experimentalConfig[key] + ''];
