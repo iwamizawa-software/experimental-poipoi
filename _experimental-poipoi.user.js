@@ -422,6 +422,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       this.video.srcObject = canvas.captureStream(30);
       this.ctx.fillRect(0, 0, 1, 1);
       this.video.onpause = this.play;
+      setTimeout(() => {
+        this.paint();
+        this.video.requestPictureInPicture?.();
+      }, 1000);
       this.video.onloadedmetadata = () => {
         this.video.requestPictureInPicture?.();
         setTimeout(() => this.paint(), 500);
