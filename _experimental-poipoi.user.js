@@ -424,8 +424,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       this.video.onpause = this.play;
       setTimeout(() => {
         this.paint();
-        this.video.requestPictureInPicture?.();
-      }, 1000);
+      }, 3000);
       this.video.onloadedmetadata = () => {
         this.video.requestPictureInPicture?.();
         setTimeout(() => this.paint(), 500);
