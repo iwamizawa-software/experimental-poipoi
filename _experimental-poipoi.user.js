@@ -338,7 +338,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (experimentalConfig.stopBack)
       history.pushState(null, null);
   };
-  window.modifyConfig = function (obj) {
+  window.modifyConfig = function (obj, mainWindow) {
     var json = JSON.stringify(obj);
     if (experimentalConfig.useCookie) {
       document.cookie = 'experimentalConfig=' + encodeURIComponent(json) + '; expires=Tue, 31-Dec-2037 00:00:00 GMT;';
@@ -347,6 +347,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       localStorage.setItem('experimentalConfig', json);
     }
     experimentalConfig = JSON.parse(json);
+    if (mainWindow)
+      configWindow?.load?.(experimentalConfig);
     apply();
   };
   var configText = document.cookie.match(/experimentalConfig=([^;]+)/);
@@ -414,8 +416,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
           experimentalConfig.unignoreList = [];
         if (!experimentalConfig.unignoreList.some(name => trip.includes(name))) {
           experimentalConfig.unignoreList.push(trip);
-          modifyConfig(experimentalConfig);
-          configWindow?.load?.(experimentalConfig);
+          modifyConfig(experimentalConfig, true);
         }
       }
     }
@@ -1747,8 +1748,8 @@ window.interval = setInterval(function () {
           return;
         if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
           if (experimentalConfig.accessLog)
-            systemMessage(addIHash(user.name, user.id) + text('が退室', ' has left the room') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
-          accessNotification(user, text('退室', 'leave'));
+            systemMessage(addIHash(user.name, user.id) + text('が退室', ' has exited the room') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
+          accessNotification(user, text('退室', 'exit'));
         }
         // 配信通知
         var stream = vueApp.streams.find(s => s.userId === user.id);
