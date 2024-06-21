@@ -420,7 +420,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       canvas.height = this.video.height = experimentalConfig.widgetHeight;
       this.video.style.width = canvas.width / canvas.height * 100 + 'px';
       this.video.srcObject = canvas.captureStream(30);
-      this.ctx.fillRect(0, 0, 1, 1);
+      this.ctx.fillStyle = '#fff';
+      this.ctx.fillRect(0, 0, canvas.width, canvas.height);
       this.video.onpause = this.play;
       setTimeout(() => {
         this.paint();
