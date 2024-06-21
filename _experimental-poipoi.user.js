@@ -411,6 +411,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       var div = document.createElement('div');
       div.setAttribute('style', 'display:flex;order:5');
       this.video = document.createElement('video');
+      this.video.style.border = '1px solid #000';
       this.video.style.height = '100px';
       this.video.playsInline = this.video.muted = this.video.autoplay = true;
       var canvas = document.createElement('canvas');
@@ -423,7 +424,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       this.video.onpause = this.play;
       this.video.onloadedmetadata = () => {
         this.video.requestPictureInPicture?.();
-        setTimeout(() => this.paint(), 1000);
+        setTimeout(() => this.paint(), 500);
       };
       this.video.onenterpictureinpicture = () => {
         this.video.parentNode.style.visibility = 'hidden';
@@ -437,7 +438,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       var closeButton = document.createElement('button');
       closeButton.textContent = '×';
       this.video.onleavepictureinpicture = closeButton.onclick = () => this.close();
-      div.append(this.video, '← ' + text('右クリックしてピクチャーインピクチャーを選択', 'Right-click and Select Picture-in-Picture'), closeButton);
+      this.video.ondblclick = () => this.video.requestPictureInPicture?.();
+      div.append(this.video, '← ' + text('右クリックしてピクチャーインピクチャーを選択 (iOSはダブルタップ)', 'Right-click and Select Picture-in-Picture (double-click on iOS)'), closeButton);
       document.getElementById('chat-log-container').after(div);
     },
     close: function () {
