@@ -55,6 +55,12 @@
       value: false
     },
     {
+      key: 'hideWidgetButton',
+      name: 'Widget',
+      type: 'checkbox',
+      value: false
+    },
+    {
       key: 'hideLogWindowButton',
       name: text('ログ窓', 'Log Window'),
       type: 'checkbox',
@@ -336,7 +342,7 @@
     },
     {
       key: 'notifyAccess',
-      name: text('入退室通知', 'Enter and leave notifications'),
+      name: text('入退室通知', 'Enter and Exit notifications'),
       type: [
         'OFF',
         text('アクティブ時のみ', 'Active'),
@@ -347,7 +353,7 @@
     },
     {
       key: 'accessLog',
-      name: text('入退室ログ', 'Log enter and leave'),
+      name: text('入退室ログ', 'Log enter and exit'),
       type: [
         'OFF',
         'ON',
@@ -357,7 +363,7 @@
     },
     {
       key: 'withoutAnon',
-      name: text('入退室通知とログで名無しを除外', 'Enter and leave log without anon'),
+      name: text('入退室通知とログで名無しを除外', 'Enter and exit log without anon'),
       type: 'onoff',
       value: 0
     },
@@ -366,6 +372,81 @@
       name: text('部屋名をログに記録する', 'Log room name'),
       type: 'onoff',
       value: 0
+    },
+    {
+      name: 'Widget',
+      type: 'separator'
+    },
+    {
+      name: text('表示する内容', 'Display'),
+      type: 'title'
+    },
+    {
+      key: 'widgetStreaming',
+      name: text('配信開始', 'Start streaming'),
+      type: 'checkbox',
+      value: false
+    },
+    {
+      key: 'widgetMention',
+      name: text('メンション', 'Mention'),
+      type: 'checkbox',
+      value: false
+    },
+    {
+      key: 'widgetAccess',
+      name: text('入退室', 'Enter and Exit'),
+      type: 'checkbox',
+      value: true
+    },
+    {
+      key: 'widgetAnonAccess',
+      name: text('名無しの入退室', 'Anon enter and exit'),
+      type: 'checkbox',
+      value: true
+    },
+    {
+      key: 'widgetComment',
+      name: text('発言', 'Comment'),
+      type: 'checkbox',
+      value: true
+    },
+    {
+      key: 'widgetAnonComment',
+      name: text('名無しの発言', 'Anon Comment'),
+      type: 'checkbox',
+      value: true
+    },
+    {
+      key: 'widgetLength',
+      name: text('最大行数', 'Length'),
+      type: 'input',
+      value: '30'
+    },
+    {
+      key: 'widgetWidth',
+      name: text('横幅', 'Width'),
+      type: 'input',
+      value: '250'
+    },
+    {
+      key: 'widgetHeight',
+      name: text('高さ', 'Height'),
+      type: 'input',
+      value: '500'
+    },
+    {
+      key: 'widgetCSS',
+      name: 'CSS',
+      type: 'textarea',
+      description: `Sample HTML
+<div class="log">
+<p class="streaming"><span class="name">test</span><span class="ihash">◇AAAAAA</span><span class="content"> has started streaming.</span></p>
+<p class="access"><span class="name">test</span><span class="ihash">◇AAAAAA</span><span class="content"> has joined the room.</span></p>
+<p class="comment anon"><span class="name">Anonymous</span><span class="ihash">◇AAAAAA</span><span class="separator">: </span><span class="content">test</span></p>
+<p class="comment mention"><span class="name"></span><span class="ihash">◇AAAAAA</span><span class="trip">◆AAAAAAAAAA</span><span class="separator">: </span><span class="content">hi test</span></p>
+</div>`,
+      value: 'body{margin:0;padding:0;width:100%;height:100%;border:1px solid #000;box-sizing:border-box;background:#fff}.log{position:fixed;bottom:1px;width:100%}p{margin:0;padding:2px;font-size:0.8em;border-top:1px solid #000;word-break:break-all}.ihash{display:none}'
     },
     {
       name: text('その他', 'Others'),
@@ -585,12 +666,12 @@
           }
         });
         if (item.description)
-          append('p').textContent = item.description;
+          append('p').innerText = item.description;
         return;
       case 'title':
         append('h2').textContent = item.name;
         if (item.description)
-          append('p').textContent = item.description;
+          append('p').innerText = item.description;
         return;
       case 'checkbox':
         append('label').append(
@@ -609,7 +690,7 @@
       case 'input':
         append('h2', item.key).textContent = item.name;
         if (item.description)
-          append('p', item.key).textContent = item.description;
+          append('p', item.key).innerText = item.description;
         var input = append(item.type, item.key, {id: item.key, spellcheck: false});
         if (item.type === 'input') {
           input.type = 'text';
@@ -629,7 +710,7 @@
       case 'list':
         append('h2', item.key).textContent = item.name;
         if (item.description)
-          append('p', item.key).textContent = item.description;
+          append('p', item.key).innerText = item.description;
         var addText = append('input', item.key, {
           type: 'text',
           onkeypress: function (event) {
@@ -686,7 +767,7 @@
           break;
         append('h2', item.key).textContent = item.name;
         if (item.description)
-          append('p', item.key).textContent = item.description;
+          append('p', item.key).innerText = item.description;
         var changeStyle = () => {
           select.style.backgroundColor = {ON: '#afa', OFF: '#faa'}[select.value] || '';
           if (item.relations)

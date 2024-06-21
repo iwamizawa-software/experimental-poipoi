@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  83
+// @version  84
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
@@ -227,7 +227,6 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       characterIconData[name + '_alt'] = Object.assign({}, characterIconData[name]);
     });
   });
-  console.log('injected');
 
   if (window.iPhoneBookmarklet) {
     var audio = new Audio();
@@ -318,6 +317,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     vnCSS.textContent = (experimentalConfig.vtuberNiconico & 1 ? '.vtuber-character{display:none}' : '') +
                         (experimentalConfig.vtuberNiconico & 2 ? '.nico-nico-messages-container{display:none}' : '') +
                         (experimentalConfig.hideVoiceButton ? '#voiceButton{display:none}' : '') +
+                        (experimentalConfig.hideWidgetButton ? '#widgetButton{display:none}' : '') +
                         (experimentalConfig.hideLogWindowButton ? '#logWindowButton{display:none}' : '') +
                         (experimentalConfig.hideClearButton ? '#clearButton{display:none}' : '') +
                         (experimentalConfig.hideSaveButton ? '#saveButton{display:none}' : '') +
@@ -337,6 +337,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       mentionSound.volume = experimentalConfig.mentionVolume || 1;
     if (experimentalConfig.stopBack)
       history.pushState(null, null);
+    widget?.paint();
   };
   window.modifyConfig = function (obj, mainWindow) {
     var json = JSON.stringify(obj);
@@ -362,6 +363,107 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   });
   apply();
   Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
+  var isAnon = name => (new RegExp('^(?:' + vueApp.toDisplayName('') + '\\d*)?$')).test(name);
+  var isMention = msg => vueApp.checkIfMentioned?.(msg);
+  // widget
+  var createSpan = (className, textContent) => Object.assign(document.createElement('span'), {className, textContent});
+  var widget = window.widget = {
+    streaming: function (id, name) {
+      if (!this.log || vueApp.ignoredUserIds.has(id) || !experimentalConfig.widgetStreaming)
+        return;
+      this.addLog(id, name, 'streaming' + (isAnon(name) ? ' anon' : ''), text('が配信開始', ' has started streaming.'));
+    },
+    access: function (id, name, entering) {
+      if (!this.log || vueApp.ignoredUserIds.has(id))
+        return;
+      var anon = isAnon(name);
+      if (!((experimentalConfig.widgetAccess && !anon) || (experimentalConfig.widgetAnonAccess && anon)))
+        return;
+      this.addLog(id, name, 'access' + (anon ? ' anon' : ''), text('が' + (entering ? '入室' : '退室'), ' has ' + (entering ? 'entered' : 'exited') + ' the room.'));
+    },
+    comment: function (id, name, comment) {
+      if (!this.log || vueApp.ignoredUserIds.has(id) || !comment)
+        return;
+      var anon = isAnon(name);
+      if (!((experimentalConfig.widgetComment && !anon) || (experimentalConfig.widgetAnonComment && anon) || (experimentalConfig.widgetMention && isMention(comment))))
+        return;
+      this.addLog(id, name, 'comment' + (anon ? ' anon' : ''), comment);
+    },
+    addLog: function (id, name, className, content) {
+      var p = this.log.appendChild(document.createElement('p'));
+      while (this.log.children.length > experimentalConfig.widgetLength)
+        this.log.firstElementChild.remove();
+      p.className = className;
+      var splitedName = (name + '').split('◆');
+      p.append(createSpan('name', splitedName[0]), createSpan('ihash', toIHash(id + '')));
+      if (splitedName[1])
+        p.append(createSpan('trip', '◆' + splitedName[1]));
+      if (className.includes('comment'))
+        p.append(createSpan('separator', ': '));
+      p.append(createSpan('content', content + ''));
+      this.paint();
+    },
+    open: function () {
+      if (document.contains(this.video))
+        return;
+      this.log = document.createElement('div');
+      this.log.className = 'log';
+      var div = document.createElement('div');
+      div.setAttribute('style', 'display:flex;order:5');
+      this.video = document.createElement('video');
+      this.video.style.height = '100px';
+      this.video.playsInline = this.video.muted = this.video.autoplay = true;
+      var canvas = document.createElement('canvas');
+      this.ctx = canvas.getContext('2d');
+      canvas.width = this.video.width = experimentalConfig.widgetWidth;
+      canvas.height = this.video.height = experimentalConfig.widgetHeight;
+      this.video.style.width = canvas.width / canvas.height * 100 + 'px';
+      this.video.srcObject = canvas.captureStream(30);
+      this.ctx.fillRect(0, 0, 1, 1);
+      this.video.onpause = this.play;
+      this.video.onloadedmetadata = () => {
+        this.video.requestPictureInPicture?.();
+        setTimeout(() => this.paint(), 500);
+      };
+      this.video.onenterpictureinpicture = () => {
+        this.video.parentNode.style.visibility = 'hidden';
+        if (event.pictureInPictureWindow)
+          event.pictureInPictureWindow.onresize = event => {
+            experimentalConfig.widgetWidth = event.target.width;
+            experimentalConfig.widgetHeight = event.target.height;
+            modifyConfig(experimentalConfig, true);
+          };
+      };
+      var closeButton = document.createElement('button');
+      closeButton.textContent = '×';
+      this.video.onleavepictureinpicture = closeButton.onclick = () => this.close();
+      div.append(this.video, '← ' + text('右クリックしてピクチャーインピクチャーを選択', 'Right-click and Select Picture-in-Picture'), closeButton);
+      document.getElementById('chat-log-container').after(div);
+    },
+    close: function () {
+      this.log = this.ctx = this.video.srcObject = null;
+      if (this.video === document.pictureInPictureElement)
+        document.exitPictureInPicture?.();
+      this.video.parentNode.remove();
+      this.video = null;
+    },
+    paint: async function () {
+      if (!document.contains(this.video))
+        return;
+      var img = new Image();
+      var width = this.ctx.canvas.width = this.video.width = experimentalConfig.widgetWidth;
+      var height = this.ctx.canvas.height = this.video.height = experimentalConfig.widgetHeight;
+      this.video.style.width = width / height * 100 + 'px';
+      img.src = 'data:image/svg+xml,' + encodeURIComponent(
+`<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+<foreignObject width="${width}" height="${height}" requiredExtensions="http://www.w3.org/1999/xhtml">
+<style>${experimentalConfig.widgetCSS}</style>
+<body xmlns="http://www.w3.org/1999/xhtml">${(new XMLSerializer()).serializeToString(this.log)}</body></foreignObject></svg>`);
+      await img.decode();
+      this.ctx.drawImage(img, 0, 0, width, height);
+    }
+  };
+  console.log('injected');
   // 入室時
   var updateRoomState = vueApp.updateRoomState;
   var lastRoomName, henshined, bubbleChanged;
@@ -799,6 +901,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     var logButtons = createButtonContainer();
     logButtons.setAttribute('style', 'all:unset;display:flex;order:4');
     document.getElementById('chat-log-container').after(logButtons);
+    var widgetButton = logButtons.appendChild(document.createElement('button'));
+    widgetButton.id = 'widgetButton';
+    widgetButton.textContent = 'Widget';
+    widgetButton.onclick = () => widget.open();
     writeLogToWindow = function (div) {
       if (!logWindow || logWindow.closed)
         return;
@@ -995,7 +1101,7 @@ window.interval = setInterval(function () {
       !document.hasFocus() &&
       user &&
       !vueApp.ignoredUserIds.has(user.id) &&
-      vueApp.checkIfMentioned?.(msg)
+      isMention(msg)
     ) {
       mention = new Notification(user.name, {
         // ChromeはNotification.iconにSVGを指定できない
@@ -1723,19 +1829,17 @@ window.interval = setInterval(function () {
         setTimeout(() => {
           if (!user || user.id === vueApp.myUserID)
             return;
-          if (user.aboned) {
-            if (vueApp.users[user.id])
-              vueApp.users[user.id].aboned = true;
+          if (user.aboned)
             return;
-          }
           // 最終発言時間
           if (vueApp.users[user.id])
             recordInterval(vueApp.users[user.id]);
-          if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
+          if (!experimentalConfig.withoutAnon || !isAnon(user.name)) {
             if (experimentalConfig.accessLog)
-              systemMessage(addIHash(user.name, user.id) + text('が入室', ' has joined the room') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
+              systemMessage(addIHash(user.name, user.id) + text('が入室', ' has entered the room.') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
             accessNotification(user, text('入室', 'join'));
           }
+          widget.access(user.id, user.name, true);
         }, 0);
         break;
       case 'server-user-left-room':
@@ -1746,11 +1850,12 @@ window.interval = setInterval(function () {
         // 退室ログ
         if (!user || user.id === vueApp.myUserID || user.aboned)
           return;
-        if (!experimentalConfig.withoutAnon || user.name?.indexOf(vueApp.toDisplayName(''))) {
+        if (!vueApp.ignoredUserIds.has(user.id) && !(experimentalConfig.withoutAnon && isAnon(user.name))) {
           if (experimentalConfig.accessLog)
-            systemMessage(addIHash(user.name, user.id) + text('が退室', ' has exited the room') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
+            systemMessage(addIHash(user.name, user.id) + text('が退室', ' has exited the room.') + (experimentalConfig.accessLog === 2 ? ' (ID:' + user.id +')' : ''));
           accessNotification(user, text('退室', 'exit'));
         }
+        widget.access(user.id, user.name);
         // 配信通知
         var stream = vueApp.streams.find(s => s.userId === user.id);
         if (stream)
@@ -1762,6 +1867,7 @@ window.interval = setInterval(function () {
         var user = vueApp.users[arguments[1]];
         if (!user)
           return;
+        widget.comment(user.id, user.name, arguments[2]);
         if (user.id === vueApp.myUserID)
           break;
         // 最終発言時間
@@ -1805,8 +1911,11 @@ window.interval = setInterval(function () {
         var currentStates = arguments[1].map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
         var index = currentStates.findIndex((s, i) => s && !streamStates[i] && !vueApp.takenStreams[i]);
         streamStates = currentStates;
-        if (index !== -1)
-          streamNotification(vueApp.users[arguments[1][index].userId], index);
+        if (index !== -1) {
+          var user = vueApp.users[arguments[1][index].userId];
+          streamNotification(user, index);
+          widget.streaming(user.id, user.name);
+        }
         // ステミキ表示
         wsm.show(arguments[1].some(s => s.userId === vueApp.myUserID && s.isActive && s.isReady && s.withSound));
         break;
