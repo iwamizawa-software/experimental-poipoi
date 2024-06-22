@@ -767,6 +767,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // ログイン時
   var logWindow, configWindow;
   var onlogin = function () {
+    document.getElementById('disableButtonContainer')?.remove();
     // 音声入力
     var textbox = document.getElementById('input-textbox');
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;

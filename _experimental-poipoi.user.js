@@ -12,12 +12,13 @@ document.currentScript?.remove();
 document.querySelector('head').appendChild(document.createElement('script').appendChild(document.createTextNode('(' + async function inject() {
 
   document.currentScript?.remove();
-  if (window.experimental)
+  if (window.experimental || location.href.includes('video-tab.html'))
     return;
   window.experimental = true;
   var GITHUB_PATH = 'https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/';
   var WEBSITE_PATH = 'https://iwamizawa-software.github.io/experimental-poipoi/';
   var disableButtonContainer = document.createElement('div');
+  disableButtonContainer.id = 'disableButtonContainer';
   disableButtonContainer.setAttribute('style', 'position:absolute;top:0;right:20px;z-index:10000');
   document.body.insertBefore(disableButtonContainer, document.body.firstChild);
   var disableButton = document.createElement('button');
@@ -36,21 +37,6 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       localStorage.setItem('experimentalVersion', window.experimentalVersion);
     };
   }
-  var handleButtonClick = event => {
-    if (event.target?.id === 'login-button')
-      removeDisableButtonContainer();
-  };
-  var handleEnterKey = event => {
-    if (event.key === 'Enter' && document.getElementById('login-form')?.contains(event.target))
-      removeDisableButtonContainer();
-  };
-  var removeDisableButtonContainer = function () {
-    disableButtonContainer.remove();
-    document.removeEventListener('click', handleButtonClick);
-    document.removeEventListener('keydown', handleEnterKey);
-  };
-  document.addEventListener('click', handleButtonClick);
-  document.addEventListener('keydown', handleEnterKey);
   if (localStorage.getItem('disableScript')) {
     disableButton.textContent = 'スクリプトを有効化 Enable script';
     disableButton.style.background = '#5f5';
@@ -871,6 +857,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // ログイン時
   var logWindow, configWindow;
   var onlogin = function () {
+    document.getElementById('disableButtonContainer')?.remove();
     // 音声入力
     var textbox = document.getElementById('input-textbox');
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
