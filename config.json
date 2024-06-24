@@ -73,6 +73,8 @@
   "logWindowCSS": ".message {\n  padding: 2px 0;\n  border-bottom: 1px solid #000;\n}",
   "voiceLog": 0,
   "voiceLang": "",
+  "voiceFormatGen": "音声入力:message",
+  "voiceFormatFor": "Voice input:message",
   "youtube": 0,
   "debugWebhook": ""
 }

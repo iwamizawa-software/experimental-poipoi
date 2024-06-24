@@ -535,6 +535,18 @@
       value: ''
     },
     {
+      key: 'voiceFormatGen',
+      name: 'Voice input format in _gen',
+      type: 'input',
+      value: '音声入力:message'
+    },
+    {
+      key: 'voiceFormatFor',
+      name: 'Voice input format in _for',
+      type: 'input',
+      value: 'Voice input:message'
+    },
+    {
       key: 'youtube',
       name: 'Open iframe YouTube player on click YouTube URL',
       type: 'onoff',
