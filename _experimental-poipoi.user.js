@@ -412,13 +412,14 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       closeButton.textContent = '×';
       video.onleavepictureinpicture = closeButton.onclick = () => this.close();
       video.ondblclick = () => video.requestFullscreen?.();
-      div.append(video, '← ' + text('右クリックしてピクチャーインピクチャーを選択 (Android Firefoxは全画面になるのでそこからPIPする)', 'Right-click and Select Picture-in-Picture (Double-click to fullscreen and enable PIP on Android Firefox)'), closeButton);
+      div.append(video, '← ' + text('右クリックしてピクチャーインピクチャーを選択 (AndroidのFirefoxはダブルクリックで全画面になるのでそこからPIPする)', 'Right-click and Select Picture-in-Picture (Double-click to fullscreen and enable PIP on Firefox Android)'), closeButton);
       document.getElementById('chat-log-container').after(div);
     },
     open: function () {
+      if (!this.log)
+        this.container.style.visibility = '';
       this.log = document.createElement('div');
       this.log.className = 'log';
-      this.container.style.visibility = '';
       this.paint();
       this.video.requestPictureInPicture?.();
     },
