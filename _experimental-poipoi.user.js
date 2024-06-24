@@ -407,7 +407,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       ctx.fillStyle = '#fff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       video.onpause = video.play;
-      video.onenterpictureinpicture = () => div.style.visibility = 'hidden';
+      video.onenterpictureinpicture = () => {
+        if (!window.iPhoneBookmarklet)
+          div.style.visibility = 'hidden';
+      };
       var closeButton = document.createElement('button');
       closeButton.textContent = '×';
       video.onleavepictureinpicture = closeButton.onclick = () => this.close();
