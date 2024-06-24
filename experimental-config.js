@@ -717,6 +717,14 @@
             update(item.key, input.value);
           }
         });
+        append('input', item.key, {
+          type: 'button',
+          value: 'Reset',
+          onclick: function () {
+            if (confirm(text('初期値に戻しますか？', 'Do you set default value?')))
+              update(item.key, input.value = item.value);
+          }
+        });
         break;
       case 'color':
       case 'list':
@@ -800,6 +808,6 @@
     defaultValue[item.key] = item.value;
   });
   load(defaultValue);
-  document.querySelector('head').appendChild(document.createElement('style')).textContent = 'h1{color:#06f;cursor:pointer;text-decoration:underline;margin:0;padding:10px 0}.hide{display:none}label{padding:10px;display:inline-block}';
+  document.querySelector('head').appendChild(document.createElement('style')).textContent = 'h1{color:#06f;cursor:pointer;text-decoration:underline;margin:0;padding:10px 0}.hide{display:none}label{padding:10px;display:inline-block}input[type=button]{padding-left:30px;padding-right:30px;}';
   Array.from(document.getElementsByTagName('h1')).forEach(h1 => h1.click());
 })();
