@@ -436,6 +436,12 @@
       value: '500'
     },
     {
+      key: 'widgetFps',
+      name: 'fps',
+      type: 'input',
+      value: '2'
+    },
+    {
       key: 'widgetCSS',
       name: 'CSS',
       type: 'textarea',

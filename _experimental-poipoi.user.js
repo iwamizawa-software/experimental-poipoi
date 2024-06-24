@@ -353,7 +353,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var isMention = msg => vueApp.checkIfMentioned?.(msg);
   // widget
   var createSpan = (className, textContent) => Object.assign(document.createElement('span'), {className, textContent});
-  var widget = window.widget = {
+  var widget = {
     streaming: function (id, name) {
       if (!this.log || vueApp.ignoredUserIds.has(id) || !experimentalConfig.widgetStreaming)
         return;
@@ -389,62 +389,53 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       p.append(createSpan('content', content + ''));
       this.paint();
     },
-    open: function () {
-      if (document.contains(this.video))
-        return;
-      this.log = document.createElement('div');
-      this.log.className = 'log';
-      var div = document.createElement('div');
-      div.setAttribute('style', 'display:flex;order:5');
-      this.video = document.createElement('video');
-      this.video.style.border = '1px solid #000';
-      this.video.style.height = '100px';
-      this.video.playsInline = this.video.muted = this.video.autoplay = true;
-      var canvas = document.createElement('canvas');
-      this.ctx = canvas.getContext('2d');
-      canvas.width = this.video.width = experimentalConfig.widgetWidth;
-      canvas.height = this.video.height = experimentalConfig.widgetHeight;
-      this.video.style.width = canvas.width / canvas.height * 100 + 'px';
-      this.video.srcObject = canvas.captureStream(30);
-      this.ctx.fillStyle = '#fff';
-      this.ctx.fillRect(0, 0, canvas.width, canvas.height);
-      this.video.onpause = this.play;
-      setTimeout(() => {
-        this.paint();
-      }, 3000);
-      this.video.onloadedmetadata = () => {
-        this.video.requestPictureInPicture?.();
-        setTimeout(() => this.paint(), 500);
-      };
-      this.video.onenterpictureinpicture = () => {
-        this.video.parentNode.style.visibility = 'hidden';
-        if (event.pictureInPictureWindow)
-          event.pictureInPictureWindow.onresize = event => {
-            experimentalConfig.widgetWidth = event.target.width;
-            experimentalConfig.widgetHeight = event.target.height;
-            modifyConfig(experimentalConfig, true);
-          };
-      };
+    init: function () {
+      var div = this.container = document.createElement('div');
+      div.setAttribute('style', 'display:flex;order:5;visibility:hidden');
+      var video = this.video = document.createElement('video');
+      video.style.border = '1px solid #000';
+      video.style.height = '100px';
+      video.playsInline = video.muted = video.autoplay = true;
+      var canvas = this.canvas = document.createElement('canvas');
+      canvas.setAttribute('style', 'position:fixed;top:0;right:0;width:1px;height:1px');
+      document.body.append(canvas);
+      var ctx = this.ctx = canvas.getContext('2d');
+      canvas.width = video.width = experimentalConfig.widgetWidth;
+      canvas.height = video.height = experimentalConfig.widgetHeight;
+      video.style.width = canvas.width / canvas.height * 100 + 'px';
+      video.srcObject = canvas.captureStream(experimentalConfig.widgetFps);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      video.onpause = video.play;
+      video.onenterpictureinpicture = () => div.style.visibility = 'hidden';
       var closeButton = document.createElement('button');
       closeButton.textContent = '×';
-      this.video.onleavepictureinpicture = closeButton.onclick = () => this.close();
-      this.video.ondblclick = () => this.video.requestPictureInPicture?.();
-      div.append(this.video, '← ' + text('右クリックしてピクチャーインピクチャーを選択 (iOSはダブルタップ)', 'Right-click and Select Picture-in-Picture (double-click on iOS)'), closeButton);
+      video.onleavepictureinpicture = closeButton.onclick = () => this.close();
+      video.ondblclick = () => video.requestFullscreen?.();
+      div.append(video, '← ' + text('右クリックしてピクチャーインピクチャーを選択 (Android Firefoxは全画面になるのでそこからPIPする)', 'Right-click and Select Picture-in-Picture (Double-click to fullscreen and enable PIP on Android Firefox)'), closeButton);
       document.getElementById('chat-log-container').after(div);
     },
+    open: function () {
+      this.log = document.createElement('div');
+      this.log.className = 'log';
+      this.container.style.visibility = '';
+      this.paint();
+      this.video.requestPictureInPicture?.();
+    },
     close: function () {
-      this.log = this.ctx = this.video.srcObject = null;
+      this.log = null;
       if (this.video === document.pictureInPictureElement)
         document.exitPictureInPicture?.();
-      this.video.parentNode.remove();
-      this.video = null;
+      this.container.style.visibility = 'hidden';
+      this.video.remove();
+      this.container.prepend(this.video);
     },
     paint: async function () {
-      if (!document.contains(this.video))
+      if (!this.log)
         return;
       var img = new Image();
-      var width = this.ctx.canvas.width = this.video.width = experimentalConfig.widgetWidth;
-      var height = this.ctx.canvas.height = this.video.height = experimentalConfig.widgetHeight;
+      var width = this.canvas.width = this.video.width = experimentalConfig.widgetWidth;
+      var height = this.canvas.height = this.video.height = experimentalConfig.widgetHeight;
       this.video.style.width = width / height * 100 + 'px';
       img.src = 'data:image/svg+xml,' + encodeURIComponent(
 `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -453,6 +444,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
 <body xmlns="http://www.w3.org/1999/xhtml">${(new XMLSerializer()).serializeToString(this.log)}</body></foreignObject></svg>`);
       await img.decode();
       this.ctx.drawImage(img, 0, 0, width, height);
+      this.video.srcObject.getTracks?.()?.[0]?.requestFrame?.();
     }
   };
   console.log('injected');
@@ -1042,6 +1034,7 @@ window.interval = setInterval(function () {
 `);
       configWindow.document.close();
     };
+    widget.init();
   };
   if (document.getElementById('input-textbox')) {
     onlogin();
