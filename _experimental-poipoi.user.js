@@ -406,9 +406,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       video.srcObject = canvas.captureStream(experimentalConfig.widgetFps);
       ctx.fillStyle = '#fff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      setTimeout(() => ctx.fillRect(0, 0, canvas.width, canvas.height), 3000);
       video.onpause = video.play;
       video.onenterpictureinpicture = () => {
-        if (!window.iPhoneBookmarklet)
+        //if (!window.iPhoneBookmarklet)
           div.style.visibility = 'hidden';
       };
       var closeButton = document.createElement('button');
