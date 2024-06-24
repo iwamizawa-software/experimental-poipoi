@@ -406,7 +406,12 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       video.srcObject = canvas.captureStream(experimentalConfig.widgetFps);
       ctx.fillStyle = '#fff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      setTimeout(() => ctx.fillRect(0, 0, canvas.width, canvas.height), 3000);
+      (async () => {
+        for (var i = 0; i < 6 && !this.log; i++) {
+          await sleep(500);
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+      })();
       video.onpause = video.play;
       video.onenterpictureinpicture = () => {
         div.style.width = div.style.height = '1px';
@@ -415,8 +420,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       var closeButton = document.createElement('button');
       closeButton.textContent = '×';
       video.onleavepictureinpicture = closeButton.onclick = () => this.close();
-      video.ondblclick = () => video.requestFullscreen?.();
-      div.append(video, '← ' + text('右クリックしてピクチャーインピクチャーを選択 (AndroidのFirefoxはダブルクリックで全画面になるのでそこからPIPする)', 'Right-click and Select Picture-in-Picture (Double-click to fullscreen and enable PIP on Firefox Android)'), closeButton);
+      div.append(video, '← ' + text('右クリックしてピクチャーインピクチャーを選択', 'Right-click and Select Picture-in-Picture'), closeButton);
       document.getElementById('chat-log-container').after(div);
     },
     open: function () {
