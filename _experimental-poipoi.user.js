@@ -303,7 +303,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     vnCSS.textContent = (experimentalConfig.vtuberNiconico & 1 ? '.vtuber-character{display:none}' : '') +
                         (experimentalConfig.vtuberNiconico & 2 ? '.nico-nico-messages-container{display:none}' : '') +
                         (experimentalConfig.hideVoiceButton ? '#voiceButton{display:none}' : '') +
-                        (experimentalConfig.hideWidgetButton ? '#widgetButton{display:none}' : '') +
+                        (experimentalConfig.hideWidgetButton || /Android.+Firefox/.test(navigator.userAgent) ? '#widgetButton{display:none}' : '') +
                         (experimentalConfig.hideLogWindowButton ? '#logWindowButton{display:none}' : '') +
                         (experimentalConfig.hideClearButton ? '#clearButton{display:none}' : '') +
                         (experimentalConfig.hideSaveButton ? '#saveButton{display:none}' : '') +
