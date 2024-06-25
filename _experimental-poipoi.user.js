@@ -389,8 +389,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       while (this.log.children.length > experimentalConfig.widgetLength)
         this.log.firstElementChild.remove();
       p.className = className;
-      var splitedName = (name + '').split('◆');
-      p.append(createSpan('name', vueApp.toDisplayName(splitedName[0])), createSpan('ihash', toIHash(id + '')));
+      var splitedName = vueApp.toDisplayName(name + '').split('◆');
+      p.append(createSpan('name', splitedName[0]), createSpan('ihash', toIHash(id + '')));
       if (splitedName[1])
         p.append(createSpan('trip', '◆' + splitedName[1]));
       if (className.includes('comment'))
