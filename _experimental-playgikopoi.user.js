@@ -313,7 +313,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         this.log.firstElementChild.remove();
       p.className = className;
       var splitedName = (name + '').split('◆');
-      p.append(createSpan('name', splitedName[0]), createSpan('ihash', toIHash(id + '')));
+      p.append(createSpan('name', vueApp.toDisplayName(splitedName[0])), createSpan('ihash', toIHash(id + '')));
       if (splitedName[1])
         p.append(createSpan('trip', '◆' + splitedName[1]));
       if (className.includes('comment'))
@@ -386,12 +386,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       if (!this.log || (retry && !this.img.complete))
         return;
       if (retry > 4) {
-        console.log('retry limit reached' + (new Date()));
+        asyncAlert('再描画エラー　報告お願いします　必要な情報はOSの種類（Windows, Mac, iPhoneとか）ブラウザの種類（Chrome, Edge, Firefoxとか）', 'Repaint error. Please tell me about OS and Browser.');
         return;
       }
-      if (retry) {
-        console.log('retry paint' + (new Date()));
-      } else {
+      if (!retry) {
         var img = this.img = new Image();
         var width = this.canvas.width = this.video.width = experimentalConfig.widgetWidth;
         var height = this.canvas.height = this.video.height = experimentalConfig.widgetHeight;
