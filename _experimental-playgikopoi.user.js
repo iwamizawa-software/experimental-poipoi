@@ -352,7 +352,18 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       this.log = document.createElement('div');
       this.log.className = 'log';
       this.paint();
-      this.video.requestPictureInPicture?.();
+      this.video.requestPictureInPicture?.().catch(async err => {
+        if (err.name === 'NotSupportedError') {
+          if (navigator.userAgent?.includes('Android')) {
+            await asyncAlert(text('全画面表示になったらホームボタンを押してください', 'Press home button after fullscreen'));
+            this.video.requestFullscreen();
+          } else {
+            experimentalConfig.hidePIP = experimentalConfig.hideWidgetButton = true;
+            modifyConfig(experimentalConfig, true);
+            this.close();
+          }
+        }
+      });
     },
     close: function () {
       this.log = null;
