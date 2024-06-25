@@ -73,9 +73,18 @@ document.querySelector('head').appendChild(document.createElement('script').appe
               pipButton.onclick = () => {
                 var video = div.parentNode.querySelector('[id^=received-video]');
                 if (video) {
-                  video.requestPictureInPicture();
-                  // iOS用
-                  video.onleavepictureinpicture = () => video.play();
+                  video.onpause = video.play;
+                  video.requestPictureInPicture().catch(async err => {
+                    if (err.name === 'NotSupportedError') {
+                      if (navigator.userAgent?.includes('Android')) {
+                        await asyncAlert(text('全画面表示になったら画面下から上にスワイプし、ホームボタンを押してください', 'Press home button after fullscreen'));
+                        video.requestFullscreen();
+                      } else {
+                        experimentalConfig.hidePIP = experimentalConfig.hideWidgetButton = true;
+                        modifyConfig(experimentalConfig, true);
+                      }
+                    }
+                  });
                 }
               }
               div.insertBefore(pipButton, div.firstChild);
@@ -355,7 +364,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       this.video.requestPictureInPicture?.().catch(async err => {
         if (err.name === 'NotSupportedError') {
           if (navigator.userAgent?.includes('Android')) {
-            await asyncAlert(text('全画面表示になったらホームボタンを押してください', 'Press home button after fullscreen'));
+            await asyncAlert(text('全画面表示になったら画面下から上にスワイプし、ホームボタンを押してください', 'Press home button after fullscreen'));
             this.video.requestFullscreen();
           } else {
             experimentalConfig.hidePIP = experimentalConfig.hideWidgetButton = true;
