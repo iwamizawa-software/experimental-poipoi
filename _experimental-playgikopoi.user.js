@@ -397,8 +397,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       await img.decode();
       this.ctx.drawImage(img, 0, 0, width, height);
       this.video.srcObject.getTracks?.()?.[0]?.requestFrame?.();
-      if (navigator.userAgent?.includes('Android'))
+      if (navigator.userAgent?.includes('Android')) {
         (window.paintLog = window.paintLog || []).push([this.video.getVideoPlaybackQuality(), new Date()]);
+        while (paintLog.length > 100)
+          paintLog.shift();
+      }
     }
   };
   console.log('injected');
