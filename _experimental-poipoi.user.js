@@ -460,27 +460,36 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       this.video.remove();
       this.container.prepend(this.video);
     },
-    paint: async function () {
-      if (!this.log)
+    paint: async function (retry) {
+      if (!this.log || (retry && !this.img.complete))
         return;
-      var img = new Image();
-      var width = this.canvas.width = this.video.width = experimentalConfig.widgetWidth;
-      var height = this.canvas.height = this.video.height = experimentalConfig.widgetHeight;
-      this.video.style.width = width / height * 100 + 'px';
-      img.src = 'data:image/svg+xml,' + encodeURIComponent(
+      if (retry > 4) {
+        console.log('retry limit reached' + (new Date()));
+        return;
+      }
+      if (retry) {
+        console.log('retry paint' + (new Date()));
+      } else {
+        var img = this.img = new Image();
+        var width = this.canvas.width = this.video.width = experimentalConfig.widgetWidth;
+        var height = this.canvas.height = this.video.height = experimentalConfig.widgetHeight;
+        this.video.style.width = width / height * 100 + 'px';
+        img.src = 'data:image/svg+xml,' + encodeURIComponent(
 `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
 <foreignObject width="${width}" height="${height}" requiredExtensions="http://www.w3.org/1999/xhtml">
 <style>${experimentalConfig.widgetCSS}</style>
 <body xmlns="http://www.w3.org/1999/xhtml">${(new XMLSerializer()).serializeToString(this.log)}</body></foreignObject></svg>`);
-      await img.decode();
-      this.ctx.drawImage(img, 0, 0, width, height);
-      this.video.srcObject.getTracks?.()?.[0]?.requestFrame?.();
-      if (navigator.userAgent?.includes('Android')) {
-        (window.paintLog = window.paintLog || []).push([this.video.getVideoPlaybackQuality(), new Date()]);
-        while (paintLog.length > 100)
-          paintLog.shift();
+        await img.decode();
       }
-    }
+      this.ctx.drawImage(this.img, 0, 0, width, height);
+      this.video.srcObject.getTracks?.()?.[0]?.requestFrame?.();
+      await sleep(500);
+      var frames = this.video.getVideoPlaybackQuality?.()?.droppedVideoFrames || 0;
+      if (this.lastDroppedVideoFrames < frames)
+        this.paint((retry || 0) + 1);
+      this.lastDroppedVideoFrames = frames;
+    },
+    lastDroppedVideoFrames: 0
   };
   console.log('injected');
   // 入室時
