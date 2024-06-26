@@ -434,6 +434,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       document.getElementById('chat-log-container').after(div);
     },
     open: function () {
+      if (+localStorage.getItem('experimentalNotice') < 1) {
+        asyncAlert(text('このメッセージを見てから、ログがリアルタイムで表示されない等の不具合があった場合は報告お願いします。\n\nWidget機能は再描画に問題があり、将来的に廃止される可能性があります。', 'If logs are not updated on widget, please contact author.'));
+        localStorage.setItem('experimentalNotice', 1);
+      }
       if (!this.log)
         this.container.style.visibility = '';
       this.log = document.createElement('div');
