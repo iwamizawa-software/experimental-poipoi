@@ -921,7 +921,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         if (experimentalConfig.voiceLog)
           vueApp.writeMessageToLog(text('音声入力', 'Voice input'), result, 'voice input');
         else
-          sendMessage(text(experimentalConfig.voiceFormatGen || '音声入力:message', experimentalConfig.voiceFormatFor || 'Voice input:message').replace('message', result));
+          sendMessage(text(experimentalConfig.voiceFormatGen || '音声入力:message', experimentalConfig.voiceFormatFor || 'Voice input:message').replace(/message|$/, result));
       };
       recognition.onend = function () {
         if (enableSpeech.checked)
