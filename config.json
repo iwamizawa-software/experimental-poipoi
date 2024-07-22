@@ -77,5 +77,6 @@
   "voiceFormatGen": "音声入力:message",
   "voiceFormatFor": "Voice input:message",
   "youtube": 0,
+  "disablePixelRatio": 0,
   "debugWebhook": ""
 }

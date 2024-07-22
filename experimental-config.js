@@ -559,6 +559,12 @@
       value: 0
     },
     {
+      key: 'disablePixelRatio',
+      name: 'Disable calc pixel ratio',
+      type: 'onoff',
+      value: 0
+    },
+    {
       key: 'debugWebhook',
       name: 'Webhook URL for debug',
       type: 'input',
