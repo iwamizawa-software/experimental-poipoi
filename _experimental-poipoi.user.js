@@ -1499,7 +1499,7 @@ window.interval = setInterval(function () {
     return {x: Math.floor(x - y), y: Math.floor(x + y)};
   };
   document.addEventListener('dblclick', event => {
-    var devicePixelRatio = experimentalConfig.disablePixelRatio ? window.devicePixelRatio : 1;
+    var devicePixelRatio = experimentalConfig.disablePixelRatio ? 1 : window.devicePixelRatio;
     if (event.target.id === 'room-canvas' && !experimentalConfig.disableMove && !ikaoni.playing) {
       var from = vueApp.users[vueApp.myUserID], to = physicalToLogical(event.offsetX * devicePixelRatio, event.offsetY * devicePixelRatio);
       vueApp.route.add(graph?.search(from.logicalPositionX, from.logicalPositionY, to.x, to.y, from.direction));
