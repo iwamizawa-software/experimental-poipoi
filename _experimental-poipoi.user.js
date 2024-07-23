@@ -319,6 +319,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
                         (experimentalConfig.hideConfigButton ? '#configButton{display:none}' : '') +
                         (experimentalConfig.hidePIP ? '.experimental-buttons{display:none}' : '') +
                         (experimentalConfig.brightness ? '#room-canvas{filter: brightness(' + experimentalConfig.brightness + ')}' : '') +
+                        (experimentalConfig.showColorPicker ? '' : '#colorPicker{visibility:hidden;width:0;padding:0;border:0}') +
                         (experimentalConfig.outdoor ? 'h1,#character-selection,#canvas-container,.changelog{display:none}' : '');
     if (experimentalConfig.iconSize)
       characterLogCSS.textContent = characterLogCSS.textContent.replace(/--characterlog-size:\d+px/, '--characterlog-size:' + experimentalConfig.iconSize + 'px');
@@ -1044,8 +1045,6 @@ window.interval = setInterval(function () {
     var colorPicker = logButtons.appendChild(document.createElement('input'));
     colorPicker.id = 'colorPicker';
     colorPicker.type = 'color';
-    if (!experimentalConfig.showColorPicker)
-      colorPicker.setAttribute('style', 'width:0;padding:0;border:0');
     // 設定
     var configButton = logButtons.appendChild(document.createElement('button'));
     configButton.textContent = text('設定', 'Config');
