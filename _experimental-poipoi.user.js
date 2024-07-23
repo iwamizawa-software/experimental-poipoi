@@ -1041,10 +1041,6 @@ window.interval = setInterval(function () {
       downloadLink.download = (new Date()).toLocaleString([], opts).replace(/\D/g, '') + '.txt';
       downloadLink.click();
     };
-    // カラーピッカー
-    var colorPicker = logButtons.appendChild(document.createElement('input'));
-    colorPicker.id = 'colorPicker';
-    colorPicker.type = 'color';
     // 設定
     var configButton = logButtons.appendChild(document.createElement('button'));
     configButton.textContent = text('設定', 'Config');
@@ -1080,6 +1076,10 @@ window.interval = setInterval(function () {
 `);
       configWindow.document.close();
     };
+    // カラーピッカー
+    var colorPicker = logButtons.appendChild(document.createElement('input'));
+    colorPicker.id = 'colorPicker';
+    colorPicker.type = 'color';
     widget.init();
   };
   if (document.getElementById('input-textbox')) {
