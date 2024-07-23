@@ -565,6 +565,12 @@
       value: 0
     },
     {
+      key: 'showColorPicker',
+      name: 'Show color picker',
+      type: 'onoff',
+      value: 0
+    },
+    {
       key: 'debugWebhook',
       name: 'Webhook URL for debug',
       type: 'input',

@@ -78,5 +78,6 @@
   "voiceFormatFor": "Voice input:message",
   "youtube": 0,
   "disablePixelRatio": 0,
+  "showColorPicker": 0,
   "debugWebhook": ""
 }

@@ -1044,7 +1044,8 @@ window.interval = setInterval(function () {
     var colorPicker = logButtons.appendChild(document.createElement('input'));
     colorPicker.id = 'colorPicker';
     colorPicker.type = 'color';
-    colorPicker.setAttribute('style', 'width:0;padding:0;border:0');
+    if (!experimentalConfig.showColorPicker)
+      colorPicker.setAttribute('style', 'width:0;padding:0;border:0');
     // 設定
     var configButton = logButtons.appendChild(document.createElement('button'));
     configButton.textContent = text('設定', 'Config');
