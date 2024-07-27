@@ -401,7 +401,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     },
     init: function () {
       var div = this.container = document.createElement('div');
-      div.setAttribute('style', 'display:flex;order:5;visibility:hidden');
+      div.setAttribute('style', 'display:flex;order:5;visibility:hidden;display:none');
       var video = this.video = document.createElement('video');
       video.style.border = '1px solid #000';
       video.style.height = '100px';
@@ -440,7 +440,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         localStorage.setItem('experimentalNotice', 1);
       }
       if (!this.log)
-        this.container.style.visibility = '';
+        this.container.style.display = this.container.style.visibility = '';
       this.log = document.createElement('div');
       this.log.className = 'log';
       this.paint();
@@ -561,6 +561,8 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     // 偽ナンバリング
     if (match(userDTO.name, ['/^' + vueApp.toDisplayName('') + '\\d+$/']))
       userDTO.name = '(' + userDTO.name + ')';
+    // 偽トリップ
+    userDTO.name = userDTO.name?.replace(/◇|◊|🔶|🔷|🔸|🔹/g, 'O');
     // 名無しナンバリング
     if (experimentalConfig.numbering && typeof userDTO.id === 'string') {
       userDTO.name = vueApp.toDisplayName(userDTO.name);
