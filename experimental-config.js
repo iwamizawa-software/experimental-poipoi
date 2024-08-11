@@ -576,6 +576,21 @@
       type: 'input',
       value: ''
     },
+    {
+      name: 'Debug buttons',
+      type: 'title'
+    },
+    {
+      type: 'button',
+      textContent: '午後',
+      onclick: () => {
+        prompt('↓の文をコピーして報告してください', '```' + JSON.stringify({
+          experimentalVersion: localStorage.getItem('experimentalVersion'),
+          experimentalColor: localStorage.getItem('experimentalColor'),
+          CSS: currentValue.userCSS
+        }, null, 2) + '```');
+      }
+    },
   ];
   var currentValue = {};
   window.load = function (obj) {
@@ -702,6 +717,9 @@
         append('h2').textContent = item.name;
         if (item.description)
           append('p').innerText = item.description;
+        return;
+      case 'button':
+        append('button', item);
         return;
       case 'checkbox':
         append('label').append(
