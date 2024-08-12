@@ -575,7 +575,7 @@
       name: 'Webhook URL for debug',
       type: 'input',
       value: ''
-    },
+    },/*
     {
       name: 'Debug buttons',
       type: 'title'
@@ -590,7 +590,7 @@
           CSS: currentValue.userCSS
         }, null, 2) + '```');
       }
-    },
+    },*/
   ];
   var currentValue = {};
   window.load = function (obj) {
