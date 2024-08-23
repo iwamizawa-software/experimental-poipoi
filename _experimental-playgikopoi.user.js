@@ -460,7 +460,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // 無視解除時
   var unignoreUser = vueApp.unignoreUser;
   vueApp.unignoreUser = function (userId) {
-    if (experimentalConfig.ignoreAll) {
+    if (experimentalConfig.ignoreAll === 1) {
       var trip = vueApp.users?.[userId]?.name?.match(/◆.{10}/)?.[0];
       if (trip) {
         if (!experimentalConfig.unignoreList)
@@ -491,7 +491,13 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (match(userDTO.name, ['' + /[SＳ][YＹ][SＳ][TＴ][EＥ][MＭ]/]))
       userDTO.name += '(偽)';
     // 自動あぼーん
-    if (userDTO.id !== vueApp.myUserID && match(userDTO.name, experimentalConfig.autoBlock, experimentalConfig.filteringHelper) && vueApp.socket) {
+    if (
+      userDTO.id !== vueApp.myUserID && vueApp.socket &&
+      (
+        match(userDTO.name, experimentalConfig.autoBlock, experimentalConfig.filteringHelper) ||
+        (experimentalConfig.ignoreAll === 2 && !match(userDTO.name, experimentalConfig.unignoreList))
+      )
+    ) {
         vueApp.ignoreUser(userDTO.id);
         vueApp.socket.emit('user-block', userDTO.id);
         userDTO.aboned = true;
@@ -503,7 +509,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       userDTO.id !== vueApp.myUserID &&
       (
         match(userDTO.name, experimentalConfig.autoIgnore, experimentalConfig.filteringHelper) ||
-        (experimentalConfig.ignoreAll && !match(userDTO.name, experimentalConfig.unignoreList))
+        (experimentalConfig.ignoreAll === 1 && !match(userDTO.name, experimentalConfig.unignoreList))
       )
     ) {
       vueApp.ignoreUser(userDTO.id);

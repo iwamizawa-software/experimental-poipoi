@@ -1,3 +1,4 @@
+2024/8/23	ホワイトリスト型自動あぼーんで相互あぼーんを出来るようにした
 2024/6/25	Android Kiwi BrowserでPIPに対応
 2024/6/21	Widget機能
 2024/6/12	ピクチャーインピクチャーボタン
@@ -37,6 +38,7 @@
 2022/6/11	音声入力
 2022/6/5	名無しナンバリング、自動あぼーん、動画配信を別タブで開く、メンション通知機能、ログ右クリックメニュー
 
+2024/8/23	Allowlist mode (Blocking)
 2024/6/25	Widget and PIP are available on Android Kiwi Browser
 2024/6/21	Widget
 2024/6/12	Picture-in-Picture button

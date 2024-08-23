@@ -214,9 +214,13 @@
     },
     {
       key: 'ignoreAll',
-      name: text('ホワイトリスト型自動一方あぼーん', 'Allowlist mode'),
-      description: text('指定した名前の人以外全員一方あぼーんします。', 'Ignore everyone without allowlist members.'),
-      type: 'onoff',
+      name: text('ホワイトリスト型自動あぼーん', 'Allowlist mode'),
+      description: text('指定した名前の人以外全員あぼーんします。', 'Block or Ignore everyone without allowlist members.'),
+      type: [
+        'OFF',
+        text('一方あぼーん', 'Auto ignore'),
+        text('相互あぼーん', 'Auto block')
+      ],
       value: 0,
       relations: ['unignoreList']
       
