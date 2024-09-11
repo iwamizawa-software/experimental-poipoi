@@ -477,7 +477,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   var addUser = vueApp.addUser;
   vueApp.addUser = function (userDTO) {
     // 偽ナンバリング
-    if (match(userDTO.name, ['/^' + vueApp.toDisplayName('') + '\\d+$/']))
+    if (match(userDTO.name, ['/' + vueApp.toDisplayName('') + '\\d+/']))
       userDTO.name = '(' + userDTO.name + ')';
     // 偽トリップ
     userDTO.name = userDTO.name?.replace(/◇|◊|🔶|🔷|🔸|🔹/g, 'O');
