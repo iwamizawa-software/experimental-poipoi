@@ -1259,6 +1259,8 @@ window.interval = setInterval(function () {
             opt.value = device.deviceId;
             opt.text = device.label || ('mic ' + i);
             this.addAudio.add(opt);
+            // 調査用
+            console.log(['入力デバイス', opt.text, opt.value].join('：'));
           });
         }
         mutebtn.parentNode.after(this.addAudio);
@@ -1337,6 +1339,8 @@ window.interval = setInterval(function () {
         stream.oninactive = closeBtn.onclick = null;
       };
       wsm.addVolume(div, gain);
+      // 調査用
+      console.log(['選択入力デバイス', selected].join('：'), stream.getAudioTracks()[0]);
     },
     addVolume: function (div, gain) {
       var control = div.appendChild(document.createElement('p'));
