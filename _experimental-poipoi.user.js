@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     _experimental-poipoi
-// @version  86
+// @version  87
 // @grant    none
 // @run-at   document-end
 // @match    https://gikopoipoi.net/*
