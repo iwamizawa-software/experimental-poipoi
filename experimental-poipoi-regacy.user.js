@@ -1,15 +1,68 @@
 // ==UserScript==
-// @name     _experimental-playgikopoi
-// @version  1
+// @name     experimental-poipoi-regacy
+// @version  87
 // @grant    none
 // @run-at   document-end
-// @match    https://play.gikopoi.com/*
+// @match    https://gikopoipoi.net/*
+// @match    https://gikopoi.hu/*
 // ==/UserScript==
 
+window.experimentalVersion = +document.currentScript?.textContent?.match(/@version\s+(\d+)/)?.[1];
+document.currentScript?.remove();
 document.querySelector('head').appendChild(document.createElement('script').appendChild(document.createTextNode('(' + async function inject() {
 
   document.currentScript?.remove();
+  if (window.experimental || location.href.includes('video-tab.html'))
+    return;
+  window.experimental = true;
   var GITHUB_PATH = 'https://raw.githubusercontent.com/iwamizawa-software/experimental-poipoi/main/';
+  var WEBSITE_PATH = 'https://iwamizawa-software.github.io/experimental-poipoi/';
+  var disableButtonContainer = document.createElement('div');
+  disableButtonContainer.id = 'disableButtonContainer';
+  disableButtonContainer.setAttribute('style', 'position:absolute;top:0;right:20px;z-index:10000');
+  document.body.insertBefore(disableButtonContainer, document.body.firstChild);
+  var disableButton = document.createElement('button');
+  disableButtonContainer.append(disableButton);
+  var contactButton = document.createElement('button');
+  disableButtonContainer.append(contactButton);
+  contactButton.textContent = '問い合わせ Contact';
+  contactButton.onclick = () => open('https://form1ssl.fc2.com/form/?id=019f176bae31cba6', '_blank', 'noreferrer');
+  if (+localStorage.getItem('experimentalVersion') < window.experimentalVersion) {
+    var changelogButton = document.createElement('button');
+    disableButtonContainer.append(changelogButton);
+    changelogButton.textContent = '新機能 Whats new';
+    changelogButton.style.backgroundColor = '#c88';
+    changelogButton.onclick = () => {
+      open(WEBSITE_PATH + 'changelog.txt', '_blank', 'noreferrer');
+      localStorage.setItem('experimentalVersion', window.experimentalVersion);
+    };
+  }
+  if (localStorage.getItem('disableScript')) {
+    disableButton.textContent = 'スクリプトを有効化 Enable script';
+    disableButton.style.background = '#5f5';
+    disableButton.onclick = () => {
+      localStorage.removeItem('disableScript');
+      location.reload();
+    };
+    var resetButton = document.createElement('button');
+    resetButton.textContent = 'リセット Reset';
+    resetButton.onclick = () => {
+      if (confirm('スクリプトの設定をリセットしますか？ Do you clear config of script?')) {
+        localStorage.removeItem('experimentalConfig');
+        alert('リセットしました Done');
+        disableButton.click();
+      }
+    };
+    disableButton.after(resetButton);
+    return;
+  } else {
+    disableButton.textContent = 'バグったら押す Disable script';
+    disableButton.onclick = () => {
+      localStorage.setItem('disableScript', 'true');
+      alert('スクリプトが無効になりました。\nこれで治った場合スクリプトのバグなので報告お願いします。\nScript has been disabled.');
+      location.reload();
+    };
+  }
   var consolelog = function () {
     var log = Array.from(arguments).map(err => err.stack ? err.message + '\n' + err.stack : err).join('\n');
     console.log(log);
@@ -43,7 +96,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     return obj[key];
   };
   var observedSelectors = [];
-  var observer = new MutationObserver(mutations => {
+  var observer = new MutationObserver(() => {
     observedSelectors = observedSelectors.filter(obj => {
       var element = document.querySelector(obj.selector);
       if (element)
@@ -111,8 +164,11 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   // ルーラリンク
   var roomNameToKey = {}, roomNameRegex = /0^/;
   var createRoomNameRegex = function () {
-    Object.keys(vueApp._i18n.messages.en.room).forEach(key => {
-      var roomName = vueApp._i18n.t('room.' + key, 'ja').split(' ');
+    Object.keys(vueApp.$i18next.options.resources.en.common.room).forEach(key => {
+      var nihongo = vueApp.$i18next.options.resources.ja.common.room[key] || key;
+      var roomName = (nihongo?.t || nihongo).split(' ');
+      if (roomName[1] && roomName[0])
+        roomNameToKey[roomName[0] + ' ' + roomName[1]] = key;
       roomNameToKey[roomName = roomName[1] || roomName[0]] = key;
       var halfSize = roomName.replace(/[！-～]/g, s => String.fromCharCode(s.charCodeAt() - (0xFF01 - 0x21)));
       roomNameToKey[key] = roomNameToKey[halfSize] = roomNameToKey[halfSize.toLowerCase()] = roomNameToKey[roomName.toLowerCase()] = key;
@@ -120,32 +176,44 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     roomNameToKey['開発前'] = 'admin_st';
     roomNameRegex = new RegExp('(^|じゃ|[ 　「])(' + Object.keys(roomNameToKey).sort((a, b) => b.length - a.length).join('|') + ')(で$|$|に?(?:来|集|きて|こい|行|[居い][るた])|にて|[ 　」])', 'g');
   };
-  var replaceRulaLink = html => html.replace(roomNameRegex, (s, s1, s2, s3) => `${s1}<a href="javascript:void%20vueApp.changeRoom('${roomNameToKey[s2]}')">${s2}</a>${s3}`);
+  var replaceRulaLink = html => html.replace(roomNameRegex, (s, s1, s2, s3) => `${s1}<a href="javascript:void%20_vueApp.changeRoom('${roomNameToKey[s2]}')">${s2}</a>${s3}`);
 
-  await ready(window, 'vueApp');
-  await ready(window.vueApp, '_isMounted');
+  var vueApp = window._vueApp = await ready(await ready(await ready(await ready(await ready(window, 'vueApp'), '_container'), '_vnode'), 'component'), 'proxy');
+  vueApp.toDisplayName = name => name || vueApp.$i18next.t('default_user_name');
+  var room = vueApp.$i18next.options.resources.ja.common.room;
   createRoomNameRegex();
-  var characterIconData = {"giko":{"type":".svg","x":-50,"y":24,"width":190},"naito":{"type":".svg","x":-48,"y":13,"width":190},"shii":{"type":".svg","x":-50,"y":24,"width":190},"hikki":{"type":".svg","x":-44,"y":-12,"width":190},"tinpopo":{"type":".svg","x":-50,"y":26,"width":190},"shobon":{"type":".svg","x":-50,"y":-20,"width":190},"nida":{"type":".svg","x":-50,"y":27,"width":190},"salmon":{"type":".svg","x":17,"y":-54,"width":190},"giko_hat":{"type":".svg","x":-50,"y":10,"width":190},"shii_hat":{"type":".svg","x":-50,"y":10,"width":190},"shobon_hat":{"type":".svg","x":-41,"y":-20,"width":190},"furoshiki":{"type":".svg","x":-50,"y":24,"width":190},"golden_furoshiki":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shii":{"type":".svg","x":-50,"y":24,"width":190},"sakura_furoshiki_shii":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shobon":{"type":".svg","x":-41,"y":-20,"width":190},"naitoapple":{"type":".svg","x":-50,"y":10,"width":190},"shii_pianica":{"type":".svg","x":-46,"y":24,"width":190},"shii_uniform":{"type":".svg","x":-50,"y":24,"width":190},"hungry_giko":{"type":".svg","x":-45,"y":15,"width":190},"rikishi_naito":{"type":".svg","x":-30,"y":-18,"width":170},"hentai_giko":{"type":".svg","x":-45,"y":33,"width":170},"dark_naito_walking":{"type":".svg","x":-48,"y":13,"width":190},"takenoko":{"type":".svg","x":0,"y":0,"width":100},"kaminarisama_naito":{"type":".svg","x":-48,"y":13,"width":190},"panda_naito":{"type":".svg","x":-48,"y":13,"width":190},"wild_panda_naito":{"type":".svg","x":-48,"y":13,"width":190},"funkynaito":{"type":".png","x":-48,"y":13,"width":190},"molgiko":{"type":".png","x":-80,"y":-70,"width":190},"tikan_giko":{"type":".svg","x":-50,"y":24,"width":190},"hotsuma_giko":{"type":".svg","x":-50,"y":24,"width":190},"dokuo":{"type":".svg","x":-58,"y":-33,"width":190},"onigiri":{"type":".svg","x":-38,"y":20,"width":170},"tabako_dokuo":{"type":".svg","x":-58,"y":-33,"width":190},"himawari":{"type":".svg","x":-47,"y":0,"width":190},"zonu":{"type":".svg","x":-70,"y":-46,"width":190},"george":{"type":".svg","x":-48,"y":13,"width":190},"chotto_toorimasu_yo":{"type":".svg","x":-54,"y":-34,"width":190},"tokita_naito":{"type":".svg","x":-40,"y":4,"width":170},"pumpkinhead":{"type":".svg","x":-74,"y":34,"width":230},"naito_yurei":{"type":".svg","x":-48,"y":13,"width":190},"shiinigami":{"type":".svg","x":-100,"y":2,"width":280},"youkanman":{"type":".svg","x":-46,"y":-50,"width":180},"baba_shobon":{"type":".svg","x":-50,"y":-20,"width":190},"uzukumari":{"type":".svg","x":-98,"y":-69,"width":190},"giko_basketball":{"type":".svg","x":-50,"y":24,"width":190},"giko_shamisen":{"type":".svg","x":-50,"y":24,"width":190},"mikan_naito":{"type":".svg","x":-48,"y":13,"width":190},"shii_syakuhati":{"type":".svg","x":-50,"y":24,"width":190},"taiko_naito":{"type":".svg","x":-48,"y":13,"width":190},"mitsugiko":{"type":".svg","x":-90,"y":-50,"width":190},"giko_cop":{"type":".png","x":-50,"y":24,"width":190},"giko_batman":{"type":".png","x":-50,"y":24,"width":190},"giko_hungover":{"type":".png","x":-50,"y":24,"width":190},"giko_islam":{"type":".png","x":-50,"y":24,"width":190},"shii_islam":{"type":".png","x":-50,"y":24,"width":190},"giko_shroom":{"type":".png","x":-55,"y":24,"width":190},"bif_alien":{"type":".png","x":-54,"y":-34,"width":190},"bif_wizard":{"type":".png","x":-54,"y":-34,"width":190},"winter_shii":{"type":".svg","x":-50,"y":0,"width":190},"longcat":{"type":".png","x":-50,"y":-30,"width":190},"hotaru":{"type":".png","x":-58,"y":0,"width":190},"mona":{"type":".png","x":-50,"y":33,"width":190},"foe":{"type":".svg","x":-50,"y":-50,"width":190},"kimono_giko":{"type":".svg","x":-50,"y":24,"width":190},"kimono_shii":{"type":".svg","x":-50,"y":24,"width":190},"shar_naito":{"type":".svg","x":-48,"y":13,"width":190},"ika":{"type":".svg","x":0,"y":18,"width":100},"giko_gold":{"type":".png","x":-50,"y":24,"width":190},"naito_npc":{"type":".png","x":-50,"y":0,"width":190},"habbo":{"type":".png","x":-40,"y":-40,"width":190},"blankchan":{"type":".png","x":-50,"y":24,"width":190},"goatse":{"type":".png","x":-50,"y":24,"width":190},"onigiri_alt":{"type":".svg","x":-38,"y":20,"width":170},"shobon_alt":{"type":".svg","x":-50,"y":-20,"width":190},"himawari_alt":{"type":".svg","x":-47,"y":0,"width":190},"george_alt":{"type":".svg","x":-48,"y":13,"width":190},"furoshiki_alt":{"type":".svg","x":-50,"y":24,"width":190},"furoshiki_shobon_alt":{"type":".svg","x":-41,"y":-20,"width":190},"tokita_naito_alt":{"type":".svg","x":-40,"y":4,"width":170},"youkanman_alt":{"type":".svg","x":-46,"y":-50,"width":180},"baba_shobon_alt":{"type":".svg","x":-50,"y":-20,"width":190},"takenoko_alt":{"type":".svg","x":0,"y":0,"width":100},"shobon_raincoat":{"type":".svg","x":-41,"y":-20,"width":190},"shii_raincoat":{"type":".svg","x":-46,"y":24,"width":190}};
+  var characterIconData = {};
   querySelectorAsync('#login-button').then(loginButton => {
     var select = document.createElement('select');
-    Object.keys(vueApp._i18n.messages.en.room).map(key => ({
-      value: key,
-      text: vueApp._i18n.t('room.' + key, 'ja') + ' - ' + vueApp._i18n.messages.en.room[key],
-      reading: vueApp._i18n.t('room.' + key, 'ja', {reading: true})
-    })).sort((a, b) => a.reading > b.reading ? 1 : -1).forEach(({value, text}) => {
+    Object.keys(vueApp.$i18next.options.resources.en.common.room).map(key => {
+      var nihongo = vueApp.$i18next.options.resources.ja.common.room[key];
+      return {
+        value: key,
+        text: (nihongo?.t || nihongo) + ' - ' + vueApp.$i18next.options.resources.en.common.room[key],
+        reading: nihongo?.sort_key || nihongo
+      };
+    }).sort((a, b) => a.reading > b.reading ? 1 : -1).forEach(({value, text}) => {
       var option = select.appendChild(document.createElement('option'));
       option.value = value;
       option.text = text;
     });
-    select.value = (new URL(location.href)).searchParams.get('roomid') || 'bar';
+    select.value = (new URL(location.href)).searchParams.get('roomid') || 'admin_st';
     document.getElementById('area-selection').onchange = select.onchange = () => {
       history.replaceState(null, '', '?areaid=' + vueApp.areaId + '&roomid=' + select.value);
     };
     select.style.display = 'block';
     loginButton.before(select);
+    Array.from(document.querySelectorAll('#character-selection label img')).forEach(img => {
+      var name = img.previousElementSibling.value;
+      characterIconData[name] = {
+        type: img.src.slice(-4),
+        x: +img.style.left.slice(0, -1),
+        y: +img.style.top.slice(0, -1),
+        width: +img.style.width.slice(0, -1)
+      };
+      characterIconData[name + '_alt'] = Object.assign({}, characterIconData[name]);
+    });
   });
-
-  Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
 
   if (window.iPhoneBookmarklet) {
     var audio = new Audio();
@@ -161,9 +229,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
 
   var text = (_gen, _for) => vueApp.areaId === 'gen' ? _gen : _for;
   var systemMessage = msg => vueApp.writeMessageToLog('SYSTEM', msg, null);
-  var sendMessage = function (msg) {
+  var sendMessage = function (msg, silent) {
     vueApp.socket.emit('user-msg', msg);
-    if (experimentalConfig.clearBubble)
+    if (experimentalConfig.clearBubble || silent)
       vueApp.socket.emit('user-msg', '');
   };
   var asyncAlert = text => new Promise(resolve => vueApp.openDialog(text, '', ['OK'], 0, resolve));
@@ -282,8 +350,9 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       experimentalConfig[key] = experimentalConfig[key].split?.(',') || [experimentalConfig[key] + ''];
   });
   apply();
+  Array.from(document.querySelectorAll('#character-selection label')).forEach(label => label.setAttribute('style', 'font-size:0'));
   var isAnon = name => (new RegExp('^(?:' + vueApp.toDisplayName('') + '\\d*)?$')).test(name);
-  var isMention = msg => vueApp.mentionSoundFunction?.(msg);
+  var isMention = msg => vueApp.checkIfMentioned?.(msg);
   // widget
   var createSpan = (className, textContent) => Object.assign(document.createElement('span'), {className, textContent});
   var widget = {
@@ -343,6 +412,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         for (var i = 0; i < 6 && !this.log; i++) {
           await sleep(500);
           ctx.fillRect(0, 0, canvas.width, canvas.height);
+          this.video.srcObject.getTracks?.()?.[0]?.requestFrame?.();
         }
       })();
       video.onpause = video.play;
@@ -357,6 +427,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       document.getElementById('chat-log-container').after(div);
     },
     open: function () {
+      if (+localStorage.getItem('experimentalNotice') < 1) {
+        asyncAlert(text('このメッセージを見てから、ログがリアルタイムで表示されない等の不具合があった場合は報告お願いします。\n\nWidget機能は再描画に問題があり、将来的に廃止される可能性があります。', 'If logs are not updated on widget, please contact author.'));
+        localStorage.setItem('experimentalNotice', 1);
+      }
       if (!this.log)
         this.container.style.display = this.container.style.visibility = '';
       this.log = document.createElement('div');
@@ -421,7 +495,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (experimentalConfig.roomColor)
       dto.currentRoom.backgroundColor = experimentalConfig.roomColor;
     // 部屋名をログ出力
-    var roomName = vueApp._i18n.t('room.' + dto?.currentRoom?.id);
+    var roomName = vueApp.$i18next.t('room.' + dto?.currentRoom?.id);
     var numberOfUsers = (dto.connectedUsers.some(u => u.id === vueApp.myUserID) ? 0 : 1) + dto.connectedUsers.length;
     if (experimentalConfig.logRoomName && lastRoomName !== roomName)
       systemMessage(text(`${roomName}に入室 (${numberOfUsers}人)`, `Entered to  ${roomName} (${numberOfUsers} users)`));
@@ -499,7 +573,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       )
     ) {
         vueApp.ignoreUser(userDTO.id);
-        vueApp.socket.emit('user-block', userDTO.id);
+        abon(userDTO.id);
         userDTO.aboned = true;
         if (!experimentalConfig.withoutBlockMsg)
           systemMessage(userDTO.name + text('を自動相互あぼーんした', ' has been blocked automatically'));
@@ -596,7 +670,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
         if (experimentalConfig.wordBlock === 3)
           vueApp.ignoreUser(user.id);
         else
-          (await getObjectAsync(vueApp, 'socket')).emit('user-block', user.id);
+          abon(user.id);
         if (!experimentalConfig.withoutBlockMsg)
           systemMessage(user.name + text('をNGワードあぼーんした', ' has been blocked by filtering'));
       }
@@ -638,6 +712,16 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     }
     if (!isAtBottom())
       newMessageButtonContainer.style.display = '';
+    // いかおに
+    if (ikaoni.MASTER_WORD === msg) {
+      ikaoni.players = {};
+      ikaoni.players[ikaoni.masterId = userId] = userName;
+      ikaoni.lastPlayTime = (new Date()).getTime();
+    } else if (ikaoni.playing && ikaoni.masterId === userId && msg?.startsWith(vueApp.myUserID)) {
+      sendMessage('#ika');
+      ikaoni.ikaed = true;
+    } else if (ikaoni.waiting() && msg === 'いかおに')
+      ikaoni.players[userId] = userName;
     return writeMessageToLog.apply(this, arguments);
   };
   // Enter1回で吹き出しを消す
@@ -720,7 +804,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
     if (event.target.parentNode !== logMenu)
       logMenu.style.display = 'none';
     if (experimentalConfig.youtube && event.target.href && /^https:\/\/(?:(?:www\.|m\.)?youtube\.com|youtu\.be)\/./.test(event.target.href))
-      event.target.href = 'https://iwamizawa-software.github.io/experimental-poipoi/youtube.html#' + encodeURIComponent(event.target.href);
+      event.target.href = WEBSITE_PATH + 'youtube.html#' + encodeURIComponent(event.target.href);
   });
   document.addEventListener('contextmenu', function (event) {
     logMenu.style.display = 'none';
@@ -823,7 +907,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       textbox.before(buttonContainer);
       var enableSpeech = document.getElementById('enableSpeech');
       enableSpeech.onclick = function () {
-        recognition.lang = experimentalConfig.voiceLang || vueApp._i18n.locale;
+        recognition.lang = experimentalConfig.voiceLang || vueApp.$i18next?.language || vueApp.$i18n?.locale;
         recognition[enableSpeech.checked ? 'start' : 'stop']();
       };
       var recognition = new SpeechRecognition();
@@ -880,7 +964,7 @@ document.querySelector('head').appendChild(document.createElement('script').appe
       logWindow.document.write(`
 <!doctype html>
 <head>
-<title>${vueApp._i18n.t('room.' + vueApp.currentRoom.id)}</title>
+<title>${vueApp.$i18next.t('room.' + vueApp.currentRoom.id)}</title>
 <style>
 html,body,#chatLog,input{margin:0;padding:0;box-sizing:border-box;width:100%;height:100%;resize:none;overflow:auto}
 #chatLog{height:calc(100% - 3em);padding:2px;font-size:12px}
@@ -909,7 +993,7 @@ window.interval = setInterval(function () {
         log.scrollTop = log.scrollHeight - log.clientHeight;
         logWindow.onresize = log.onscroll = function () {
           if ((log.scrollHeight - log.clientHeight) - log.scrollTop < 5)
-            logWindow.document.title = vueApp._i18n.t('room.' + vueApp.currentRoom.id);
+            logWindow.document.title = vueApp.$i18next.t('room.' + vueApp.currentRoom.id);
         };
         logWindow.document.body.lastElementChild.onkeypress = function (event) {
           if (this.value && event.key === 'Enter') {
@@ -1005,7 +1089,7 @@ window.interval = setInterval(function () {
     vueApp.connectToServer = async function () {
       // 内藤髪制御
       if (localStorage.getItem('characterId') === 'naito' && experimentalConfig.hairControl) {
-        vueApp.characterId = experimentalConfig.hairControl === 1 ? 'naito' : 'funkynaito';
+        arguments[2] = vueApp.characterId = experimentalConfig.hairControl === 1 ? 'naito' : 'funkynaito';
         vueApp.selectedCharacter = vueApp.allCharacters.find(c => c.characterName === vueApp.characterId);
       }
       var r = await connectToServer.apply(this, arguments);
@@ -1124,57 +1208,151 @@ window.interval = setInterval(function () {
   };
   addEventListener('focus', closeChessNotification);
   addEventListener('mousedown', closeChessNotification);
-  // PC音声追加
-  const DEVICE_ID = '3526701059AE4F9F8B811CA0EF190593';
-  navigator.mediaDevices.enumerateDevices = async function () {
-    var list = await MediaDevices.prototype.enumerateDevices.call(navigator.mediaDevices);
-    return list.concat({
-      deviceId: DEVICE_ID,
-      label: 'Speaker Sound',
-      kind: 'audioinput'
-    });
+  // ステミキ
+  var mute = vueApp.mute;
+  vueApp.mute = function () {
+    try {
+      Array.from(document.querySelectorAll('.input-volume')).forEach(input => {
+        input.dataset.value = input.value;
+        input.value = 0;
+        input.disabled = true;
+        input.oninput();
+      });
+    } catch (err) {
+      asyncAlert(text('ミュートでエラーが発生した', 'failed to mute'));
+      console.log(err);
+    }
+    return mute.apply(this, arguments);
   };
-  navigator.mediaDevices.getUserMedia = async function (option) {
-    var userMedia, stream;
-    if (option?.audio?.deviceId?.exact === DEVICE_ID) {
-      try {
-        await asyncAlert('Check "Share audio", and share screen. Video is not changed.\nMaybe Firefox and mobile cannot use "Share audio".');
-        var stream = await navigator.mediaDevices.getDisplayMedia({
-          video: {displaySurface: 'monitor'},
-          audio: {
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false,
-            channelCount: 2
-          }
-        });
-        stream.getVideoTracks().forEach(track => {
-          track.stop();
-          stream.removeTrack(track);
-        });
-        if (!stream.getAudioTracks().length)
-          throw new Error('Audio track not found');
-        delete option.audio;
-      } catch (err) {
-        asyncAlert('Audio track not found');
-        console.log(err);
-        throw err;
+  var unmute = vueApp.unmute;
+  vueApp.unmute = function () {
+    var result = unmute.apply(this, arguments);
+    Array.from(document.querySelectorAll('.input-volume')).forEach(input => {
+      input.value = input.dataset.value ? +input.dataset.value : 1;
+      input.disabled = false;
+      input.oninput();
+    });
+    return result;
+  };
+  var wsm = {
+    show: async function (show) {
+      if (show) {
+        var mutebtn = await querySelectorAsync('button.mute-unmute-button');
+        if (!this.addAudio) {
+          this.addAudio = document.createElement('select');
+          this.addAudio.innerHTML = `<option>${text('配信音声の追加', 'Add voice')}<option value="browser">${text('ブラウザの音声', 'browser sound')}<option value="monitor">${text('PCの音声', 'speaker sound')}`;
+          this.addAudio.style.display = 'block';
+          this.addAudio.style.marginTop = '10px';
+          this.addAudio.onchange = this.add;
+          (await navigator.mediaDevices.enumerateDevices()).forEach((device, i) => {
+            if (device.kind !== 'audioinput' || /default|communications/.test(device.deviceId))
+              return;
+            var opt = document.createElement('option');
+            opt.value = device.deviceId;
+            opt.text = device.label || ('mic ' + i);
+            this.addAudio.add(opt);
+          });
+        }
+        mutebtn.parentNode.after(this.addAudio);
+        this.streamVolume?.remove();
+        this.addVolume(this.streamVolume = document.createElement('div'), vueApp.outboundAudioProcessor.gain);
+        mutebtn.parentNode.before(this.streamVolume);
+      } else {
+        this.addAudio?.remove();
+        this.streamVolume?.remove();
       }
+    },
+    add: async function () {
+      var selected = this.value;
+      this.selectedIndex = 0;
+      var stream;
+      try {
+        if (selected === 'browser' || selected === 'monitor') {
+          await asyncAlert(text('「音声を共有」をチェックして画面共有してください。映像は変わりません。\nFirefoxとスマホは多分使えません。', 'Check "Share audio", and share screen. Video is not changed.\nMaybe Firefox and mobile cannot use "Share audio".'));
+          stream = await navigator.mediaDevices.getDisplayMedia({
+            video: {displaySurface: selected},
+            audio: {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false,
+              channelCount: 2
+            }
+          });
+          stream.getVideoTracks().forEach(track => {
+            track.stop();
+            stream.removeTrack(track);
+          });
+          if (!stream.getAudioTracks().length)
+            throw new Error('Audio track not found');
+        } else {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              deviceId: {exact: selected},
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false
+            }
+          });
+        }
+      } catch (err) {
+        asyncAlert(text('音声が取得できなかった', 'Audio track not found'));
+        console.log(err);
+        return;
+      }
+      if (!vueApp.outboundAudioProcessor) {
+        asyncAlert('outboundAudioProcessor not found');
+        stream.getTracks().forEach(t => t.stop());
+        return;
+      }
+      var track = stream.getAudioTracks()[0];
+      vueApp.outboundAudioProcessor.stream.addTrack(track);
+      track.stop = function () {
+        closeBtn.click();
+        return track.__proto__.stop.apply(this, arguments);
+      };
+      var gain = vueApp.outboundAudioProcessor.context.createGain();
+      vueApp.outboundAudioProcessor.context.createMediaStreamSource(stream).connect(gain);
+      gain.connect(vueApp.outboundAudioProcessor.pan);
+      var div = document.createElement('div');
+      this.after(div);
+      div.setAttribute('style', 'border:1px solid #000;width:fit-content;padding:5px');
+      var title = div.appendChild(document.createElement('p'));
+      title.textContent = stream.getAudioTracks()[0].label;
+      var closeBtn = title.appendChild(document.createElement('button'));
+      closeBtn.style.cssFloat = 'right';
+      closeBtn.textContent = '×';
+      stream.oninactive = closeBtn.onclick = function () {
+        stream.getTracks().forEach(t => t.stop());
+        gain.disconnect();
+        div.remove();
+        vueApp.outboundAudioProcessor?.stream.removeTrack(stream.getAudioTracks()[0]);
+        stream.oninactive = closeBtn.onclick = null;
+      };
+      wsm.addVolume(div, gain);
+    },
+    addVolume: function (div, gain) {
+      var control = div.appendChild(document.createElement('p'));
+      control.textContent = 'Volume ';
+      var vol = control.appendChild(document.createElement('input'));
+      vol.type = 'range';
+      vol.className = 'input-volume';
+      vol.min = 0;
+      vol.max = 1;
+      vol.step = 'any';
+      vol.disabled = vueApp.outboundAudioProcessor.isMute;
+      vol.value = gain.gain.value = vol.disabled ? 0 : 1;
+      vol.oninput = function () {
+        gain.gain.value = vol.value;
+      };
     }
-    if (option.video || option.audio) {
-      userMedia = await MediaDevices.prototype.getUserMedia.apply(navigator.mediaDevices, arguments);
-      if (stream)
-        userMedia.addTrack(stream.getAudioTracks()[0]);
-    } else {
-      userMedia = stream;
-    }
-    return userMedia;
   };
   // グラフ
   var graph, Graph = function ({currentRoom, connectedUsers}) {
     this.nodes = eval('[' + ('[' + '{},'.repeat(currentRoom.size.x) + '],').repeat(currentRoom.size.y) + ']');
     this.room = currentRoom.id;
     currentRoom.blocked.forEach(({x, y}) => this.nodes[y][x] = null);
+    if (this.room === 'idoA')
+      delete this.nodes[6][6];
     var flag = [false];
     for (var y = 0; y < currentRoom.size.y; y++)
       for (var x = 0; x < currentRoom.size.x; x++) {
@@ -1215,8 +1393,8 @@ window.interval = setInterval(function () {
           from.edges.delete(to);
       }
       var edge = to.edges.get(from);
-      if (edge.direction)
-        delete edge?.reverse;
+      if (edge?.direction)
+        delete edge.reverse;
       else
         to.edges.delete(from);
     });
@@ -1278,6 +1456,18 @@ window.interval = setInterval(function () {
     var currentNode = this.nodes[y]?.[x];
     if (!currentNode || currentNode.users.size < 2)
       return;
+    // いかおに
+    if (ikaoni.playing && !ikaoni.ikaed) {
+      Object.keys(ikaoni.players).some(id => {
+        if (currentNode.users.has(id) && vueApp.myUserID !== id && vueApp.users[id]?.character?.characterName === 'ika') {
+          sendMessage('#ika');
+          systemMessage('イカにされた');
+          return ikaoni.ikaed = true;
+        }
+      });
+    }
+    if (!experimentalConfig.escape || !this.moved)
+      return;
     var candidate = [], second = [];
     var queue = [{node: currentNode, path: {length: 0}}], current, flag = currentNode.flag = [true];
     while (current = queue.shift()) {
@@ -1300,6 +1490,7 @@ window.interval = setInterval(function () {
     flag[0] = false;
     return Array.from(candidate.length ? candidate[Math.random() * candidate.length | 0] : second[Math.random() * second.length | 0]);
   };
+  // ダブルクリックで移動
   var physicalToLogical = function (x, y) {
     var room = vueApp.currentRoom, scale = vueApp.getCanvasScale();
     var blockWidth = room.blockWidth || 80, blockHeight = room.blockHeight || 40;
@@ -1309,7 +1500,7 @@ window.interval = setInterval(function () {
   };
   document.addEventListener('dblclick', event => {
     var devicePixelRatio = experimentalConfig.disablePixelRatio ? 1 : window.devicePixelRatio;
-    if (event.target.id === 'room-canvas' && !experimentalConfig.disableMove) {
+    if (event.target.id === 'room-canvas' && !experimentalConfig.disableMove && !ikaoni.playing) {
       var from = vueApp.users[vueApp.myUserID], to = physicalToLogical(event.offsetX * devicePixelRatio, event.offsetY * devicePixelRatio);
       vueApp.route.add(graph?.search(from.logicalPositionX, from.logicalPositionY, to.x, to.y, from.direction));
     }
@@ -1318,6 +1509,7 @@ window.interval = setInterval(function () {
   vueApp.route = {
     queue: [],
     next: function (prev) {
+      this.lastMovement = (new Date()).getTime();
       if (!this.queue.length || (prev === 'room' ? Array !== this.queue[0].constructor : (prev && prev !== this.queue[0]))) {
         this.clear();
         return;
@@ -1329,7 +1521,15 @@ window.interval = setInterval(function () {
       if (!this.queue.length)
         return;
       if (typeof this.queue[0] === 'string') {
-        vueApp.socket.emit('user-move', this.queue[0]);
+        var direction = this.queue[0];
+        while (true) {
+          var t = (vueApp.characterId === 'shar_naito' ? 250 : 300) * (vueApp.currentRoom.id === 'long_st' ? 0.5 : 1) - (new Date()).getTime() + this.lastMovement;
+          if (t > 0)
+            await sleep(t);
+          else
+            break;
+        }
+        vueApp.socket.emit('user-move', direction);
       } else {
         vueApp.changeRoom.apply(vueApp, this.queue[0]);
       }
@@ -1342,7 +1542,9 @@ window.interval = setInterval(function () {
     },
     clear: function () {
       this.queue = [];
-    }
+      this.lastMovement = (new Date()).getTime();
+    },
+    lastMovement: 0
   };
   // URL短縮
   document.addEventListener('paste', async event => {
@@ -1381,7 +1583,7 @@ window.interval = setInterval(function () {
     this.stopCount = users.length;
     this.dead = [];
     this.users = [];
-    users.forEach(u => setTimeout(()=>vueApp.socket.emit('user-block', u.id), 0));
+    users.forEach(u => setTimeout(()=>abon(u.id), 0));
   };
   nimado.count = function (userCount) {
     if (!this.stopCount)
@@ -1397,6 +1599,57 @@ window.interval = setInterval(function () {
       return;
     this.dead.push(name);
   };
+  // いかおに
+  var ikaoni = {
+    timerId: 0,
+    masterId: '',
+    lastPlayTime: 0,
+    players: {},
+    WAIT_SECONDS: 30,
+    PLAY_MINUTES: 5
+  };
+  ikaoni.waiting = () => (new Date()).getTime() - ikaoni.lastPlayTime < ikaoni.WAIT_SECONDS * 1000;
+  ikaoni.MASTER_WORD = 'いかおにをする人は' + ikaoni.WAIT_SECONDS + '秒以内に「いかおに」と発言してください。(スクリプトが必要)';
+  ikaoni.start = master => {
+    ikaoni.playing = true;
+    clearTimeout(ikaoni.timerId);
+    ikaoni.timerId = setTimeout(() => {
+      delete ikaoni.playing;
+      if (vueApp.users[vueApp.myUserID]?.character?.characterName !== 'ika')
+        systemMessage('イカから逃げ切ったのであなたの勝ちです。おめでとう。');
+      else
+        systemMessage(ikaoni.PLAY_MINUTES + '分経ったのでいかおにを終了します。');
+    }, ikaoni.PLAY_MINUTES * 60000);
+    if (master) {
+      ikaoni.waitTimerId = setTimeout(() => {
+        var entries = Object.entries(ikaoni.players);
+        if (entries.length > 1) {
+          var [ikaId, ikaName] = entries.splice(Math.random() * entries.length | 0, 1)[0];
+          sendMessage(ikaId + ' \n最初のイカは' + ikaName + 'です。' + entries.map(a => a[1]).join('、') + 'は' + ikaoni.PLAY_MINUTES + '分間イカから逃げてください。スタート', true);
+        } else {
+          ikaoni.abort('参加者が集まりませんでした。');
+        }
+      }, ikaoni.WAIT_SECONDS * 1000);
+      sendMessage(ikaoni.MASTER_WORD, true);
+    } else {
+      sendMessage('いかおに', true);
+    }
+  };
+  ikaoni.abort = cause => {
+    systemMessage(cause);
+    clearTimeout(ikaoni.waitTimerId);
+    clearTimeout(ikaoni.timerId);
+    ikaoni.playing = ikaoni.lastPlayTime = 0;
+  };
+  var requestRoomList = vueApp.requestRoomList;
+  vueApp.requestRoomList = function () {
+    if (ikaoni.playing) {
+      systemMessage('いかおに中はﾙｰﾗ出来ません。');
+      return;
+    }
+    return requestRoomList.apply(this, arguments);
+  };
+  // ユーザーのメッセージ送信
   var quizWindow, sendMessageToServer = vueApp.sendMessageToServer;
   vueApp.sendMessageToServer = function () {
     var t = document.getElementById('input-textbox');
@@ -1406,7 +1659,7 @@ window.interval = setInterval(function () {
         t.value = '';
         return;
       } else if (t.value === '#quiz') {
-        quizWindow = open('https://iwamizawa-software.github.io/experimental-poipoi/quiz.html' + text('', '?en'), JSON.stringify(Object.values(vueApp.users).map(({id, name, character}) => ({id, name, characterId: character.characterName}))));
+        quizWindow = open(WEBSITE_PATH + 'quiz.html' + text('', '?en'), JSON.stringify(Object.values(vueApp.users).map(({id, name, character}) => ({id, name, characterId: character.characterName}))));
         t.value = '';
         return;
       } else if (t.value.startsWith('#block ')) {
@@ -1419,6 +1672,30 @@ window.interval = setInterval(function () {
         return;
       } else if (t.value === '#ver') {
         t.value = window.experimentalVersion;
+      } else if (t.value === '#ikaoni') {
+        if (vueApp.characterId === 'shar_naito' || vueApp.users[vueApp.myUserID].character?.characterName === 'ika')
+          systemMessage('足の速いキャラとイカは出来ません。');
+        else if (ikaoni.playing)
+          systemMessage('既にプレイ中です。');
+        else
+          ikaoni.start(true);
+        t.value = '';
+        return;
+      } else if (t.value === 'いかおに') {
+        if (vueApp.characterId === 'shar_naito' || vueApp.users[vueApp.myUserID].character?.characterName === 'ika')
+          systemMessage('足の速いキャラとイカは参加できません。');
+        else if (ikaoni.playing)
+          systemMessage('既にプレイ中です。');
+        else if (!ikaoni.waiting())
+          systemMessage('途中参加は出来ません。');
+        else
+          ikaoni.start();
+        t.value = '';
+        return;
+      } else if (t.value === 'やめる' && ikaoni.playing) {
+        ikaoni.abort('いかおにをやめました。');
+        t.value = '';
+        return;
       }
     }
     return sendMessageToServer.apply(this, arguments);
@@ -1550,7 +1827,6 @@ window.interval = setInterval(function () {
   };
   // socket event
   var streamStates = [];
-  var moved = false;
   var socketEvent = function (eventName) {
     switch (eventName) {
       case 'server-move':
@@ -1561,13 +1837,12 @@ window.interval = setInterval(function () {
         // 経路移動
         if (dto?.direction && dto?.userId === vueApp.myUserID) {
           vueApp.route.next(dto.direction);
-          moved = true;
+          if (graph)
+            graph.moved = true;
         }
         // 重なり回避
-        if (experimentalConfig.escape && moved) {
-          var myself = vueApp.users[vueApp.myUserID];
-          vueApp.route.add(graph.escape(dto?.userId === vueApp.myUserID ? dto : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}, experimentalConfig.escape === 2));
-        }
+        var myself = vueApp.users[vueApp.myUserID];
+        vueApp.route.add(graph.escape(dto?.userId === vueApp.myUserID ? dto : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}, experimentalConfig.escape === 2));
         break;
       case 'server-reject-movement':
         vueApp.route.next();
@@ -1578,13 +1853,11 @@ window.interval = setInterval(function () {
         if (user)
           graph?.update(user.id, null, null, user.position.x, user.position.y);
         // 重なり回避
-        if (experimentalConfig.escape && moved) {
-          var myself = vueApp.users[vueApp.myUserID];
-          vueApp.route.add(graph.escape(user.id === vueApp.myUserID
-            ? {x: user.position.x, y: user.position.y, direction: user.direction}
-            : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}
-          , experimentalConfig.escape === 2));
-        }
+        var myself = vueApp.users[vueApp.myUserID];
+        vueApp.route.add(graph.escape(user.id === vueApp.myUserID
+          ? {x: user.position.x, y: user.position.y, direction: user.direction}
+          : {x: myself?.logicalPositionX, y: myself?.logicalPositionY, direction: myself?.direction}
+        , experimentalConfig.escape === 2));
         // 入室ログ
         setTimeout(() => {
           if (!user || user.id === vueApp.myUserID)
@@ -1608,7 +1881,7 @@ window.interval = setInterval(function () {
         if (user)
           graph?.update(arguments[1], user.logicalPositionX, user.logicalPositionY, null, null);
         // 退室ログ
-        if (!user || user.id === vueApp.myUserID)
+        if (!user || user.id === vueApp.myUserID || user.aboned)
           return;
         if (!vueApp.ignoredUserIds.has(user.id) && !(experimentalConfig.withoutAnon && isAnon(user.name))) {
           if (experimentalConfig.accessLog)
@@ -1657,9 +1930,12 @@ window.interval = setInterval(function () {
       case 'server-update-current-room-state':
         // 配信通知
         streamStates = arguments[1].streams.map(s => s.isActive && s.isReady && s.isAllowed && s.userId !== vueApp.myUserID);
+        // ステミキ表示
+        wsm.show(arguments[1].streams.some(s => s.userId === vueApp.myUserID && s.isActive && s.isReady && s.withSound));
         // 経路移動
         vueApp.route.next('room');
-        moved = false;
+        if (graph)
+          graph.moved = false;
         // チェス棋譜
         fens = [];
         break;
@@ -1673,6 +1949,8 @@ window.interval = setInterval(function () {
           streamNotification(user, index);
           widget.streaming(user.id, user.name);
         }
+        // ステミキ表示
+        wsm.show(arguments[1].some(s => s.userId === vueApp.myUserID && s.isActive && s.isReady && s.withSound));
         break;
       // 全部屋ﾙｰﾗ
       case 'server-room-list':
