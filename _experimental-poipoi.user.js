@@ -14,6 +14,10 @@ document.querySelector('head').appendChild(document.createElement('script').appe
   if (window.experimental || location.href.includes('video-tab.html'))
     return;
   window.experimental = true;
+  if (window.iPhoneBookmarklet) {
+    eval(await (await fetch('https://raw.githubusercontent.com/iwamizawa-software/poipoi-extension/refs/heads/main/src/poipoi-extension.js?t=' + (new Date).getTime())).text());
+    return;
+  }
   var migrateButtonContainer = document.createElement('div');
   migrateButtonContainer.id = 'migrateButtonContainer';
   migrateButtonContainer.setAttribute('style', 'position:absolute;top:0;right:20px;z-index:10001');
