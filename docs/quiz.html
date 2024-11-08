@@ -68,7 +68,7 @@ document.write(`
 </div>
 <div id="quiz">
 <p style="float:left;margin:0"><input type="button" value="${t('Next', '次の問題')}" id="next">
-<p style="float:right;margin:0">${t('Time limit ', '残り')}<span data-bind="current.time">60</span>${t(' seconds', '秒')} <input type="button" value="${t('+15', '＋15秒')}" id="extend"></p>
+<p style="float:right;margin:0">${t('Time limit ', '残り')}<span data-bind="current.time">60</span>${t(' seconds', '秒')} <input type="button" value="+15" id="extend"> <input type="button" value="-15" id="reduce"></p>
 <h1 style="clear:both"><span data-bind="quiz.title"></span><br>${t('', '第')}<span data-bind="current.count">1</span>${t(' / ', '問 / 全')}<span data-bind="settings.maxQuestions">10</span>${t('', '問')} (<span data-bind="current.quiz.point">1</span>${t(' points', '点問題')})</h1>
 <div class="quizImage" style="display:none"><img id="quizImage"></div>
 <p data-bind="current.displayed"></p>

@@ -191,6 +191,42 @@ var characters = {
   "uzukumari": {
     "src": "https://gikopoipoi.net/characters/uzukumari/front-standing.svg",
     "style": "top: -69%; left: -98%; width: 190%;"
+  },
+  "giko_basketball": {
+    "src": "https://gikopoipoi.net/characters/giko_basketball/front-standing.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "mikan_naito": {
+    "src": "https://gikopoipoi.net/characters/mikan_naito/front-standing.svg",
+    "style": "top: 13%; left: -48%; width: 190%;"
+  },
+  "giko_shamisen": {
+    "src": "https://gikopoipoi.net/characters/giko_shamisen/front-standing.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "shii_syakuhati": {
+    "src": "https://gikopoipoi.net/characters/shii_syakuhati/front-standing.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "taiko_naito": {
+    "src": "https://gikopoipoi.net/characters/taiko_naito/front-standing.svg",
+    "style": "top: 13%; left: -48%; width: 190%;"
+  },
+  "shobon_raincoat": {
+    "src": "https://gikopoipoi.net/characters/shobon_raincoat/front-standing.svg",
+    "style": "top: -20%; left: -41%; width: 190%;"
+  },
+  "shii_raincoat": {
+    "src": "https://gikopoipoi.net/characters/shii_raincoat/front-standing.svg",
+    "style": "top: 24%; left: -46%; width: 190%;"
+  },
+  "shii_shintaisou": {
+    "src": "https://gikopoipoi.net/characters/shii_shintaisou/front-standing.svg",
+    "style": "top: 24%; left: -46%; width: 190%;"
+  },
+  "shii_toast": {
+    "src": "https://gikopoipoi.net/characters/shii_toast/front-standing.svg",
+    "style": "top: 24%; left: -46%; width: 190%;"
   }
 };
 var elements = {}, settings = {msg: t('Congratulations!', 'おめでとうございます。')}, current = {}, quiz = {data:[], title: t('Quiz', 'クイズ')}, users = {}, rank = [];
@@ -371,6 +407,10 @@ elements.next.onclick = function () {
 };
 elements.extend.onclick = function () {
   current.time += 15;
+  update('current.time');
+};
+elements.reduce.onclick = function () {
+  current.time -= 15;
   update('current.time');
 };
 elements.showSettings.onclick = function () {
