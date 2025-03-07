@@ -674,6 +674,7 @@ var getUserName = user => {
   name = name.replace(/◇|◊|🔶|🔷|🔸|🔹/g, 'O');
   if (name === defaultName)
     name += parseInt(user.id?.slice(-3), 16);
+  return name;
 };
 var getUserIcon = user => (user.isAlternateCharacter && characters[user.characterId + '_alt'] ? characters[user.characterId + '_alt'] : characters[user.characterId]) || {
   src: 'https://play.gikopoi.com/characters/' + user.characterId + '/front-standing.png',
