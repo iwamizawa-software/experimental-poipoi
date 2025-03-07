@@ -1,8 +1,57 @@
 /*
+// アイコンデータの取得
 var chars = {};
-Array.from(document.querySelectorAll('label img')).forEach(img => chars[img.previousElementSibling.value] = {src: img.src, style: img.getAttribute('style')});
-console.log(JSON.stringify(chars, '', 2));
+Array.from(document.querySelectorAll('label img')).forEach(img => {
+  var name = img.previousElementSibling.value;
+  chars[name] = {src: img.src, style: img.getAttribute('style')};
+  var alt = new Image();
+  alt.src = img.src.replace('front-standing', 'front-standing-alt');
+  alt.onload = () => {
+    chars[name + '_alt'] = Object.assign({}, chars[name]);
+    chars[name + '_alt'].src = alt.src;
+  };
+});
+setTimeout(() => console.log(JSON.stringify(chars, '', 2)), 5000);
+
+// 本家で実行
+var characterIconData = {};
+Array.from(document.querySelectorAll('#character-selection label img')).forEach(img => {
+  characterIconData[img.previousElementSibling.value] = true;
+});
+console.log('var characterIconData = ' + JSON.stringify(characterIconData) + ';');
+
+// playgikopoiで実行
+document.querySelector('head').appendChild(document.createElement('style')).textContent = `
+#character-selection label {
+    position: relative;
+    height: 60px;
+    min-width: 60px;
+    margin: 2px;
+    overflow: hidden;
+    display: block;
+    border: 1px solid #999999;
+}
+#character-selection {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    user-select: none;
+}
+#character-selection img{
+    display: block;
+    position: absolute;
+    object-fit: cover;
+    padding:0;
+    height: auto;
+}
+`;
+Object.keys(characterIconData).forEach(name => document.querySelector(`[for="${name}-selection"]`)?.remove());
+Array.from(document.querySelectorAll('#character-selection label img')).forEach(img => img.setAttribute('style', characters[img.previousElementSibling.value]?.style || 'top:24%;left:-50%;width:190%'));
+
 */
+
 var characters = {
   "giko": {
     "src": "https://gikopoipoi.net/characters/giko/front-standing.svg",
@@ -227,6 +276,150 @@ var characters = {
   "shii_toast": {
     "src": "https://gikopoipoi.net/characters/shii_toast/front-standing.svg",
     "style": "top: 24%; left: -46%; width: 190%;"
+  },
+  "shobon_alt": {
+    "src": "https://gikopoipoi.net/characters/shobon/front-standing-alt.svg",
+    "style": "top: -20%; left: -50%; width: 190%;"
+  },
+  "furoshiki_alt": {
+    "src": "https://gikopoipoi.net/characters/furoshiki/front-standing-alt.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "furoshiki_shobon_alt": {
+    "src": "https://gikopoipoi.net/characters/furoshiki_shobon/front-standing-alt.svg",
+    "style": "top: -20%; left: -41%; width: 190%;"
+  },
+  "takenoko_alt": {
+    "src": "https://gikopoipoi.net/characters/takenoko/front-standing-alt.svg",
+    "style": "top: 0%; left: 0%; width: 100%;"
+  },
+  "onigiri_alt": {
+    "src": "https://gikopoipoi.net/characters/onigiri/front-standing-alt.svg",
+    "style": "top: 20%; left: -38%; width: 170%;"
+  },
+  "himawari_alt": {
+    "src": "https://gikopoipoi.net/characters/himawari/front-standing-alt.svg",
+    "style": "top: 0%; left: -47%; width: 190%;"
+  },
+  "george_alt": {
+    "src": "https://gikopoipoi.net/characters/george/front-standing-alt.svg",
+    "style": "top: 13%; left: -48%; width: 190%;"
+  },
+  "tokita_naito_alt": {
+    "src": "https://gikopoipoi.net/characters/tokita_naito/front-standing-alt.svg",
+    "style": "top: 4%; left: -40%; width: 170%;"
+  },
+  "youkanman_alt": {
+    "src": "https://gikopoipoi.net/characters/youkanman/front-standing-alt.svg",
+    "style": "top: -50%; left: -46%; width: 180%;"
+  },
+  "baba_shobon_alt": {
+    "src": "https://gikopoipoi.net/characters/baba_shobon/front-standing-alt.svg",
+    "style": "top: -20%; left: -50%; width: 190%;"
+  },
+  "shii_shintaisou_alt": {
+    "src": "https://gikopoipoi.net/characters/shii_shintaisou/front-standing-alt.svg",
+    "style": "top: 24%; left: -46%; width: 190%;"
+  },
+  "shii_toast_alt": {
+    "src": "https://gikopoipoi.net/characters/shii_toast/front-standing-alt.svg",
+    "style": "top: 24%; left: -46%; width: 190%;"
+  },
+  "mitsugiko": {
+    "src": "https://play.gikopoi.com/characters/mitsugiko/front-standing.svg",
+    "style": "top:-40%;left:-90%;width:190%"
+  },
+  "giko_cop": {
+    "src": "https://play.gikopoi.com/characters/giko_cop/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "giko_batman": {
+    "src": "https://play.gikopoi.com/characters/giko_batman/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "giko_hungover": {
+    "src": "https://play.gikopoi.com/characters/giko_hungover/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "giko_islam": {
+    "src": "https://play.gikopoi.com/characters/giko_islam/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "shii_islam": {
+    "src": "https://play.gikopoi.com/characters/shii_islam/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "giko_shroom": {
+    "src": "https://play.gikopoi.com/characters/giko_shroom/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "akai": {
+    "src": "https://play.gikopoi.com/characters/akai/front-standing.png",
+    "style": "top:-10%;left:-50%;width:190%"
+  },
+  "bif_alien": {
+    "src": "https://play.gikopoi.com/characters/bif_alien/front-standing.png",
+    "style": "top:-40%;left:-60%;width:190%"
+  },
+  "bif_wizard": {
+    "src": "https://play.gikopoi.com/characters/bif_wizard/front-standing.png",
+    "style": "top:-40%;left:-60%;width:190%"
+  },
+  "hotaru": {
+    "src": "https://play.gikopoi.com/characters/hotaru/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "winter_shii": {
+    "src": "https://play.gikopoi.com/characters/winter_shii/front-standing.svg",
+    "style": "top:0%;left:-50%;width:190%"
+  },
+  "longcat": {
+    "src": "https://play.gikopoi.com/characters/longcat/front-standing.png",
+    "style": "top:-30%;left:-50%;width:190%"
+  },
+  "mona": {
+    "src": "https://play.gikopoi.com/characters/mona/front-standing.png",
+    "style": "top:30%;left:-50%;width:190%"
+  },
+  "foe": {
+    "src": "https://play.gikopoi.com/characters/foe/front-standing.svg",
+    "style": "top:-50%;left:-50%;width:190%"
+  },
+  "kimono_giko": {
+    "src": "https://play.gikopoi.com/characters/kimono_giko/front-standing.svg",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "kimono_shii": {
+    "src": "https://play.gikopoi.com/characters/kimono_shii/front-standing.svg",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "sonichu": {
+    "src": "https://play.gikopoi.com/characters/sonichu/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "yume": {
+    "src": "https://play.gikopoi.com/characters/yume/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "giko_gold": {
+    "src": "https://play.gikopoi.com/characters/giko_gold/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "naito_npc": {
+    "src": "https://play.gikopoi.com/characters/naito_npc/front-standing.png",
+    "style": "top:0%;left:-50%;width:190%"
+  },
+  "habbo": {
+    "src": "https://play.gikopoi.com/characters/habbo/front-standing.png",
+    "style": "top:-50%;left:-50%;width:190%"
+  },
+  "blankchan": {
+    "src": "https://play.gikopoi.com/characters/blankchan/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
+  },
+  "goatse": {
+    "src": "https://play.gikopoi.com/characters/goatse/front-standing.png",
+    "style": "top:24%;left:-50%;width:190%"
   }
 };
 var elements = {}, settings = {msg: t('Congratulations!', 'おめでとうございます。')}, current = {}, quiz = {data:[], title: t('Quiz', 'クイズ')}, users = {}, rank = [];
@@ -448,6 +641,44 @@ elements.checkError.onclick = async function () {
   this.value = checkErrorButton;
   alert(t('Completed', 'チェック完了'));
 };
+var removeSpace = str => str.replace(/[\u{0000}\u{0009}-\u{000D}\u{0020}\u{0085}\u{00A0}\u{00AD}\u{034F}\u{061C}\u{070F}\u{115F}\u{1160}\u{1680}\u{17B4}\u{17B5}\u{180E}\u{2000}-\u{200F}\u{2028}-\u{202F}\u{205F}-\u{206F}\u{2800}\u{3000}\u{3164}\u{FEFF}\u{FFA0}\u{110B1}\u{1BCA0}-\u{1BCA3}\u{1D159}\u{1D173}-\u{1D17A}\u{E0000}-\u{E0FFF}]/gu, '');
+var match = (str, cond, removeWorkaround) => {
+  if (!cond || cond.constructor !== Array || typeof str !== 'string')
+    return false;
+  var targets = [];
+  var nospace = removeSpace(str);
+  if (nospace !== str)
+    targets.push(nospace);
+  if (removeWorkaround) {
+    var removed = nospace.split('').filter(c => !removeWorkaround.includes(c)).join('');
+    if (removed !== nospace)
+      targets.push(removed);
+  }
+  targets.push(str);
+  return cond.some(c => {
+    if (!c)
+      return false;
+    if (/^\/.+\/([dgimsuy]*)$/i.test(c)) {
+      var regex = new RegExp(c.slice(1, -(1 + RegExp.$1.length)), RegExp.$1);
+      return targets.some(target => regex.test(target));
+    } else {
+      return targets.some(target => target.includes(c));
+    }
+  });
+};
+var getUserName = user => {
+  var defaultName = t('Anonymous', '名無しさん');
+  var name = user.name || defaultName;
+  if (match(name, ['/' + defaultName + '\\d+/']))
+    name = '(' + name + ')';
+  name = name.replace(/◇|◊|🔶|🔷|🔸|🔹/g, 'O');
+  if (name === defaultName)
+    name += parseInt(user.id?.slice(-3), 16);
+};
+var getUserIcon = user => (user.isAlternateCharacter && characters[user.characterId + '_alt'] ? characters[user.characterId + '_alt'] : characters[user.characterId]) || {
+  src: 'https://play.gikopoi.com/characters/' + user.characterId + '/front-standing.png',
+  style: 'max-width:100%;max-height:100%'
+};
 onmessage = function (event) {
   var args = event.data;
   switch (args[0]) {
@@ -462,6 +693,20 @@ onmessage = function (event) {
     case 'server-user-left-room':
       delete users[args[1]];
       break;
+    case 'server-character-changed':
+      var user = users[args[1]];
+      if (user) {
+        Object.assign(user, {characterId: args[2], isAlternateCharacter: args[3]});
+        var name = getUserName(user);
+        var p = rank.find(p => p.name === name);
+        if (p) {
+          var icon = getUserIcon(user);
+          var img = p.playerElement.querySelector('img');
+          img.src = icon.src;
+          img.setAttribute('style', icon.style);
+        }
+      }
+      break;
     case 'server-bubble-position':
       if (!current?.quiz?.choice)
         break;
@@ -475,19 +720,17 @@ onmessage = function (event) {
         else
           return;
       }
-      var name = users[args[1]]?.name || t('Anonymous', '名無しさん');
+      var user = users[args[1]] || {name: '', characterId: 'giko'};
+      var name = getUserName(user);
       if (current.qualified.includes(name))
         return;
       var p = rank.find(p => p.name === name);
       if (!p) {
-        var char = characters[users[args[1]]?.characterId] || {
-          src: 'https://play.gikopoi.com/characters/' + users[args[1]]?.characterId + '/front-standing.png',
-          style: 'max-width:100%;max-height:100%'
-        };
+        var icon = getUserIcon(user);
         var playerElement = elements.players.appendChild(document.createElement('div'));
         playerElement.style.setProperty('--rank', rank.length);
         playerElement.className = 'player';
-        playerElement.innerHTML = `<figure><img src="${char.src}" style="${char.style}"></figure>`;
+        playerElement.innerHTML = `<figure><img src="${icon.src}" style="${icon.style}"></figure>`;
         playerElement.appendChild(document.createElement('p')).textContent = name;
         var pointElement = playerElement.appendChild(document.createElement('p'));
         pointElement.className = 'point';
@@ -544,7 +787,7 @@ if (window.name) {
   name = '';
 }
 (async () => load(await (await fetch('quiz-sample/' + encodeURIComponent(t('english.txt', '246題.txt')))).text()))();
-var version = 4;
+var version = 5;
 update('version');
 if (location.protocol === 'file:')
   postMessage(["server-update-current-room-state",{"connectedUsers":[{"id":"0","name":"test1","characterId":"golden_furoshiki"},{"id":"1","name":"test2","characterId":"naitoapple"},{"id":"2","name":"test3","characterId":"furoshiki_shobon"},{"id":"3","name":"test4","characterId":"naito"},{"id":"4","name":"test5","characterId":"dark_naito_walking"}]}]);
