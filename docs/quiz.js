@@ -608,8 +608,10 @@ elements.extend.onclick = function () {
   update('current.time');
 };
 elements.reduce.onclick = function () {
-  current.time -= 15;
+  current.time = Math.max(0, current.time - 15);
   update('current.time');
+  if (!current.time)
+    close();
 };
 elements.showSettings.onclick = function () {
   elements.settings.style.display = '';
