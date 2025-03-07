@@ -14,12 +14,12 @@ body{margin:0;margin-bottom:100%}
 #settings{border-bottom:1px solid #000;margin:0;font-size:20px}
 #main{display:flex;flex-direction:row}
 #main *{font-size:var(--font-size)}
-#players{width:30%;--height:calc(var(--font-size) * 3);position:relative}
+#players{width:var(--player-list-width);--height:calc(var(--font-size) * 3);position:relative}
 #players figure{float:left;width:var(--height);height:var(--height);margin:0;position:relative;overflow:hidden}
 #players figure img{position:absolute;}
 #players p{margin:0}
 .player{white-space: nowrap;overflow:hidden;background:#fff;width:100%;position:absolute;border:1px solid #000;top:calc(var(--rank) * var(--height));height:var(--height);transition-duration:2s;transition-property:top}
-#title,#quiz,#finish{width:70%;padding:var(--font-size);display:none}
+#title,#quiz,#finish{width:calc(100% - var(--player-list-width));padding:var(--font-size);display:none}
 .title #title,.quiz #quiz,.finish #finish{display:block;word-wrap:break-word}
 .point{position:absolute;bottom:0;right:0;background:inherit}
 .correct{background:#acf}
@@ -34,7 +34,7 @@ body{margin:0;margin-bottom:100%}
 </head>
 <body>
 <script>
-var t = (en, ja) => location.search === '?en' ? en : ja;
+var t = (en, ja) => location.search.startsWith('?en') ? en : ja;
 if (t(1, 0))
   document.title = 'Quiz';
 document.write(`
@@ -52,6 +52,7 @@ document.write(`
 <li>${t('2nd point bonus x', '2人目の正答者の点数')}<input type="text" value="2" id="secondBonus">${t('', '倍')}</li>
 <li>${t('Time limit', '回答時間')}<input type="text" value="60" id="time">${t('seconds', '秒')}</li>
 <li>${t('Player list font size', '回答者一覧の文字サイズ')}<input type="text" value="36" id="playersFontSize" data-target="players">px</li>
+<li>${t('Player list width', '回答者一覧の幅')}<input type="text" value="30%" id="playerListWidth" data-target="main"></li>
 <li>${t('Quiz font size', 'クイズの文字サイズ')}<input type="text" value="36" id="quizFontSize" data-target="main">px</li>
 <li><label><input type="checkbox" id="random" checked>${t('Random question', 'ランダムに出題')}</label></li>
 <li><label><input type="checkbox" id="autoplay" checked>${t('Auto next', '自動的に次の問題に進む')}</label></li>

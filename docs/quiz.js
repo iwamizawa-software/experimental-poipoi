@@ -518,6 +518,11 @@ elements.playersFontSize.onkeyup = elements.quizFontSize.onkeyup = function () {
   settings[this.id] = this.value;
   saveSettings();
 };
+elements.playerListWidth.onkeyup = function () {
+  elements[this.dataset.target].style.setProperty('--player-list-width', this.value);
+  settings[this.id] = this.value;
+  saveSettings();
+};
 elements.dark.onclick = function () {
   document.documentElement.className = this.checked ? 'dark' : '';
 };
@@ -667,7 +672,7 @@ var match = (str, cond, removeWorkaround) => {
   });
 };
 var getUserName = user => {
-  var defaultName = t('Anonymous', '名無しさん');
+  var defaultName = t(location.search.includes('play') ? 'Spy' : 'Anonymous', '名無しさん');
   var name = user.name || defaultName;
   if (match(name, ['/' + defaultName + '\\d+/']))
     name = '(' + name + ')';
@@ -788,7 +793,7 @@ if (window.name) {
   name = '';
 }
 (async () => load(await (await fetch('quiz-sample/' + encodeURIComponent(t('english.txt', '246題.txt')))).text()))();
-var version = 5;
+var version = 6;
 update('version');
 if (location.protocol === 'file:')
   postMessage(["server-update-current-room-state",{"connectedUsers":[{"id":"0","name":"test1","characterId":"golden_furoshiki"},{"id":"1","name":"test2","characterId":"naitoapple"},{"id":"2","name":"test3","characterId":"furoshiki_shobon"},{"id":"3","name":"test4","characterId":"naito"},{"id":"4","name":"test5","characterId":"dark_naito_walking"}]}]);
