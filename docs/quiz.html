@@ -18,8 +18,8 @@ body{margin:0;margin-bottom:100%}
 #players figure{float:left;width:var(--height);height:var(--height);margin:0;position:relative;overflow:hidden}
 #players figure img{position:absolute;}
 #players p{margin:0}
-.player{white-space: nowrap;overflow:hidden;background:#fff;width:100%;position:absolute;border:1px solid #000;top:calc(var(--rank) * var(--height));height:var(--height);transition-duration:2s;transition-property:top}
-#title,#quiz,#finish{width:calc(100% - var(--player-list-width));padding:var(--font-size);display:none}
+.player{white-space: nowrap;overflow:hidden;background:#fff;width:100%;position:absolute;border:1px solid #000;top:calc(var(--rank) * var(--height));height:var(--height);transition-duration:2s;transition-property:top;box-sizing:border-box}
+#title,#quiz,#finish{width:calc(100% - var(--player-list-width));padding:var(--font-size);display:none;box-sizing:border-box}
 .title #title,.quiz #quiz,.finish #finish{display:block;word-wrap:break-word}
 .point{position:absolute;bottom:0;right:0;background:inherit}
 .correct{background:#acf}
