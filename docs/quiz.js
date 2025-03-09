@@ -676,9 +676,6 @@ var match = (str, cond, removeWorkaround) => {
 var getUserName = user => {
   var defaultName = t(location.search.includes('play') ? 'Spy' : 'Anonymous', '名無しさん');
   var name = user.name || defaultName;
-  if (match(name, ['/' + defaultName + '\\d+/']))
-    name = '(' + name + ')';
-  name = name.replace(/◇|◊|🔶|🔷|🔸|🔹/g, 'O');
   if (name === defaultName)
     name += parseInt(user.id?.slice(-3), 16);
   return name;
