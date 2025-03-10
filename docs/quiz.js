@@ -580,7 +580,6 @@ var requestCheckAnswers = async ({p, ans, end} = {}) => {
   if (!end && time - lastRequest < 5000) {
     clearTimeout(requestTimer);
     requestTimer = setTimeout(requestCheckAnswers, 5000 - (time - lastRequest));
-    console.log('settimeout', p, ans, end, 5000 - (time - lastRequest));
     return;
   }
   var quiz = current.quiz;
