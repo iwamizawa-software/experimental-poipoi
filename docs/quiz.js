@@ -449,6 +449,31 @@ var update = function () {
   }
 };
 Array.from(document.querySelectorAll('[id]')).forEach(element => elements[element.id] = element);
+elements.verifyApiKey.onclick = async () => {
+  alert(await verifyApiKey(elements.apikey.value) ? t('OK', '有効') : t('Failed', 'エラー'));
+};
+elements.makeQuiz.onclick = async () => {
+  if (!elements.apikey.value) {
+    alert(t('Set API key', 'APIキーが無いと出来ません。'));
+    return;
+  }
+  var theme;
+  if (!(theme = prompt(t('Input quiz theme.', 'どんなクイズを作ってほしいか書いてください(少し時間かかります)'))))
+    return;
+  var buttonText = elements.makeQuiz.value;
+  elements.makeQuiz.disabled = true;
+  elements.makeQuiz.value = t('Generating quiz...', '作問中...');
+  var text = await generateQuizWithGemini(t('Output all quiz in English. ', 'すべて日本語で作問してください。') + theme, elements.apikey.value, settings.model);
+  if (text) {
+    quiz.title = theme;
+    update('quiz.title');
+    load(text);
+  } else {
+    alert(t('Failed to generate quiz.', '作問に失敗した'));
+  }
+  elements.makeQuiz.disabled = false;
+  elements.makeQuiz.value = buttonText;
+};
 var reader = new FileReader();
 elements.file.onchange = function (event) {
   reader.readAsText(elements.file.files[0], elements.encoding.value);
@@ -508,7 +533,7 @@ elements.maxQuestions.onkeyup = function () {
   update('settings.maxQuestions');
   saveSettings();
 };
-elements.encoding.onchange = elements.maxAnswers.onkeyup = elements.firstBonus.onkeyup = elements.secondBonus.onkeyup = elements.time.onkeyup = elements.autoplay.onclick = elements.random.onclick = function () {
+elements.encoding.onchange = elements.model.onkeyup = elements.maxAnswers.onkeyup = elements.firstBonus.onkeyup = elements.secondBonus.onkeyup = elements.time.onkeyup = elements.autoplay.onclick = elements.random.onclick = function () {
   settings[this.id] = this.type === 'checkbox' ? this.checked : this.value;
   update('settings.' + this.id);
   saveSettings();
@@ -547,21 +572,81 @@ elements.quizImage.onerror = function (event) {
 elements.quizImage.onload = function () {
   this.parentNode.style.display = '';
 };
+var lastRequest = 0, requestTimer;
+var requestCheckAnswers = async ({p, ans, end} = {}) => {
+  var time = performance.now();
+  if (p && ans)
+    current.msgs.push([p, ans]);
+  if (!end && time - lastRequest < 5000) {
+    clearTimeout(requestTimer);
+    requestTimer = setTimeout(requestCheckAnswers, 5000 - (time - lastRequest));
+    console.log('settimeout', p, ans, end, 5000 - (time - lastRequest));
+    return;
+  }
+  var quiz = current.quiz;
+  var tookLength = 0;
+  try {
+    if (current.msgs.length) {
+      lastRequest = time;
+      tookLength = current.msgs.length;
+      var correctMsgs = await checkAnswers(quiz.question.join(t(' ', '')), quiz.correct, current.msgs, elements.apikey.value, settings.model);
+    } else {
+      var correctMsgs = [];
+    }
+  } catch (err) {
+    if (quiz === current.quiz && end) {
+      console.log(err);
+      current.quiz.correctText += ' AI Error';
+      update('current.quiz.correctText');
+      close();
+    }
+    return;
+  }
+  if (quiz !== current.quiz)
+    return;
+  if (tookLength)
+    current.msgs = current.msgs.slice(tookLength);
+  correctMsgs.forEach(([p, ans]) => {
+    if (current.qualified.includes(p.name))
+      return;
+    if (current.qualified.length >= +settings.maxAnswers) {
+      p.answer = ans + t(':Delayed', '(遅)');
+      return;
+    }
+    p.answer = ans;
+    p.correct = true;
+    p.order = current.qualified.length;
+    current.qualified.push(p.name);
+  });
+  if (end || current.qualified.length >= +settings.maxAnswers)
+    close();
+};
 var timer, close = function () {
   if (!elements.closed.style.display)
     return;
   current.time = 0;
+  update('current.time');
   clearInterval(timer);
+  clearTimeout(requestTimer);
   elements.closed.style.display = '';
-  current.displayed += current.quiz.question.join('');
+  current.displayed += current.quiz.question.join(t(' ', ''));
   update('current.displayed');
   rank.forEach(p => p.displayAnswer());
   rank.sort((a, b) => b.point - a.point).forEach((p, index) => p.setRank(index));
   if (settings.autoplay)
     timer = setTimeout(() => elements.next.onclick(), 5000);
 };
+var timeout = () => {
+  if (!elements.apikey.value) {
+    close();
+    return;
+  }
+  clearInterval(timer);
+  clearTimeout(requestTimer);
+  requestCheckAnswers({end: true});
+};
 var animationTimer, animation = function () {
-  if (!current.time || !current.quiz.question.length)
+  if (current.time <= 0 || !current.quiz.question.length)
     return;
   clearTimeout(animationTimer);
   current.displayed += current.quiz.question.shift() + t(' ', '');
@@ -570,6 +655,7 @@ var animationTimer, animation = function () {
 };
 elements.next.onclick = function () {
   clearInterval(timer);
+  clearTimeout(requestTimer);
   elements.closed.style.display = 'none';
   document.getElementById('youtube').parentNode.innerHTML = '<div id="youtube"></div>';
   rank.forEach(p => p.hideAnswer());
@@ -583,6 +669,7 @@ elements.next.onclick = function () {
     return;
   }
   current.qualified = [];
+  current.msgs = [];
   current.displayed = '';
   current.quiz = quiz.data.splice(settings.random ? Math.floor(Math.random() * quiz.data.length) : 0, 1)[0];
   elements.quizImage.parentNode.style.display = 'none';
@@ -597,7 +684,7 @@ elements.next.onclick = function () {
   current.time = +settings.time;
   timer = setInterval(() => {
     if (--current.time <= 0)
-      close();
+      timeout();
     update('current.time');
   }, 1000);
   animation();
@@ -608,10 +695,12 @@ elements.extend.onclick = function () {
   update('current.time');
 };
 elements.reduce.onclick = function () {
+  if (current.time === 0)
+    return;
   current.time = Math.max(0, current.time - 15);
   update('current.time');
-  if (!current.time)
-    close();
+  if (current.time === 0)
+    timeout();
 };
 elements.showSettings.onclick = function () {
   elements.settings.style.display = '';
@@ -717,7 +806,7 @@ onmessage = function (event) {
         break;
       args[2] = {left: 1, up: 2, down: 3, right: 4}[args[2]];
     case 'server-msg':
-      if (elements.main.className !== 'quiz' || !args[2] || !current.time)
+      if (elements.main.className !== 'quiz' || !args[2] || current.time <= 0)
         return;
       if (current.quiz.choice) {
         if (/^[1234]$/.test(args[2]))
@@ -773,14 +862,17 @@ onmessage = function (event) {
           }
         });
       }
-      if ((p.correct = current.quiz.correct.includes(normalize(p.answer = args[2]))) && !current.quiz.choice) {
+      p.answer = args[2];
+      if (current.quiz.choice)
+        p.ansElement.textContent = '回答済';
+      else if (elements.apikey.value)
+        requestCheckAnswers({p, ans: args[2]});
+      else if (p.correct = current.quiz.correct.includes(normalize(p.answer))) {
         p.order = current.qualified.length;
         current.qualified.push(name);
         if (current.qualified.length >= +settings.maxAnswers)
           close();
       }
-      if (current.quiz.choice)
-        p.ansElement.textContent = '回答済';
       break;
   }
 };
@@ -792,7 +884,7 @@ if (window.name) {
   name = '';
 }
 (async () => load(await (await fetch('quiz-sample/' + encodeURIComponent(t('english.txt', '246題.txt')))).text()))();
-var version = 6;
+var version = 7;
 update('version');
 if (location.protocol === 'file:')
   postMessage(["server-update-current-room-state",{"connectedUsers":[{"id":"0","name":"test1","characterId":"golden_furoshiki"},{"id":"1","name":"test2","characterId":"naitoapple"},{"id":"2","name":"test3","characterId":"furoshiki_shobon"},{"id":"3","name":"test4","characterId":"naito"},{"id":"4","name":"test5","characterId":"dark_naito_walking"}]}]);

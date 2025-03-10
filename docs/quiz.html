@@ -42,10 +42,23 @@ document.write(`
 <div id="ready">
 <ul id="settings">
 <li>Version <span data-bind="version"></span></li>
+<li>
+Gemini API Key
+<input type="password" value="" id="apikey">
+${t('If API key is set, AI will check the answers.', 'APIキーをセットした場合、AIが答え合わせします')}
+</li>
+<li>
+AI Model
+<input type="text" value="gemini-2.0-flash" id="model">
+<input type="button" value="${t('Verify API Key', 'APIキーを検証')}" id="verifyApiKey">
+<input type="button" value="${t('AI makes quiz', 'AIに作問させる')}" id="makeQuiz">
+</li>
 <li>${t('Load quiz file', '問題ファイル読み込み')}<input type="file" id="file" accept=".txt"></li>
 <li>${t('Quiz file encoding', '問題ファイル文字コード')}<select id="encoding"><option selected>UTF-8<option>Shift_JIS<option>EUC-JP<option>UTF-16</select></li>
-<li><input type="button" value="${t('Check URL error (heavy)', 'URLエラーチェック (重い)')}" id="checkError"></li>
-<li><input type="button" value="${t('Reset result', 'ポイントリセット')}" id="reset"></li>
+<li>
+<input type="button" value="${t('Check URL error (heavy)', 'URLエラーチェック (重い)')}" id="checkError">
+<input type="button" value="${t('Reset result', 'ポイントリセット')}" id="reset">
+</li>
 <li>${t('Number of questions', '出題数')}<input type="text" value="10" id="maxQuestions">${t('', '問')}</li>
 <li>${t('Number of qualified players', '')}<input type="text" value="1" id="maxAnswers">${t('', '人正解したら締切')}</li>
 <li>${t('1st point bonus x', '1人目の正答者の点数')}<input type="text" value="3" id="firstBonus">${t('', '倍')}</li>
@@ -85,6 +98,7 @@ document.write(`
 <div style="display:none"><div id="youtube"></div></div>
 `);
 </script>
+<script src="ai.js"></script>
 <script src="quiz.js"></script>
 </body>
 </html>
