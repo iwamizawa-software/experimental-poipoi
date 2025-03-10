@@ -37,11 +37,12 @@ JSONなどの特別な形式は使わず、正解の添字だけをカンマ区�
 
     // APIにリクエスト
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-goog-api-key': key
         },
         body: JSON.stringify(requestData),
       }
@@ -191,7 +192,10 @@ async function verifyApiKey(apiKey) {
         // モデル一覧を取得するエンドポイント（軽量なリクエスト）
         const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
         
-        const response = await fetch(`${apiUrl}?key=${apiKey}`);
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: { 'x-goog-api-key': apiKey }
+        });
         return response.ok;
     } catch (error) {
         console.log("APIキー検証エラー:", error);
