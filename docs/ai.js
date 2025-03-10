@@ -50,10 +50,8 @@ JSONなどの特別な形式は使わず、正解の添字だけをカンマ区�
     // レスポンスを処理
     const data = await response.json();
     
-    if (!response.ok) {
-      console.log('API Error:', data);
-      return [];
-    }
+    if (!response.ok)
+      throw new Error(JSON.stringify(data));
 
     // 応答テキストを取得
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
