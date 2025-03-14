@@ -463,7 +463,7 @@ elements.makeQuiz.onclick = async () => {
   var buttonText = elements.makeQuiz.value;
   elements.makeQuiz.disabled = true;
   elements.makeQuiz.value = t('Generating quiz...', '作問中...');
-  var text = await generateQuizWithGemini(t('Output all quiz in English. ', 'すべて日本語で作問してください。') + theme, elements.apikey.value, settings.model);
+  var text = await generateQuizWithGemini(theme, elements.apikey.value, settings.model, t(true, false));
   if (text) {
     quiz.title = theme;
     update('quiz.title');
@@ -504,7 +504,7 @@ var load = function (text) {
       }
       return '';
     }).replace(/\\n/g, '\n');
-    q.question = qText.split(t(' ', ''));
+    q.question = qText.split('');
     q.correct = fields.map(a => normalize(a));
     q.correctText = fields.join(', ');
     if (q.choice = /^[↖↗↙↘]$/.test(q.correct[0])) {
@@ -588,7 +588,7 @@ var requestCheckAnswers = async ({p, ans, end} = {}) => {
     if (current.msgs.length) {
       lastRequest = time;
       tookLength = current.msgs.length;
-      var correctMsgs = await checkAnswers(quiz.question.join(t(' ', '')), quiz.correct, current.msgs, elements.apikey.value, settings.model);
+      var correctMsgs = await checkAnswers(quiz.question.join(''), quiz.correct, current.msgs, elements.apikey.value, settings.model);
     } else {
       var correctMsgs = [];
     }
@@ -628,7 +628,7 @@ var timer, close = function () {
   clearInterval(timer);
   clearTimeout(requestTimer);
   elements.closed.style.display = '';
-  current.displayed += current.quiz.question.join(t(' ', ''));
+  current.displayed += current.quiz.question.join('');
   update('current.displayed');
   rank.forEach(p => p.displayAnswer());
   rank.sort((a, b) => b.point - a.point).forEach((p, index) => p.setRank(index));
@@ -648,7 +648,9 @@ var animationTimer, animation = function () {
   if (current.time <= 0 || !current.quiz.question.length)
     return;
   clearTimeout(animationTimer);
-  current.displayed += current.quiz.question.shift() + t(' ', '');
+  current.displayed += current.quiz.question.shift();
+  if (t(true, false) && current.quiz.question.length)
+    current.displayed += current.quiz.question.shift();
   update('current.displayed');
   animationTimer = setTimeout(animation, 50);
 };
@@ -883,7 +885,7 @@ if (window.name) {
   name = '';
 }
 (async () => load(await (await fetch('quiz-sample/' + encodeURIComponent(t('english.txt', '246題.txt')))).text()))();
-var version = 7;
+var version = 8;
 update('version');
 if (location.protocol === 'file:')
   postMessage(["server-update-current-room-state",{"connectedUsers":[{"id":"0","name":"test1","characterId":"golden_furoshiki"},{"id":"1","name":"test2","characterId":"naitoapple"},{"id":"2","name":"test3","characterId":"furoshiki_shobon"},{"id":"3","name":"test4","characterId":"naito"},{"id":"4","name":"test5","characterId":"dark_naito_walking"}]}]);

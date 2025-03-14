@@ -67,7 +67,7 @@ JSONなどの特別な形式は使わず、正解の添字だけをカンマ区�
     return correctMsgs;
 }
 
-async function generateQuizWithGemini(theme, apiKey, model = 'gemini-2.0-flash') {
+async function generateQuizWithGemini(theme, apiKey, model = 'gemini-2.0-flash', isEnglish) {
     try {
         // APIキーの検証
         if (!apiKey) {
@@ -91,12 +91,17 @@ async function generateQuizWithGemini(theme, apiKey, model = 'gemini-2.0-flash')
             task: "クイズ問題の生成",
             theme: sanitizedTheme,
             numberOfQuestions: 30,
+            isEnglish,
             outputFormat: {
                 type: "text",
-                description: "各行は1つの問題とカンマ区切りの回答を表します",
-                pattern: "問題,回答 または 問題,回答1,回答2,...",
+                description: "isEnglishがtrueのとき、各行は1つの問題とタブ区切りの回答を表します。isEnglishがfalseのとき、各行は1つの問題とカンマ区切りの回答を表します。",
+                patterns: [
+                    "問題,回答 または 問題,回答1,回答2,...",
+                    "Question\tAnswer Or Question\tAnswer1\tAnswer2\t..."
+                ],
                 constraints: [
-                    "問題文と回答にカンマを含めないこと",
+                    "isEnglishがtrueのとき、問題文と回答にタブを含めず、全て英語で作問すること",
+                    "isEnglishがfalseのとき、問題文と回答にカンマを含めず、すべて日本語で作問すること",
                     "各問題は別々の行に記述すること",
                     "正確に30問のクイズを生成すること",
                     "追加のテキストや説明、マークダウンは含めないこと"
@@ -154,25 +159,19 @@ async function generateQuizWithGemini(theme, apiKey, model = 'gemini-2.0-flash')
             
             // マークダウンのコードブロックがあれば削除
             quizContent = quizContent.replace(/```[\s\S]*?```/g, '').trim();
-            
+            if (isEnglish) {
+                quizContent = quizContent.replace(/(?:\\t)+/g, "\t");
+            }
             // 行に分割して形式を検証
-            const lines = quizContent.split('\n').filter(line => line.trim() !== '');
+            // 各行が正しい形式（少なくとも1つのカンマを含む）かチェック
+            const validLines = quizContent.split('\n').filter(line => line.trim() !== '' && line.includes(isEnglish ? "\t" : ","));
             
-            if (lines.length < 10) { // 30問期待していますが、最低10問は許容
-                console.log("生成された問題数が不足しています:", lines.length);
+            if (validLines.length < 10) { // 30問期待していますが、最低10問は許容
+                console.log("生成された問題数が不足しています:", validLines.length);
                 return "";
             }
             
-            // 各行が正しい形式（少なくとも1つのカンマを含む）かチェック
-            const validLines = lines.filter(line => line.includes(','));
-            
-            if (validLines.length < lines.length) {
-                console.log("一部の行に無効な形式があります");
-                // 有効な行のみ保持
-                quizContent = validLines.join('\n');
-            }
-            
-            return quizContent;
+            return validLines.join('\n');
             
         } catch (parseError) {
             console.log("クイズコンテンツの解析エラー:", parseError);
