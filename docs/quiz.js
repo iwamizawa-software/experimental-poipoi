@@ -277,6 +277,50 @@ var characters = {
     "src": "https://gikopoipoi.net/characters/shii_toast/front-standing.svg",
     "style": "top: 24%; left: -46%; width: 190%;"
   },
+  "pumpkin_shobon": {
+    "src": "https://gikopoipoi.net/characters/pumpkin_shobon/front-standing.svg",
+    "style": "top: -20%; left: -50%; width: 190%;"
+  },
+  "furoshiki_chotto": {
+    "src": "https://gikopoipoi.net/characters/furoshiki_chotto/front-standing.svg",
+    "style": "top: -34%; left: -54%; width: 190%;"
+  },
+  "chindonnya_shobon": {
+    "src": "https://gikopoipoi.net/characters/chindonnya_shobon/front-standing.svg",
+    "style": "top: -20%; left: -50%; width: 190%;"
+  },
+  "giko_megane": {
+    "src": "https://gikopoipoi.net/characters/giko_megane/front-standing.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "shii_megane": {
+    "src": "https://gikopoipoi.net/characters/shii_megane/front-standing.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "giko_headphones": {
+    "src": "https://gikopoipoi.net/characters/giko_headphones/front-standing.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "shii_headphones": {
+    "src": "https://gikopoipoi.net/characters/shii_headphones/front-standing.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "nanamegiko": {
+    "src": "https://gikopoipoi.net/characters/nanamegiko/front-standing.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
+  },
+  "himawari_alt": {
+    "src": "https://gikopoipoi.net/characters/himawari/front-standing-alt.svg",
+    "style": "top: 0%; left: -47%; width: 190%;"
+  },
+  "mikan_naito_alt": {
+    "src": "https://gikopoipoi.net/characters/mikan_naito/front-standing-alt.svg",
+    "style": "top: 13%; left: -48%; width: 190%;"
+  },
+  "takenoko_alt": {
+    "src": "https://gikopoipoi.net/characters/takenoko/front-standing-alt.svg",
+    "style": "top: 0%; left: 0%; width: 100%;"
+  },
   "shobon_alt": {
     "src": "https://gikopoipoi.net/characters/shobon/front-standing-alt.svg",
     "style": "top: -20%; left: -50%; width: 190%;"
@@ -285,25 +329,17 @@ var characters = {
     "src": "https://gikopoipoi.net/characters/furoshiki/front-standing-alt.svg",
     "style": "top: 24%; left: -50%; width: 190%;"
   },
+  "george_alt": {
+    "src": "https://gikopoipoi.net/characters/george/front-standing-alt.svg",
+    "style": "top: 13%; left: -48%; width: 190%;"
+  },
   "furoshiki_shobon_alt": {
     "src": "https://gikopoipoi.net/characters/furoshiki_shobon/front-standing-alt.svg",
     "style": "top: -20%; left: -41%; width: 190%;"
   },
-  "takenoko_alt": {
-    "src": "https://gikopoipoi.net/characters/takenoko/front-standing-alt.svg",
-    "style": "top: 0%; left: 0%; width: 100%;"
-  },
   "onigiri_alt": {
     "src": "https://gikopoipoi.net/characters/onigiri/front-standing-alt.svg",
     "style": "top: 20%; left: -38%; width: 170%;"
-  },
-  "himawari_alt": {
-    "src": "https://gikopoipoi.net/characters/himawari/front-standing-alt.svg",
-    "style": "top: 0%; left: -47%; width: 190%;"
-  },
-  "george_alt": {
-    "src": "https://gikopoipoi.net/characters/george/front-standing-alt.svg",
-    "style": "top: 13%; left: -48%; width: 190%;"
   },
   "tokita_naito_alt": {
     "src": "https://gikopoipoi.net/characters/tokita_naito/front-standing-alt.svg",
@@ -317,109 +353,29 @@ var characters = {
     "src": "https://gikopoipoi.net/characters/baba_shobon/front-standing-alt.svg",
     "style": "top: -20%; left: -50%; width: 190%;"
   },
-  "shii_shintaisou_alt": {
-    "src": "https://gikopoipoi.net/characters/shii_shintaisou/front-standing-alt.svg",
-    "style": "top: 24%; left: -46%; width: 190%;"
-  },
   "shii_toast_alt": {
     "src": "https://gikopoipoi.net/characters/shii_toast/front-standing-alt.svg",
     "style": "top: 24%; left: -46%; width: 190%;"
   },
-  "mitsugiko": {
-    "src": "https://play.gikopoi.com/characters/mitsugiko/front-standing.svg",
-    "style": "top:-40%;left:-90%;width:190%"
+  "pumpkin_shobon_alt": {
+    "src": "https://gikopoipoi.net/characters/pumpkin_shobon/front-standing-alt.svg",
+    "style": "top: -20%; left: -50%; width: 190%;"
   },
-  "giko_cop": {
-    "src": "https://play.gikopoi.com/characters/giko_cop/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
+  "chindonnya_shobon_alt": {
+    "src": "https://gikopoipoi.net/characters/chindonnya_shobon/front-standing-alt.svg",
+    "style": "top: -20%; left: -50%; width: 190%;"
   },
-  "giko_batman": {
-    "src": "https://play.gikopoi.com/characters/giko_batman/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
+  "giko_megane_alt": {
+    "src": "https://gikopoipoi.net/characters/giko_megane/front-standing-alt.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
   },
-  "giko_hungover": {
-    "src": "https://play.gikopoi.com/characters/giko_hungover/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
+  "shii_shintaisou_alt": {
+    "src": "https://gikopoipoi.net/characters/shii_shintaisou/front-standing-alt.svg",
+    "style": "top: 24%; left: -46%; width: 190%;"
   },
-  "giko_islam": {
-    "src": "https://play.gikopoi.com/characters/giko_islam/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "shii_islam": {
-    "src": "https://play.gikopoi.com/characters/shii_islam/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "giko_shroom": {
-    "src": "https://play.gikopoi.com/characters/giko_shroom/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "akai": {
-    "src": "https://play.gikopoi.com/characters/akai/front-standing.png",
-    "style": "top:-10%;left:-50%;width:190%"
-  },
-  "bif_alien": {
-    "src": "https://play.gikopoi.com/characters/bif_alien/front-standing.png",
-    "style": "top:-40%;left:-60%;width:190%"
-  },
-  "bif_wizard": {
-    "src": "https://play.gikopoi.com/characters/bif_wizard/front-standing.png",
-    "style": "top:-40%;left:-60%;width:190%"
-  },
-  "hotaru": {
-    "src": "https://play.gikopoi.com/characters/hotaru/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "winter_shii": {
-    "src": "https://play.gikopoi.com/characters/winter_shii/front-standing.svg",
-    "style": "top:0%;left:-50%;width:190%"
-  },
-  "longcat": {
-    "src": "https://play.gikopoi.com/characters/longcat/front-standing.png",
-    "style": "top:-30%;left:-50%;width:190%"
-  },
-  "mona": {
-    "src": "https://play.gikopoi.com/characters/mona/front-standing.png",
-    "style": "top:30%;left:-50%;width:190%"
-  },
-  "foe": {
-    "src": "https://play.gikopoi.com/characters/foe/front-standing.svg",
-    "style": "top:-50%;left:-50%;width:190%"
-  },
-  "kimono_giko": {
-    "src": "https://play.gikopoi.com/characters/kimono_giko/front-standing.svg",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "kimono_shii": {
-    "src": "https://play.gikopoi.com/characters/kimono_shii/front-standing.svg",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "sonichu": {
-    "src": "https://play.gikopoi.com/characters/sonichu/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "yume": {
-    "src": "https://play.gikopoi.com/characters/yume/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "giko_gold": {
-    "src": "https://play.gikopoi.com/characters/giko_gold/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "naito_npc": {
-    "src": "https://play.gikopoi.com/characters/naito_npc/front-standing.png",
-    "style": "top:0%;left:-50%;width:190%"
-  },
-  "habbo": {
-    "src": "https://play.gikopoi.com/characters/habbo/front-standing.png",
-    "style": "top:-50%;left:-50%;width:190%"
-  },
-  "blankchan": {
-    "src": "https://play.gikopoi.com/characters/blankchan/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
-  },
-  "goatse": {
-    "src": "https://play.gikopoi.com/characters/goatse/front-standing.png",
-    "style": "top:24%;left:-50%;width:190%"
+  "shii_megane_alt": {
+    "src": "https://gikopoipoi.net/characters/shii_megane/front-standing-alt.svg",
+    "style": "top: 24%; left: -50%; width: 190%;"
   }
 };
 var elements = {}, settings = {msg: t('Congratulations!', 'おめでとうございます。')}, current = {}, quiz = {data:[], title: t('Quiz', 'クイズ')}, users = {}, rank = [];
